@@ -1,0 +1,151 @@
+/* General Table Styling */
+table {
+    width: 100%;
+    margin-top: 30px;
+    border-collapse: collapse;
+    background: linear-gradient(145deg, #3a3a3a, #4f4f4f);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Table Header */
+table th {
+    padding: 16px;
+    text-align: left;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 3px solid #3e3e3e;
+}
+
+/* Table Rows */
+table td {
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 15px;
+    color: #f1f1f1;
+    border-bottom: 1px solid #444;
+    transition: background-color 0.3s, transform 0.2s ease-in-out;
+}
+
+/* Zebra Stripes (Alternating Row Colors) */
+table tr:nth-child(even) {
+    background-color: #404040;
+}
+
+/* Hover Effect on Rows */
+table tr:hover {
+    background-color: #555555;
+    transform: scale(1.01);
+}
+
+/* Action Buttons (Edit & Delete) */
+.action-icons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-icons a {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    color: #fff;
+    border: 1px solid transparent;
+}
+
+/* Edit Button */
+.action-icons .btn-warning {
+    background-color: #f39c12;
+    border-color: #e67e22;
+}
+
+.action-icons .btn-warning:hover {
+    background-color: #e67e22;
+    transform: scale(1.05);
+}
+
+/* Delete Button */
+.action-icons .btn-danger {
+    background-color: #e74c3c;
+    border-color: #c0392b;
+}
+
+.action-icons .btn-danger:hover {
+    background-color: #c0392b;
+    transform: scale(1.05);
+}
+
+/* Form Inputs in Modal */
+.modal-body .form-control {
+    border: 1px solid #666;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+    background-color: #2a2a2a;
+    color: #f1f1f1;
+}
+
+/* Form Labels */
+.modal-body label {
+    font-weight: bold;
+    color: #ffffff;
+}
+
+/* Submit & Close Buttons in Modal */
+.modal-footer .btn {
+    padding: 10px 16px;
+    font-size: 14px;
+}
+
+/* Pagination Styling */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #222;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.pagination a {
+    padding: 10px 16px;
+    margin: 0 4px;
+    background-color: #444;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.pagination .active {
+    background-color: #007bff;
+}
+
+.pagination a:hover {
+    background-color: #555;
+    transform: scale(1.05);
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 768px) {
+    table td,
+    table th {
+        font-size: 13px;
+        padding: 10px 14px;
+    }
+
+    .pagination a {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}
