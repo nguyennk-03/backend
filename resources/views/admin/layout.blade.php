@@ -205,13 +205,13 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('reviews') }}">
+                            <a href="{{ route('comments') }}">
                                 <i class="icon-speech"></i>
                                 <span> Bình luận </span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('reviews') }}">
+                            <a href="{{ route('ratings') }}">
                                 <i class="icon-star"></i>
                                 <span> Đánh giá </span>
                             </a>

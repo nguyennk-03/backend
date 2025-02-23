@@ -30,7 +30,7 @@ class AdminController extends Controller
         return view('admin.products.index', compact('products', 'categories', 'brands'));
     }
 
-    public function productAdd(Request $request)
+    public function productadd(Request $request)
     {
         $request->validate([
             'name' => 'required|string',
@@ -47,10 +47,10 @@ class AdminController extends Controller
         }
         $product->save();
 
-        return redirect()->route('products')->with('success', 'Thêm sản phẩm thành công');
+        return redirect()->route('products.index')->with('success', 'Thêm sản phẩm thành công');
     }
 
-    public function productEdit($id)
+    public function productedit($id)
     {
         $product = Product::findOrFail($id);
         $categories = Category::all();
@@ -58,7 +58,7 @@ class AdminController extends Controller
         return view('admin.products.edit', compact('product', 'categories', 'brands'));
     }
 
-    public function productUpdate(Request $request, $id)
+    public function productupdate(Request $request, $id)
     {
         $product = Product::findOrFail($id);
         $product->update($request->all());
@@ -71,7 +71,7 @@ class AdminController extends Controller
         return redirect()->route('products')->with('success', 'Cập nhật sản phẩm thành công');
     }
 
-    public function productDelete($id)
+    public function productdelete($id)
     {
         Product::destroy($id);
         return redirect()->route('products')->with('success', 'Xóa sản phẩm thành công');
@@ -85,25 +85,25 @@ class AdminController extends Controller
         return view('admin.categories.index', compact('categories'));
     }
 
-    public function categoryAdd(Request $request)
+    public function categoryadd(Request $request)
     {
         Category::create($request->all());
         return redirect()->route('categories')->with('success', 'Thêm danh mục thành công');
     }
 
-    public function categoryEdit($id)
+    public function categoryedit($id)
     {
         $category = Category::findOrFail($id);
         return view('admin.categories.edit', compact('category'));
     }
 
-    public function categoryUpdate(Request $request, $id)
+    public function categoryupdate(Request $request, $id)
     {
         Category::findOrFail($id)->update($request->all());
         return redirect()->route('categories')->with('success', 'Cập nhật danh mục thành công');
     }
 
-    public function categoryDelete($id)
+    public function categorydelete($id)
     {
         Category::destroy($id);
         return redirect()->route('categories')->with('success', 'Xóa danh mục thành công');
@@ -117,25 +117,25 @@ class AdminController extends Controller
         return view('admin.brands.index', compact('brands'));
     }
 
-    public function brandAdd(Request $request)
+    public function brandadd(Request $request)
     {
         Brand::create($request->all());
         return redirect()->route('brands')->with('success', 'Thêm thương hiệu thành công');
     }
 
-    public function brandEdit($id)
+    public function brandedit($id)
     {
         $brand = Brand::findOrFail($id);
         return view('admin.brands.edit', compact('brand'));
     }
 
-    public function brandUpdate(Request $request, $id)
+    public function brandupdate(Request $request, $id)
     {
         Brand::findOrFail($id)->update($request->all());
         return redirect()->route('brands')->with('success', 'Cập nhật thương hiệu thành công');
     }
 
-    public function brandDelete($id)
+    public function branddelete($id)
     {
         Brand::destroy($id);
         return redirect()->route('brands')->with('success', 'Xóa thương hiệu thành công');
@@ -149,25 +149,25 @@ class AdminController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
-    public function userAdd(Request $request)
+    public function useradd(Request $request)
     {
         User::create($request->all());
         return redirect()->route('users')->with('success', 'Thêm người dùng thành công');
     }
 
-    public function userEdit($id)
+    public function useredit($id)
     {
         $user = User::findOrFail($id);
         return view('admin.users.edit', compact('user'));
     }
 
-    public function userUpdate(Request $request, $id)
+    public function userupdate(Request $request, $id)
     {
         User::findOrFail($id)->update($request->all());
         return redirect()->route('users')->with('success', 'Cập nhật người dùng thành công');
     }
 
-    public function userDelete($id)
+    public function userdelete($id)
     {
         User::destroy($id);
         return redirect()->route('users')->with('success', 'Xóa người dùng thành công');
@@ -181,25 +181,25 @@ class AdminController extends Controller
         return view('admin.discounts.index', compact('discounts'));
     }
 
-    public function discountAdd(Request $request)
+    public function discountadd(Request $request)
     {
         Discount::create($request->all());
         return redirect()->route('discounts')->with('success', 'Thêm mã giảm giá thành công');
     }
 
-    public function discountEdit($id)
+    public function discountedit($id)
     {
         $discount = Discount::findOrFail($id);
         return view('admin.discounts.edit', compact('discount'));
     }
 
-    public function discountUpdate(Request $request, $id)
+    public function discountupdate(Request $request, $id)
     {
         Discount::findOrFail($id)->update($request->all());
         return redirect()->route('discounts')->with('success', 'Cập nhật mã giảm giá thành công');
     }
 
-    public function discountDelete($id)
+    public function discountdelete($id)
     {
         Discount::destroy($id);
         return redirect()->route('discounts')->with('success', 'Xóa mã giảm giá thành công');
@@ -213,25 +213,25 @@ class AdminController extends Controller
         return view('admin.orders.index', compact('orders'));
     }
 
-    public function orderView($id)
+    public function orderview($id)
     {
         $order = Order::findOrFail($id);
         return view('admin.orders.view', compact('order'));
     }
 
-    public function orderEdit($id)
+    public function orderedit($id)
     {
         $order = Order::findOrFail($id);
         return view('admin.orders.edit', compact('order'));
     }
 
-    public function orderUpdate(Request $request, $id)
+    public function orderupdate(Request $request, $id)
     {
         Order::findOrFail($id)->update($request->all());
         return redirect()->route('orders')->with('success', 'Cập nhật đơn hàng thành công');
     }
 
-    public function orderDelete($id)
+    public function orderdelete($id)
     {
         Order::destroy($id);
         return redirect()->route('orders')->with('success', 'Xóa đơn hàng thành công');
@@ -243,11 +243,31 @@ class AdminController extends Controller
         return view('admin.ratings.index', compact('ratings'));
     }
 
-    public function ratingDelete($id)
+    public function ratingview($id)
+    {
+        $rating = Rating::findOrFail($id);
+        return view('admin.ratings.view', compact('rating'));
+    }
+
+    public function ratingedit($id)
+    {
+        $rating = Rating::findOrFail($id);
+        return view('admin.ratings.edit', compact('rating'));
+    }
+
+    public function ratingupdate(Request $request, $id)
+    {
+        $rating = Rating::findOrFail($id);
+        $rating->update($request->all());
+        return redirect()->route('ratings')->with('success', 'Cập nhật đánh giá thành công!');
+    }
+
+    public function ratingdelete($id)
     {
         Rating::destroy($id);
-        return redirect()->route('ratings')->with('success', 'Xóa đánh giá thành công');
+        return redirect()->route('ratings')->with('success', 'Xóa đánh giá thành công!');
     }
+
 
     // ====================== 💬 Quản lý BÌNH LUẬN ======================
     public function comments()
@@ -256,9 +276,28 @@ class AdminController extends Controller
         return view('admin.comments.index', compact('comments'));
     }
 
-    public function commentDelete($id)
+    public function commentview($id)
+    {
+        $comment = Comment::findOrFail($id);
+        return view('admin.comments.view', compact('comment'));
+    }
+
+    public function commentedit($id)
+    {
+        $comment = Comment::findOrFail($id);
+        return view('admin.comments.edit', compact('comment'));
+    }
+
+    public function commentupdate(Request $request, $id)
+    {
+        $comment = Comment::findOrFail($id);
+        $comment->update($request->all());
+        return redirect()->route('comments')->with('success', 'Cập nhật bình luận thành công!');
+    }
+
+    public function commentdelete($id)
     {
         Comment::destroy($id);
-        return redirect()->route('comments')->with('success', 'Xóa bình luận thành công');
+        return redirect()->route('comments')->with('success', 'Xóa bình luận thành công!');
     }
 }
