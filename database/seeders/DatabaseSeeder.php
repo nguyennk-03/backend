@@ -12,18 +12,18 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             BrandSeeder::class,
             ProductSeeder::class,
-            ImageSeeder::class,
             SizeSeeder::class,
             ColorSeeder::class,
             ProductVariantSeeder::class,
+            ImageSeeder::class,
             UserSeeder::class,
-            CartItemSeeder::class,
+            CartSeeder::class,
             OrderSeeder::class,
             OrderItemSeeder::class,
             PaymentSeeder::class,
-            RatingSeeder::class,
-            CommentSeeder::class,
             DiscountSeeder::class,
+            ReviewSeeder::class,
+            ProductDiscountSeeder::class,
         ]);
     }
 }

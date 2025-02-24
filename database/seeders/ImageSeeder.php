@@ -3,7 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Image;
+use App\Models\ProductVariant;
 use Faker\Factory as Faker;
 
 class ImageSeeder extends Seeder
@@ -11,13 +12,14 @@ class ImageSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        $productIds = DB::table('products')->pluck('id')->toArray();
+        $productVariantIds = ProductVariant::pluck('id')->toArray();
 
-        for ($i = 1; $i <= 50; $i++) { // Tạo 50 ảnh ngẫu nhiên
-            DB::table('images')->insert([
-                'product_id' => $faker->randomElement($productIds),
-                'image_url' => $faker->imageUrl(640, 480, 'fashion'),
+        for ($i = 1; $i <= 30; $i++) {
+            Image::create([
+                'product_variant_id' => $faker->randomElement($productVariantIds),
+                'image_url' => $faker->imageUrl(400, 400, 'fashion'),
                 'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
     }

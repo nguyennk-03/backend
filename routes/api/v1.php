@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\BrandController;
-use App\Http\Controllers\Api\CartItemController;
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ColorController;
@@ -24,7 +24,7 @@ use Illuminate\Http\Request;
 
 // Resource routes
 Route::apiResource('brands', BrandController::class);
-Route::apiResource('cart-items', CartItemController::class);//->middleware('auth:api');
+Route::apiResource('cart-items', CartController::class);//->middleware('auth:api');
 Route::apiResource('categories', CategoryController::class);
 Route::apiResource('products', ProductController::class);
 Route::apiResource('variants', ProductVariantController::class);

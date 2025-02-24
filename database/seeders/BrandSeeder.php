@@ -3,8 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Models\Brand;
 use Faker\Factory as Faker;
 
 class BrandSeeder extends Seeder
@@ -12,15 +11,15 @@ class BrandSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        
+
         for ($i = 1; $i <= 5; $i++) {
-            DB::table('brands')->insert([
+            Brand::create([
                 'name' => $faker->company,
-                'slug' => Str::slug($faker->company),
-                'description' => $faker->sentence(10),
-                'logo' => $faker->imageUrl(100, 100, 'fashion'),
+                'slug' => $faker->slug,
+                'description' => $faker->sentence,
+                'logo' => $faker->imageUrl(200, 200, 'business'),
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ]);
         }
     }

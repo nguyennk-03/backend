@@ -12,7 +12,7 @@ class CreatePaymentsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('user_id');
-            $table->enum('payment_method', ['momo', 'vnpay', 'paypal', 'cod']);
+            $table->enum('payment_method', ['momo', 'vnpay', 'paypal', 'cod'])->default('cod');
             $table->decimal('amount', 10, 2);
             $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
             $table->timestamps();

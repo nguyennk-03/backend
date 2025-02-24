@@ -19,15 +19,8 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'phone',
-        'address',
-        'avatar',
-        'role'
-    ];
+    protected $fillable = ['full_name', 'email', 'password', 'phone', 'address', 'avatar', 'role'];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -55,18 +48,23 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
-    public function tokens()
-    {
-        return $this->morphMany(\Laravel\Sanctum\PersonalAccessToken::class, 'tokenable');
-    }
-
-    public function cartItems()
-    {
-        return $this->hasMany(CartItem::class);
-    }
-
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function cart()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 }

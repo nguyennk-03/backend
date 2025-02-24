@@ -3,7 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Payment;
+use App\Models\Order;
+use App\Models\User;
 use Faker\Factory as Faker;
 
 class PaymentSeeder extends Seeder
@@ -11,14 +13,20 @@ class PaymentSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        for ($i = 1; $i <= 10; $i++) {
-            DB::table('payments')->insert([
-                'order_id' => rand(1, 10),
-                'user_id' => rand(1, 10),
-                'payment_method' => $faker->randomElement(['momo', 'vnpay', 'paypal', 'cod']),
-                'amount' => $faker->randomFloat(2, 500000, 5000000),
-                'status' => $faker->randomElement(['pending', 'completed', 'failed']),
-                'created_at' => now()
+        $orders = Order::all();
+        $users = User::all();
+        $paymentMethods = ['momo', 'vnpay', 'paypal', 'cod'];
+        $paymentStatuses = ['pending', 'completed', 'failed'];
+
+        for ($i = 1; $i <= 50; $i++) { 
+            Payment::create([
+                'order_id' => $orders->random()->id,
+                'user_id' => $users->random()->id,
+                'payment_method' => $faker->randomElement($paymentMethods),
+                'amount' => $faker->randomFloat(2, 10, 1000),
+                'status' => $faker->randomElement($paymentStatuses),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
     }

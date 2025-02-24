@@ -3,7 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\OrderItem;
+use App\Models\Order;
+use App\Models\ProductVariant;
 use Faker\Factory as Faker;
 
 class OrderItemSeeder extends Seeder
@@ -12,20 +14,20 @@ class OrderItemSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        // Lấy danh sách `order_id` và `product_id` từ database
-        $orderIds = DB::table('orders')->pluck('id')->toArray();
-        $productIds = DB::table('product_variants')->pluck('id')->toArray();
+        // Lấy danh sách Order ID và Product Variant ID có sẵn
+        $orderIds = Order::pluck('id')->toArray();
+        $productVariantIds = ProductVariant::pluck('id')->toArray();
 
-        // Tạo dữ liệu giả cho order_items
-        for ($i = 1; $i <= 10; $i++) {
-            DB::table('order_items')->insert([
-                'order_id'   => $faker->randomElement($orderIds),
-                'product_variant_id' => $faker->randomElement($productIds),
-                'quantity'   => $faker->numberBetween(1, 10),
-                'price'      => $faker->randomFloat(2, 500000, 5000000),
+        for ($i = 1; $i <= 50; $i++) {
+            OrderItem::create([
+                'order_id' => $faker->randomElement($orderIds),
+                'product_variant_id' => $faker->randomElement($productVariantIds),
+                'quantity' => $faker->numberBetween(1, 5),
+                'price' => $faker->randomFloat(2, 1000000, 50000000),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
         }
     }
 }
+

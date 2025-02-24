@@ -3,29 +3,29 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\ProductVariant;
+use App\Models\Product;
+use App\Models\Size;
+use App\Models\Color;
 use Faker\Factory as Faker;
 
 class ProductVariantSeeder extends Seeder
 {
-    public function run()
+     public function run()
     {
         $faker = Faker::create();
+        $productIds = Product::pluck('id')->toArray();
+        $sizeIds = Size::pluck('id')->toArray();
+        $colorIds = Color::pluck('id')->toArray();
 
-        // Lấy danh sách ID của các sản phẩm, sizes và colors
-        $productIds = DB::table('products')->pluck('id')->toArray();
-        $imageIds = DB::table('images')->pluck('id')->toArray();
-        $sizeIds = DB::table('sizes')->pluck('id')->toArray();
-        $colorIds = DB::table('colors')->pluck('id')->toArray();
-
-        for ($i = 1; $i <= 30; $i++) { // Tạo 30 biến thể sản phẩm
-            DB::table('product_variants')->insert([
-                'product_id' => $faker->randomElement($productIds),
-                'images_id' => $faker->randomElement($imageIds),
-                'size_id' => $faker->randomElement($sizeIds),
+        for ($i = 1; $i <= 30; $i++) {
+            ProductVariant::create([
+                'product_id' => $faker->randomElement($productIds), 
+                'size_id' => $faker->randomElement($sizeIds),       
                 'color_id' => $faker->randomElement($colorIds),
+                'stock' => $faker->numberBetween(1, 100),
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ]);
         }
     }

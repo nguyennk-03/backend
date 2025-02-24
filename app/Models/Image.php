@@ -4,17 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Product;
 
 class Image extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'image_url'];
+    protected $fillable = ['product_variant_id', 'image_url'];
 
-    // Quan hệ với sản phẩm
-    public function product()
+    public function productVariant()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(ProductVariant::class);
     }
 }
