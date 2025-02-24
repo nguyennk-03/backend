@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->tinyInteger('rating')->unsigned()->comment('Rating từ 1 đến 5');
+            $table->tinyInteger('rating')->unsigned()->comment('Từ 1 đến 5 sao');
             $table->text('comment')->nullable();
             $table->timestamps();
         });

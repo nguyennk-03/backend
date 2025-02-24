@@ -16,7 +16,6 @@ class CategorySeeder extends Seeder
             Category::create([
                 'name' => $faker->word,
                 'slug' => $faker->slug,
-                'description' => $faker->sentence,
                 'parent_id' => null,
                 'created_at' => now(),
                 'updated_at' => now(),

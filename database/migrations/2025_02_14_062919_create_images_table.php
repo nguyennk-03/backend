@@ -10,12 +10,11 @@ class CreateImagesTable extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_variant_id');
-            $table->string('image_url')->nullable();
+            $table->foreignId('product_variant_id')->constrained('product_variants')->onDelete('cascade');
+            $table->string('image_url');
             $table->timestamps();
-
-            $table->foreign('product_variant_id')->references('id')->on('product_variants')->onDelete('cascade');
         });
+
     }
 
     public function down()

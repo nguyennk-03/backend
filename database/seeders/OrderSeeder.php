@@ -14,9 +14,9 @@ class OrderSeeder extends Seeder
         for ($i = 1; $i <= 30; $i++) {
             Order::create([
                 'user_id' => $faker->numberBetween(1, 30),
-                'status' => $faker->randomElement(['pending', 'processing', 'shipped', 'completed', 'canceled']),
+                'status' => $faker->randomElement(['pending', 'completed', 'canceled', 'shipped']),
                 'total_price' => $faker->randomFloat(2, 1000000, 10000000),
-                'payment_status' => $faker->randomElement(['pending', 'paid', 'failed']),
+                'payment_status' => $faker->randomElement(['unpaid', 'paid', 'failed']),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

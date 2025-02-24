@@ -15,7 +15,6 @@ class ProductDiscountSeeder extends Seeder
         $discounts = Discount::all();
 
         foreach ($products as $product) {
-            // Mỗi sản phẩm có thể có 0-2 mã giảm giá
             $appliedDiscounts = $discounts->random(rand(0, 2));
 
             foreach ($appliedDiscounts as $discount) {
