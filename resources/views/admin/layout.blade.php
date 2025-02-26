@@ -3,27 +3,24 @@
 
 <head>
     <meta charset="utf-8">
-    <title>| Admin Board of StepViet</title>
+    <title>Admin Board | StepViet</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description">
     <meta content="Coderthemes" name="author">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- App favicon -->
+
+    <!-- Favicon -->
     <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
 
-    <!-- Plugin CSS -->
-    <link href="{{ asset('libs/jquery-vectormap/jquery-jvectormap-1.2.2.css') }}" rel="stylesheet" type="text/css">
+    <!-- Bootstrap CSS -->
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/icons.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/app.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="">
 
-    <!-- App CSS -->
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('css/icons.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('css/app.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('css/jquery.dataTables.min.css') }}" rel="stylesheet"  />
-    <link href="{{ asset('css/dataTables.bootstrap5.min.css') }}" rel="stylesheet"  />
-    <link href="{{ asset('css/dropify.min.css') }}" rel="stylesheet"  />
-    <link href="{{ asset('css/jquery-3.6.0.min.css') }}" rel="stylesheet"  />
-    <link href="{{ asset('css/bootstrap.bundle.min.css') }}" rel="stylesheet"  />
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet"  />
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
 </head>
 
@@ -51,7 +48,8 @@
                 </li>
 
                 <li class="dropdown notification-list">
-                    <a class="nav-link dropdown-toggle waves-light waves-effect" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle waves-light waves-effect" data-toggle="dropdown" href="#"
+                        role="button" aria-haspopup="false" aria-expanded="false">
                         <i class="fe-bell noti-icon"></i>
                         <span class="badge badge-danger rounded-circle noti-icon-badge">0</span>
                     </a>
@@ -74,7 +72,8 @@
                 </li>
 
                 <li class="dropdown notification-list">
-                    <a class="nav-link dropdown-toggle nav-user mr-0 waves-effect waves-light" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle nav-user mr-0 waves-effect waves-light" data-toggle="dropdown"
+                        href="#" role="button" aria-haspopup="false" aria-expanded="false">
                         <img src="{{ asset('images/users/user-1.jpg') }}" alt="user-image" class="rounded-circle">
                         <span class="pro-user-name ml-1">
                             Marcia J. <i class="mdi mdi-chevron-down"></i>
@@ -205,13 +204,13 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('comments') }}">
+                            <a href="{{ route('reviews') }}">
                                 <i class="icon-speech"></i>
                                 <span> Bình luận </span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('ratings') }}">
+                            <a href="{{ route('reviews') }}">
                                 <i class="icon-star"></i>
                                 <span> Đánh giá </span>
                             </a>
@@ -250,7 +249,8 @@
             <!-- User box -->
             <div class="user-box">
                 <div class="user-img">
-                    <img src="{{ asset('images/users/user-1.jpg') }}" alt="user-img" title="Mat Helme" class="rounded-circle img-fluid">
+                    <img src="{{ asset('images/users/user-1.jpg') }}" alt="user-img" title="Mat Helme"
+                        class="rounded-circle img-fluid">
                     <a href="javascript:void(0);" class="user-edit"><i class="mdi mdi-pencil"></i></a>
                 </div>
 
@@ -308,7 +308,8 @@
                         <div class="inbox-item-img">
                             <img src="{{ asset('images/users/user-6.jpg') }}" class="rounded-circle" alt="">
                         </div>
-                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Adhamdannaway</a></p>
+                        <p class="inbox-item-author"><a href="javascript: void(0);" class="text-dark">Adhamdannaway</a>
+                        </p>
                         <p class="inbox-item-text">This theme is awesome!</p>
                     </div>
                 </div> <!-- end inbox-widget -->
@@ -326,23 +327,23 @@
     <script src="{{ asset('js/vendor.min.js') }}"></script>
 
     <!-- Third Party js-->
-    <script src="{{ asset('libs/peity/jquery.peity.min.js') }}"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Plugins -->
     <script src="{{ asset('libs/apexcharts/apexcharts.min.js') }}"></script>
     <script src="{{ asset('libs/jquery-vectormap/jquery-jvectormap-1.2.2.min.js') }}"></script>
     <script src="{{ asset('libs/jquery-vectormap/jquery-jvectormap-us-merc-en.js') }}"></script>
 
-    <!-- Dashboard init -->
-    <script src="{{ asset('js/pages/dashboard-1.init.js') }}"></script>
-
-    <!-- App js -->
+    <!-- App JS -->
     <script src="{{ asset('js/app.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('js/dropify.min.js') }}"></script>
-    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ asset('js/dataTables.bootstrap5.min.js') }}"></script>
     <script src="{{ asset('js/script.js') }}"></script>
-
+    <script src="{{asset('js/bootstrap.bundle.min.js')  }}"></script>
 </body>
 
 </html>

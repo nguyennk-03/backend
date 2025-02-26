@@ -51,7 +51,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="{{ route('categoryadd') }}" method="POST">
+                            <form action="{{ route('categoryAdd') }}" method="POST">
                                 @csrf
                                 <div class="mb-3">
                                     <label for="name">Tên danh mục</label>
@@ -81,8 +81,8 @@
                         <td>{{ $category->id }}</td>
                         <td>{{ $category->name }}</td>
                         <td class="action-icons">
-                            <a href="{{ route('categoryedit', $category->id) }}" class="btn btn-warning btn-sm">Sửa</a>
-                            <a href="{{ route('categorydelete', $category->id) }}" class="btn btn-danger btn-sm"
+                            <a href="{{ route('categoryEdit', $category->id) }}" class="btn btn-warning btn-sm">Sửa</a>
+                            <a href="{{ route('categoryDelete', $category->id) }}" class="btn btn-danger btn-sm"
                                 onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?')">Xóa</a>
                         </td>
                     </tr>

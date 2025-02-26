@@ -13,10 +13,13 @@ class DiscountSeeder extends Seeder
         $faker = Faker::create();
 
         for ($i = 1; $i <= 20; $i++) {
+            $discountType = $faker->randomElement(['fixed', 'percentage']);
             Discount::create([
                 'code' => strtoupper($faker->bothify('DISCOUNT##??')),
-                'discount_type' => $faker->randomElement(['fixed', 'percentage']),
-                'value' => $faker->randomFloat(2, 5, 50), 
+                'discount_type' => $discountType,
+                'value' => $discountType == 'fixed'
+                    ? $faker->numberBetween(10000, 100000) // Chục ngàn
+                    : $faker->randomFloat(2, 5, 50), // Dưới 50%
                 'start_date' => $faker->dateTimeBetween('-1 month', 'now'),
                 'end_date' => $faker->dateTimeBetween('now', '+1 month'),
                 'max_uses' => $faker->optional()->numberBetween(10, 100),

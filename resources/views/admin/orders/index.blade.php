@@ -16,19 +16,16 @@
             </div>
         </div>
 
-        <!-- Tìm kiếm & Lọc trạng thái -->
         <div class="card shadow-sm rounded-lg mb-3">
             <div class="card-body">
                 <form action="{{ route('orders') }}" method="GET">
                     <div class="row g-3 align-items-end">
-                        <!-- Ô nhập tìm kiếm -->
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Tìm kiếm</label>
                             <input type="text" name="search" class="form-control"
                                 placeholder="Nhập mã đơn hàng hoặc tên khách" value="{{ request('search') }}">
                         </div>
 
-                        <!-- Dropdown lọc trạng thái -->
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Trạng thái</label>
                             <select name="status" class="form-select">
@@ -41,22 +38,23 @@
                             </select>
                         </div>
 
-                        <!-- Nút tìm kiếm & làm mới -->
                         <div class="col-md-3 d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-search"></i> Tìm kiếm
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tìm kiếm</button>
+                            <a href="{{ route('orders') }}" class="btn btn-secondary"><i class="fas fa-sync"></i> Làm
+                                mới</a>
+                        </div>
+
+                        <div class="col-md-2 text-end">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                data-bs-target="#addOrderModal">
+                                <i class="fas fa-plus"></i> Thêm đơn hàng
                             </button>
-                            <a href="{{ route('orders') }}" class="btn btn-secondary">
-                                <i class="fas fa-sync"></i> Làm mới
-                            </a>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
 
-
-        <!-- Danh sách đơn hàng -->
         <div class="card shadow-sm rounded-lg">
             <div class="card-body">
                 <h4 class="header-title font-weight-bold mb-3">Danh Sách Đơn Hàng</h4>
@@ -75,28 +73,27 @@
                         @forelse ($orders as $order)
                             <tr>
                                 <td class="text-center">{{ $order->id }}</td>
-                                <td>{{ $order->user ? $order->user->name : 'Khách vãng lai' }}</td>
+                                <td>{{ $order->user ? $order->user->full_name : 'Khách vãng lai' }}</td>
                                 <td class="text-end">{{ number_format($order->total_price, 0, ',', '.') }} VNĐ</td>
                                 <td class="text-center">
-                                    <span class="badge 
-                                        @if($order->status == 'completed') badge-success
-                                        @elseif($order->status == 'pending') badge-warning
-                                        @elseif($order->status == 'shipped') badge-primary
-                                        @elseif($order->status == 'canceled') badge-danger
-                                        @else badge-secondary @endif">
+                                    <span class="badge @if($order->status == 'completed') badge-success
+                                    @elseif($order->status == 'pending') badge-warning
+                                    @elseif($order->status == 'shipped') badge-primary
+                                    @elseif($order->status == 'canceled') badge-danger
+                                    @else badge-secondary @endif">
                                         {{ ucfirst($order->status) }}
                                     </span>
                                 </td>
                                 <td class="text-center">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <a href="{{ route('orderview', $order->id) }}" class="btn btn-warning btn-sm">
+                                        <a href="{{ route('orderView', $order->id) }}" class="btn btn-warning btn-sm">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('orderedit', $order->id) }}" class="btn btn-info btn-sm">
+                                        <a href="{{ route('orderEdit', $order->id) }}" class="btn btn-info btn-sm">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('orderdelete', $order->id) }}" method="POST"
+                                        <form action="{{ route('orderDelete', $order->id) }}" method="POST"
                                             class="d-inline-block">
                                             @csrf
                                             @method('DELETE')
@@ -115,13 +112,102 @@
                         @endforelse
                     </tbody>
                 </table>
-
-                <!-- Phân trang -->
-                <div class="d-flex justify-content-end">
-                    {{ $orders->links('pagination::bootstrap-5') }}
+                <div class="d-flex justify-content-between align-items-center"
+                    style="background-color: #343a40; color: #fff;">
+                    <div>
+                        Hiển thị <strong>{{ $orders->firstItem() }}</strong> đến
+                        <strong>{{ $orders->lastItem() }}</strong> trong tổng số
+                        <strong>{{ $orders->total() }}</strong> đơn hàng
+                    </div>
+                    <div class="pagination-container">
+                        {{ $orders->links('pagination::bootstrap-5') }}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal Thêm Đơn Hàng -->
+    <div class="modal fade" id="addOrderModal" tabindex="-1" aria-labelledby="addOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addOrderModalLabel">Thêm Đơn Hàng Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('orderAdd') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- Khách hàng -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Khách hàng</label>
+                                <select name="user_id" class="form-select" required>
+                                    <option value="">-- Chọn khách hàng --</option>
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->full_name }} ({{ $user->email }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Số điện thoại -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Số điện thoại</label>
+                                <input type="text" name="phone" class="form-control" required>
+                            </div>
+
+                            <!-- Địa chỉ giao hàng -->
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Địa chỉ giao hàng</label>
+                                <textarea name="address" class="form-control" rows="2" required></textarea>
+                            </div>
+
+                            <!-- Sản phẩm -->
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Chọn sản phẩm</label>
+                                <select name="products[]" class="form-select select2" multiple="multiple" required>
+                                    @foreach ($products as $product)
+                                        <option value="{{ $product->id }}" data-price="{{ $product->price }}">
+                                            {{ $product->name }} - {{ number_format($product->price, 0, ',', '.') }} VNĐ
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Tổng tiền -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Tổng tiền (VNĐ)</label>
+                                <input type="text" name="total_price" id="total_price" class="form-control" readonly>
+                            </div>
+
+                            <!-- Trạng thái đơn hàng -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Trạng thái</label>
+                                <select name="status" class="form-select">
+                                    <option value="pending">Chờ xử lý</option>
+                                    <option value="processing">Đang xử lý</option>
+                                    <option value="shipped">Đã giao</option>
+                                    <option value="completed">Hoàn tất</option>
+                                    <option value="canceled">Đã hủy</option>
+                                </select>
+                            </div>
+
+                            <!-- Ghi chú -->
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Ghi chú</label>
+                                <textarea name="note" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu đơn hàng</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 
 @endsection

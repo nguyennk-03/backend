@@ -51,7 +51,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="{{ route('brandadd') }}" method="POST">
+                            <form action="{{ route('brandAdd') }}" method="POST">
                                 @csrf
                                 <div class="mb-3">
                                     <label for="name">Tên thương hiệu</label>
@@ -81,8 +81,8 @@
                         <td>{{ $brand->id }}</td>
                         <td>{{ $brand->name }}</td>
                         <td class="action-icons">
-                            <a href="{{ route('brandedit', $brand->id) }}" class="btn btn-warning btn-sm">Sửa</a>
-                            <a href="{{ route('branddelete', $brand->id) }}" class="btn btn-danger btn-sm"
+                            <a href="{{ route('brandEdit', $brand->id) }}" class="btn btn-warning btn-sm">Sửa</a>
+                            <a href="{{ route('brandDelete', $brand->id) }}" class="btn btn-danger btn-sm"
                                 onclick="return confirm('Bạn có chắc chắn muốn xóa thương hiệu này?')">Xóa</a>
                         </td>
                     </tr>
