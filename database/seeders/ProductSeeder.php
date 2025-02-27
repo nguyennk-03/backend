@@ -22,6 +22,7 @@ class ProductSeeder extends Seeder
                 'slug' => $faker->slug,
                 'description' => $faker->paragraph,
                 'price' => $faker->randomFloat(2, 1000000, 10000000),
+                'image_url' => Product::getRandomImage(),
                 'category_id' => $faker->randomElement($categoryIds),
                 'brand_id' => $faker->randomElement($brandIds),
                 'created_at' => now(),

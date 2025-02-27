@@ -9,7 +9,7 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'description', 'price', 'category_id', 'brand_id'];
+    protected $fillable = ['name', 'slug', 'description', 'price', 'category_id', 'brand_id', 'image_url'];
 
     public function category()
     {
@@ -38,5 +38,23 @@ class Product extends Model
     public function discounts()
     {
         return $this->belongsToMany(Discount::class, 'product_discounts');
+    }
+    public static function getRandomImage()
+    {
+        $directory = public_path('images/giay'); // Đường dẫn đến thư mục chứa hình ảnh
+        $files = array_diff(scandir($directory), array('..', '.')); // Lấy danh sách tệp tin
+
+        // Lọc ra những tệp tin hình ảnh
+        $images = array_filter($files, function ($file) {
+            return preg_match('/\.(jpg|jpeg|png|gif)$/i', $file);
+        });
+
+        // Nếu có hình ảnh, chọn ngẫu nhiên một hình ảnh
+        if (!empty($images)) {
+            return 'images/giay/' . $images[array_rand($images)];
+        }
+
+        // Trả về null hoặc một đường dẫn mặc định nếu không có hình ảnh
+        return null;
     }
 }

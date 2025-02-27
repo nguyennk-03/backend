@@ -18,7 +18,7 @@ class ImageSeeder extends Seeder
         for ($i = 1; $i <= 30; $i++) {
             Image::create([
                 'product_variant_id' => $faker->randomElement($productVariantIds),
-                'image_url' => 'https://picsum.photos/400/400',
+                'image_url' => Product::getRandomImage(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
