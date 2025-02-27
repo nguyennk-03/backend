@@ -11,13 +11,12 @@
 
     <!-- Favicon -->
     <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
-
+    <link rel="stylesheet" href="{{asset('libs\jquery-vectormap\jquery-jvectormap-1.2.2.css')  }}">
     <!-- Bootstrap CSS -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/icons.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/app.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="">
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
@@ -339,7 +338,7 @@
     <script src="{{ asset('libs/apexcharts/apexcharts.min.js') }}"></script>
     <script src="{{ asset('libs/jquery-vectormap/jquery-jvectormap-1.2.2.min.js') }}"></script>
     <script src="{{ asset('libs/jquery-vectormap/jquery-jvectormap-us-merc-en.js') }}"></script>
-
+    <script src="{{asset('js\pages\dashboard-1.init.js')  }}"></script>
     <!-- App JS -->
     <script src="{{ asset('js/app.min.js') }}"></script>
     <script src="{{ asset('js/script.js') }}"></script>

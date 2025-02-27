@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => (successMessage.style.display = "none"), 2000);
     }
 
-    // Kiểm tra xem jQuery và DataTables có sẵn không
+    // Khởi tạo DataTable nếu có jQuery và DataTables
     if (typeof $ !== "undefined" && $.fn.DataTable) {
         const dataTableOptions = {
             paging: true,
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ordering: true,
             language: {
                 processing: "Đang xử lý...",
-                lengthMenu: "Hiển thị _MENU_ người dùng mỗi trang",
+                lengthMenu: "Hiển thị _MENU_ mục mỗi trang",
                 zeroRecords: "Không tìm thấy dữ liệu",
                 info: "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
                 infoEmpty: "Không có dữ liệu nào",
@@ -26,10 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     previous: "Trước",
                 },
             },
-            order: [[0, "desc"]], // Sắp xếp theo ID giảm dần
+            order: [[0, "desc"]],
         };
 
-        // Danh sách bảng cần áp dụng DataTables
         let tableIds = [
             "UserTable",
             "ProductTable",

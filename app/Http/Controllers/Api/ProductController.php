@@ -11,14 +11,14 @@ class ProductController extends Controller
     // Lấy tất cả các sản phẩm
     public function index()
     {
-        $products = Product::with(['category', 'brand', 'images'])->get();
+        $products = Product::all();
         return response()->json($products);
     }
 
     // Lấy chi tiết một sản phẩm
     public function show($id)
     {
-        $product = Product::with(['category', 'brand', 'images', 'variants'])->findOrFail($id);
+        $product = Product::all()->find($id);
         return response()->json($product);
     }
 

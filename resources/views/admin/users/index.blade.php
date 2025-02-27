@@ -31,45 +31,75 @@
                             <i class="bi bi-plus-circle"></i> Thêm người dùng
                         </button>
                     </div>
-                    <!-- Modal thêm người dùng -->
-                    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserLabel"
+                    <!-- Modal Thêm Người Dùng -->
+                    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel"
                         aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog modal-lg">
                             <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="addUserLabel">Thêm Người Dùng</h5>
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title"><i class="fas fa-user-plus"></i> Thêm Người Dùng</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body">
-                                    <form id="addUserForm" action="{{ route('userAdd') }}" method="POST" autocomplete="off">
-                                        @csrf
-                                        <div class="mb-3">
-                                            <label for="name" class="form-label">Họ và Tên</label>
-                                            <input type="text" id="name" name="name" class="form-control" required>
+                                <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold"><i class="fas fa-user"></i> Họ &
+                                                    Tên</label>
+                                                <input type="text" name="name" class="form-control" required>
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold"><i class="fas fa-envelope"></i>
+                                                    Email</label>
+                                                <input type="email" name="email" class="form-control" required>
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold"><i class="fas fa-phone"></i> Số điện
+                                                    thoại</label>
+                                                <input type="text" name="phone" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold"><i class="fas fa-user-tag"></i> Vai
+                                                    trò</label>
+                                                <select name="role" class="form-select">
+                                                    <option value="user">Người dùng</option>
+                                                    <option value="admin">Quản trị viên</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold"><i class="fas fa-image"></i> Ảnh đại
+                                                    diện</label>
+                                                <input type="file" name="avatar" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold"><i class="fas fa-lock"></i> Mật
+                                                    khẩu</label>
+                                                <input type="password" name="password" class="form-control" required>
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold"><i class="fas fa-lock"></i> Xác nhận mật
+                                                    khẩu</label>
+                                                <input type="password" name="password_confirmation" class="form-control"
+                                                    required>
+                                            </div>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="email" class="form-label">Email</label>
-                                            <input type="email" id="email" name="email" class="form-control" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="phone" class="form-label">Số điện thoại</label>
-                                            <input type="text" id="phone" name="phone" class="form-control" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="role" class="form-label">Vai trò</label>
-                                            <select name="role" id="role" class="form-select">
-                                                <option value="user">Người dùng</option>
-                                                <option value="admin">Quản trị viên</option>
-                                            </select>
-                                        </div>
-                                        <div class="d-flex justify-content-end mt-3">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Đóng</button>
-                                            <button type="submit" class="btn btn-primary ms-2">Lưu</button>
-                                        </div>
-                                    </form>
-                                </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+                                                class="fas fa-times"></i> Đóng</button>
+                                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Thêm Người
+                                            Dùng</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -104,10 +134,10 @@
                                         data-name="{{ $user->full_name }}" data-email="{{ $user->email }}"
                                         data-phone="{{ $user->phone }}" data-role="{{ $user->role }}" data-bs-toggle="modal"
                                         data-bs-target="#editUserModal">
-                                        Sửa
+                                        <i class="fas fa-edit">Sửa</i>
                                     </button>
                                     <a href="{{ route('userDelete', $user->id) }}" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')">Xóa</a>
+                                        onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')"><i class="fas fa-trash-alt">Xóa</i></a>
                                 </td>
                             </tr>
                         @endforeach
@@ -117,51 +147,74 @@
         </div>
     </div>
 
-    <!-- Modal chỉnh sửa người dùng -->
-    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editUserLabel">Chỉnh sửa Người Dùng</h5>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editUserModalLabel"><i class="fas fa-edit"></i> Cập Nhật Người Dùng</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                @if(session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
+                <form id="editUserForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-body">
+                        <input type="hidden" id="userId" name="id">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label fw-bold"><i class="fas fa-user"></i> Họ & Tên</label>
+                                <input type="text" name="name" class="form-control" id="editName" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label fw-bold"><i class="fas fa-envelope"></i> Email</label>
+                                <input type="email" name="email" class="form-control" id="editEmail" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label fw-bold"><i class="fas fa-phone"></i> Số điện
+                                    thoại</label>
+                                <input type="text" name="phone" class="form-control" id="editPhone">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold"><i class="fas fa-user-tag"></i> Vai trò</label>
+                                <select name="role" class="form-select" id="editRole">
+                                    <option value="user">Người dùng</option>
+                                    <option value="admin">Quản trị viên</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold"><i class="fas fa-image"></i> Ảnh đại diện</label>
+                                <input type="file" name="avatar" class="form-control">
+                                <div class="mt-2">
+                                    <img id="previewAvatar" src="" alt="Avatar" class="img-thumbnail" width="100">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label fw-bold"><i class="fas fa-lock"></i> Mật khẩu (Để
+                                    trống nếu không đổi)</label>
+                                <input type="password" name="password" class="form-control">
+                            </div>
+                        </div>
                     </div>
-                @endif
-                <div class="modal-body">
-                    <form action="{{ route('userUpdate', $user->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" id="edit_user_id" name="id">   
-                        <div class="mb-3">
-                            <label for="edit_name" class="form-label">Họ và Tên</label>
-                            <input type="text" id="edit_name" name="name" class="form-control" value="{{ old('full_name', $user->full_name) }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_email" class="form-label">Email</label>
-                            <input type="email" id="edit_email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_phone" class="form-label">Số điện thoại</label>
-                            <input type="text" id="edit_phone" name="phone" class="form-control" value="{{ old('phone', $user->phone) }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_role" class="form-label">Vai trò</label>
-                            <select name="role" id="edit_role" class="form-select">
-                                <option value="user">Người dùng</option>
-                                <option value="admin">Quản trị viên</option>
-                            </select>
-                        </div>
-                        <div class="d-flex justify-content-end mt-3">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                            <button type="submit" class="btn btn-primary ms-2">Lưu thay đổi</button>
-                        </div>
-                    </form>
-                </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>
+                            Đóng</button>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Lưu thay đổi</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+
+    <!-- JavaScript xử lý Modal -->
+    <script>
+
+    </script>
 
 @endsection

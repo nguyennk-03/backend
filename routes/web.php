@@ -17,16 +17,16 @@ Route::prefix('admin')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::post('/users/add', [UserController::class, 'store'])->name('userAdd');
     Route::get('/users/edit/{id}', [UserController::class, 'edit'])->name('userEdit');
-    Route::post('/users/update/{id}', [UserController::class, 'update'])->name('userUpdate');
+    Route::put('/users/update/{id}', [UserController::class, 'update'])->name('userUpdate');
     Route::get('/users/delete/{id}', [UserController::class, 'destroy'])->name('userDelete');
 
     // Products
     Route::get('/products', [ProductController::class, 'index'])->name('products');
     Route::post('/products/add', [ProductController::class, 'store'])->name('productAdd');
-    Route::get('/products/{id}', [ProductController::class, 'show'])->name('productView');
-    Route::get('/products/edit/{id}', [ProductController::class, 'edit'])->name('productEdit');
-    Route::post('/products/update/{id}', [ProductController::class, 'update'])->name('productUpdate');
-    Route::get('/products/delete/{id}', [ProductController::class, 'destroy'])->name('productDelete');
+    Route::get('/products/edit/{id}', [ProductController::class,'edit'])->name('productEdit');
+    Route::put('/products/update/{id}', [ProductController::class, 'update'])->name('productUpdate');
+    Route::delete('/products/delete/{id}', [ProductController::class, 'destroy'])->name('productDelete');
+
 
     // Categories
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
@@ -58,10 +58,10 @@ Route::prefix('admin')->group(function () {
     Route::get('/discounts/delete/{id}', [DiscountController::class, 'destroy'])->name('discountDelete');
 
     // Reviews
-    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews'); 
-    Route::post('/reviews/add', [ReviewController::class, 'store'])->name('reviewAdd'); 
-    Route::get('/reviews/edit/{id}', [ReviewController::class, 'edit'])->name('reviewEdit'); 
-    Route::put('/reviews/update/{id}', [ReviewController::class, 'update'])->name('reviewUpdate'); 
-    Route::delete('/reviews/delete/{id}', [ReviewController::class, 'destroy'])->name('reviewDelete'); 
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews');
+    Route::post('/reviews/add', [ReviewController::class, 'store'])->name('reviewAdd');
+    Route::get('/reviews/edit/{id}', [ReviewController::class, 'edit'])->name('reviewEdit');
+    Route::put('/reviews/update/{id}', [ReviewController::class, 'update'])->name('reviewUpdate');
+    Route::delete('/reviews/delete/{id}', [ReviewController::class, 'destroy'])->name('reviewDelete');
 
 });

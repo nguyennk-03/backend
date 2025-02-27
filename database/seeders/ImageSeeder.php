@@ -14,12 +14,10 @@ class ImageSeeder extends Seeder
     {
         $faker = Faker::create();
         $productVariantIds = ProductVariant::pluck('id')->toArray();
-        $productIds = Product::pluck('id')->toArray();
 
         for ($i = 1; $i <= 30; $i++) {
             Image::create([
                 'product_variant_id' => $faker->randomElement($productVariantIds),
-                'product_id' => $faker->randomElement($productIds),
                 'image_url' => 'https://picsum.photos/400/400',
                 'created_at' => now(),
                 'updated_at' => now(),
