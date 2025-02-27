@@ -26,5 +26,9 @@ class Image extends Model
             'product_id'          // Khóa ngoại trong `product_variants`
         );
     }
+    public function getImageUrlAttribute($value)
+    {
+        return asset('images/' . $value); // Trả về đường dẫn đầy đủ
+    }
 }
 

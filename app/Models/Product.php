@@ -22,7 +22,7 @@ class Product extends Model
     }
     public function images()
     {
-        return $this->hasMany(Image::class, 'product_id');
+        return $this->hasManyThrough(Image::class, ProductVariant::class, 'product_id', 'product_variant_id');
     }
 
     public function product_variants()
