@@ -16,7 +16,7 @@ class BrandSeeder extends Seeder
             Brand::create([
                 'name' => $faker->company,
                 'slug' => $faker->slug,
-                'logo' => $faker->imageUrl(200, 200, 'business'),
+                'logo' => Brand::getRandomImage(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
