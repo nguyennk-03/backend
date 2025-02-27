@@ -15,8 +15,8 @@ class ImageController extends Controller
 
     public function show($id)
     {
-        $image = Image::with('product')->find($id);
-        return $image ? response()->json($image) : response()->json(['message' => 'Image not found'], 404);
+        $images = Image::with('productVariant.product')->get();
+        return $images ? response()->json($images) : response()->json(['message' => 'Image not found'], 404);
     }
 
     public function store(Request $request)

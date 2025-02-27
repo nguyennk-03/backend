@@ -15,5 +15,16 @@ class Image extends Model
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
+    public function product()
+    {
+        return $this->hasOneThrough(
+            Product::class,       // Bảng đích (products)
+            ProductVariant::class,// Bảng trung gian (product_variants)
+            'id',                 // Khóa chính của `product_variants`
+            'id',                 // Khóa chính của `products`
+            'product_variant_id',  // Khóa ngoại trong `images`
+            'product_id'          // Khóa ngoại trong `product_variants`
+        );
+    }
 }
 
