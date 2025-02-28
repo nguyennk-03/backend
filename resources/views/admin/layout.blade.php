@@ -3,24 +3,23 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Admin Board | StepViet</title>
+    <title>Upvex - Responsive Admin Dashboard Template</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description">
     <meta content="Coderthemes" name="author">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="{{asset('images\favicon.ico')  }}">
 
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
-    <link rel="stylesheet" href="{{asset('libs\jquery-vectormap\jquery-jvectormap-1.2.2.css')  }}">
-    <!-- Bootstrap CSS -->
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/icons.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/app.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <!-- plugin css -->
+    <link href="{{asset('libs\jquery-vectormap\jquery-jvectormap-1.2.2.css')  }}" rel="stylesheet" type="text/css">
 
-    <!-- DataTables CSS -->
+    <!-- App css -->
+    <link href="{{asset('css\bootstrap.min.css')  }}" rel="stylesheet" type="text/css">
+    <link href="{{asset('css\icons.min.css')  }}" rel="stylesheet" type="text/css">
+    <link href="{{asset('css\app.min.css')  }}" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-
+    <link rel="stylesheet" href="{{asset('css/style.css')  }}">
 </head>
 
 <body>
@@ -127,7 +126,7 @@
             <div class="logo-box">
                 <a href="{{ route('admin') }}" class="logo text-center">
                     <span class="logo-lg">
-                        <img src="{{ asset('images/logo-sm2.png') }}" alt="" height="100">
+                        <img src="{{ asset('images/logo-sm1.png') }}" alt="" height="100">
                         <!-- <span class="logo-lg-text-light">Upvex</span> -->
                     </span>
                     <span class="logo-sm">
@@ -323,26 +322,23 @@
     <div class="rightbar-overlay"></div>
 
     <!-- Vendor js -->
-    <script src="{{ asset('js/vendor.min.js') }}"></script>
+    <script src="{{asset('js\vendor.min.js')  }}"></script>
 
     <!-- Third Party js-->
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{asset('libs\peity\jquery.peity.min.js')  }}"></script>
+    <script src="{{asset('libs\apexcharts\apexcharts.min.js')  }}"></script>
+    <script src="{{asset('libs\jquery-vectormap\jquery-jvectormap-1.2.2.min.js')  }}"></script>
+    <script src="{{asset('libs\jquery-vectormap\jquery-jvectormap-us-merc-en.js')  }}"></script>
 
-    <!-- DataTables JS -->
+    <!-- Dashboard init -->
+    <script src="{{asset('js\pages\dashboard-1.init.js')}}"></script>
+
+    <!-- App js -->
+    <script src="{{asset('js\app.min.js')}}"></script>
+    <script src="{{asset('js/script.js')  }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-    <!-- Plugins -->
-    <script src="{{ asset('libs/apexcharts/apexcharts.min.js') }}"></script>
-    <script src="{{ asset('libs/jquery-vectormap/jquery-jvectormap-1.2.2.min.js') }}"></script>
-    <script src="{{ asset('libs/jquery-vectormap/jquery-jvectormap-us-merc-en.js') }}"></script>
-    <script src="{{asset('js\pages\dashboard-1.init.js')  }}"></script>
-    <!-- App JS -->
-    <script src="{{ asset('js/app.min.js') }}"></script>
-    <script src="{{ asset('js/script.js') }}"></script>
-    <script src="{{asset('js/bootstrap.bundle.min.js')  }}"></script>
 </body>
 
 </html>

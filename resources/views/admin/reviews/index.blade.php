@@ -111,7 +111,7 @@
         <div class="card shadow-sm rounded-lg">
             <div class="card-body">
                 <h4 class="header-title font-weight-bold mb-3">Danh Sách Đánh Giá</h4>
-                <table class="table table-striped table-bordered align-middle">
+                <table id="ReviewTable" class="table table-striped table-bordered align-middle">
                     <thead class="table-dark">
                         <tr class="text-center">
                             <th>ID</th>

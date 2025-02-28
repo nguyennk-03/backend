@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "UserTable",
             "ProductTable",
             "BrandTable",
+            "CategoryTable",
             "OrderTable",
             "DiscountTable",
             "ReviewTable",

@@ -67,7 +67,7 @@
                 </div>
             </div>
 
-            <table class="table table-striped table-hover">
+            <table id="BrandTable" class="table table-striped table-hover">
                 <thead class="bg-dark text-white">
                     <tr>
                         <th>ID</th>
