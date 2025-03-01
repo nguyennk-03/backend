@@ -12,21 +12,25 @@ class OrderItemSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create();
+        $orders = Order::all();
+        $variants = ProductVariant::all();
 
-        // Lấy danh sách Order ID và Product Variant ID có sẵn
-        $orderIds = Order::pluck('id')->toArray();
-        $productVariantIds = ProductVariant::pluck('id')->toArray();
+        if ($orders->isEmpty() || $variants->isEmpty()) {
+            return;
+        }
+        foreach ($orders as $order) {
+            $randomVariants = $variants->random(rand(1, 3)); 
 
-        for ($i = 1; $i <= 50; $i++) {
-            OrderItem::create([
-                'order_id' => $faker->randomElement($orderIds),
-                'product_variant_id' => $faker->randomElement($productVariantIds),
-                'quantity' => $faker->numberBetween(1, 5),
-                'price' => $faker->randomFloat(2, 1000000, 50000000),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            foreach ($randomVariants as $variant) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'variant_id' => $variant->id,
+                    'quantity' => rand(1, 5),
+                    'price' => $variant->product->price, 
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
     }
 }

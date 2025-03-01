@@ -8,7 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class ProductDiscount extends Model {
     use HasFactory;
 
+    protected $table = 'product_discounts';
+
     protected $fillable = ['product_id', 'discount_id'];
+
+    public $timestamps = false;
 
     public function product() {
         return $this->belongsTo(Product::class);

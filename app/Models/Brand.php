@@ -9,12 +9,20 @@ class Brand extends Model
 {
     use HasFactory;
 
+    protected $table = 'brands';
+
     protected $fillable = ['name', 'slug', 'logo'];
 
     public function products()
     {
         return $this->hasMany(Product::class);
     }
+
+    public function scopeFindBySlug($query, $slug)
+    {
+        return $query->where('slug', $slug)->first();
+    }
+    
     public static function getRandomImage()
     {
         $directory = public_path('images/logo'); // Đường dẫn đến thư mục chứa hình ảnh

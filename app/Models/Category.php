@@ -9,7 +9,9 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'parent_id'];
+    protected $table = 'categories';
+    
+    protected $fillable = ['name', 'slug','image_url', 'parent_id'];
 
     public function children()
     {
@@ -25,6 +27,17 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function allChildren()
+    {
+        return $this->children()->with('allChildren');
+    }
+
+    public function scopeFindBySlug($query, $slug)
+    {
+        return $query->where('slug', $slug)->first();
+    }
+
     public static function getRandomImage()
     {
         $directory = public_path('images/cate'); // Đường dẫn đến thư mục chứa hình ảnh

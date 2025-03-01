@@ -15,7 +15,6 @@ class CreateDiscountsTable extends Migration
             $table->decimal('value', 10, 2);
             $table->dateTime('start_date');
             $table->dateTime('end_date');
-            $table->integer('max_uses')->nullable();
             $table->timestamps();
         });
     }

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class ProductVariant extends Model {
     use HasFactory;
 
+    protected $table = 'product_variants';
+
     protected $fillable = ['product_id', 'size_id', 'color_id', 'stock'];
 
     public function size() {
@@ -23,6 +25,15 @@ class ProductVariant extends Model {
     }
 
     public function images() {
-        return $this->hasMany(Image::class,'product_variant_id');
+        return $this->hasMany(Image::class,'variant_id');
+    }
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class, 'variant_id');
+    }
+    
+    public function carts()
+    {
+        return $this->hasMany(Cart::class, 'variant_id');
     }
 }

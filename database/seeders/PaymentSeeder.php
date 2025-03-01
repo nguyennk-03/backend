@@ -7,6 +7,7 @@ use App\Models\Payment;
 use App\Models\Order;
 use App\Models\User;
 use Faker\Factory as Faker;
+use Faker\Guesser\Name;
 
 class PaymentSeeder extends Seeder
 {
@@ -15,16 +16,11 @@ class PaymentSeeder extends Seeder
         $faker = Faker::create();
         $orders = Order::all();
         $users = User::all();
-        $paymentMethods = ['momo', 'vnpay', 'paypal', 'cod'];
-        $paymentStatuses = ['pending', 'completed', 'failed'];
+        $paymentMethods = ['Momo', 'VNPay', 'PayPal', 'COD'];
 
-        for ($i = 1; $i <= 50; $i++) { 
+        foreach ($paymentMethods as $method) {
             Payment::create([
-                'order_id' => $orders->random()->id,
-                'user_id' => $users->random()->id,
-                'payment_method' => $faker->randomElement($paymentMethods),
-                'amount' => $faker->randomFloat(2, 10, 1000),
-                'status' => $faker->randomElement($paymentStatuses),
+                'name' => $method,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

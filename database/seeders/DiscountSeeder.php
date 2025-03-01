@@ -18,11 +18,10 @@ class DiscountSeeder extends Seeder
                 'code' => strtoupper($faker->bothify('DISCOUNT##??')),
                 'discount_type' => $discountType,
                 'value' => $discountType == 'fixed'
-                    ? $faker->numberBetween(10000, 100000) // Chục ngàn
-                    : $faker->randomFloat(2, 5, 50), // Dưới 50%
+                    ? $faker->numberBetween(10000, 100000) 
+                    : $faker->randomFloat(2, 5, 40),
                 'start_date' => $faker->dateTimeBetween('-1 month', 'now'),
-                'end_date' => $faker->dateTimeBetween('now', '+1 month'),
-                'max_uses' => $faker->optional()->numberBetween(10, 100),
+                'end_date' => $faker->dateTimeBetween('now', '+3 month'),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

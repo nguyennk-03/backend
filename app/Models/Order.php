@@ -5,12 +5,30 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Order extends Model {
+class Order extends Model
+{
     use HasFactory;
 
-    protected $fillable = ['user_id', 'discount_id', 'status', 'total_price', 'payment_status'];
+    protected $table = 'orders';
 
-     public function user()
+    protected $fillable = [
+        'user_id',
+        'discount_id',
+        'payment_id',
+        'status',
+        'total_price',
+        'payment_method',
+        'payment_status',
+    ];
+
+    protected $casts = [
+        'total_price' => 'decimal:2',
+        'status' => 'string',
+        'payment_method' => 'string',
+        'payment_status' => 'string',
+    ];
+
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
@@ -20,7 +38,7 @@ class Order extends Model {
         return $this->belongsTo(Discount::class);
     }
 
-    public function items()
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }
@@ -28,6 +46,18 @@ class Order extends Model {
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+    public static function getStatusList()
+    {
+        return ['pending', 'completed', 'canceled'];
+    }
+    public static function getPaymentMethods()
+    {
+        return ['momo', 'vnpay', 'paypal', 'cod'];
+    }
+    public static function getPaymentStatus()
+    {
+        return ['pending', 'paid', 'failed', 'refunded'];
     }
 }
 

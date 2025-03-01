@@ -6,6 +6,8 @@ use Illuminate\Database\Seeder;
 use App\Models\Product;
 use App\Models\Discount;
 use App\Models\ProductDiscount;
+use Illuminate\Support\Facades\DB;
+
 
 class ProductDiscountSeeder extends Seeder
 {
@@ -13,16 +15,17 @@ class ProductDiscountSeeder extends Seeder
     {
         $products = Product::all();
         $discounts = Discount::all();
+        if ($products->isEmpty() || $discounts->isEmpty()) {
+            return;
+        }
 
         foreach ($products as $product) {
-            $appliedDiscounts = $discounts->random(rand(0, 2));
+            $randomDiscounts = $discounts->random(rand(1, 2)); // Mỗi sản phẩm có thể có 1-2 mã giảm giá
 
-            foreach ($appliedDiscounts as $discount) {
-                ProductDiscount::create([
+            foreach ($randomDiscounts as $discount) {
+                DB::table('product_discounts')->insert([
                     'product_id' => $product->id,
                     'discount_id' => $discount->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
             }
         }

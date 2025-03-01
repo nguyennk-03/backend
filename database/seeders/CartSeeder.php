@@ -16,16 +16,27 @@ class CartSeeder extends Seeder
 
         // Lấy danh sách ID có sẵn
         $userIds = User::pluck('id')->toArray();
-        $productIds = ProductVariant::pluck('id')->toArray();
+        $variantIds = ProductVariant::pluck('id')->toArray();
 
-        for ($i = 1; $i <= 30; $i++) {
-            Cart::create([
-                'user_id' => $faker->randomElement($userIds),
-                'product_variant_id' => $faker->randomElement($productIds),
-                'quantity' => $faker->numberBetween(1, 5),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        foreach ($userIds as $userId) {
+            // Mỗi user có từ 1-5 sản phẩm trong giỏ hàng
+            $cartItems = rand(1, 5);
+            
+        for ($i = 0; $i < $cartItems; $i++) {
+                $variantId = $faker->randomElement($variantIds);
+                $quantity = rand(1, 3);
+                $price = ProductVariant::find($variantId)->product->price ?? 5000000;
+                $totalPrice = $quantity * $price;
+
+                 Cart::create([
+                    'user_id' => $userId,
+                    'variant_id' => $variantId,
+                    'quantity' => $quantity,
+                    'total_price' => $totalPrice,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
     }
 }

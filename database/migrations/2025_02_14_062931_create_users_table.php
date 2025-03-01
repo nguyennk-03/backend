@@ -15,7 +15,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('phone')->nullable();
             $table->string('avatar')->nullable();
-            $table->text('address')->nullable(); // Địa chỉ khách hàng
+            $table->text('address')->nullable(); 
             $table->enum('role', ['admin', 'user'])->default('user');
             $table->timestamps();
         });

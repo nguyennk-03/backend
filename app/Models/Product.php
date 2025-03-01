@@ -4,12 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
 
 class Product extends Model
 {
     use HasFactory;
 
+    protected $table = 'products';
+
     protected $fillable = ['name', 'slug', 'description', 'price', 'category_id', 'brand_id', 'image_url'];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($product) {
+            $product->slug = Str::slug($product->name);
+        });
+    }
 
     public function category()
     {
@@ -22,10 +35,10 @@ class Product extends Model
     }
     public function images()
     {
-        return $this->hasManyThrough(Image::class, ProductVariant::class, 'product_id', 'product_variant_id');
+        return $this->hasManyThrough(Image::class, ProductVariant::class, 'product_id', 'variant_id');
     }
 
-    public function product_variants()
+    public function variants()
     {
         return $this->hasMany(ProductVariant::class, 'product_id');
     }

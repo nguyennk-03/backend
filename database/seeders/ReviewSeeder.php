@@ -22,7 +22,7 @@ class ReviewSeeder extends Seeder
                 'product_id' => $products->random()->id,
                 'rating' => $faker->numberBetween(1, 5),
                 'comment' => $faker->sentence(10),
-                'created_at' => now(),
+                'created_at' => $faker->dateTimeBetween('-6 months', 'now'),
                 'updated_at' => now(),
             ]);
         }

@@ -8,7 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model {
     use HasFactory;
 
-    protected $fillable = ['order_id', 'user_id', 'payment_method', 'status', 'amount', 'transaction_id'];
+    protected $table = 'payments';
+
+    protected $fillable = [
+        'order_id',
+        'payment_method',
+        'payment_status',
+        'transaction_id',
+        'amount',
+        'paid_at',
+    ];
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'paid_at' => 'datetime',
+    ];
 
     public function order() {
         return $this->belongsTo(Order::class);
@@ -16,5 +29,10 @@ class Payment extends Model {
 
     public function user() {
         return $this->belongsTo(User::class);
+    }
+    
+    public function isPaid()
+    {
+        return $this->payment_status === 'paid';
     }
 }
