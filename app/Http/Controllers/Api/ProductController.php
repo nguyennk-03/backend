@@ -13,8 +13,8 @@ class ProductController extends Controller
     {
         $query = Product::query();
 
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+        if ($request->has('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
         }
 
         if ($request->has('category_id')) {
