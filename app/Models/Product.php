@@ -54,7 +54,7 @@ class Product extends Model
     }
     public static function getRandomImage()
     {
-        $directory = public_path('images/giay'); // Đường dẫn đến thư mục chứa hình ảnh
+        $directory = public_path('images/products'); // Đường dẫn đến thư mục chứa hình ảnh
         $files = array_diff(scandir($directory), array('..', '.')); // Lấy danh sách tệp tin
 
         // Lọc ra những tệp tin hình ảnh
@@ -64,7 +64,7 @@ class Product extends Model
 
         // Nếu có hình ảnh, chọn ngẫu nhiên một hình ảnh
         if (!empty($images)) {
-            return 'images/giay/' . $images[array_rand($images)];
+            return 'images/products/' . $images[array_rand($images)];
         }
 
         // Trả về null hoặc một đường dẫn mặc định nếu không có hình ảnh
