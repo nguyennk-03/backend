@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@gmail.com',
             'password' => Hash::make('password'),
             'phone' => '0123456789',
-            'avatar' => null,
+            'avatar' => 'images/users/user-1.jpg',
             'address' => $faker->address,
             'role' => 'admin',
         ]);
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
                 'email' => $faker->unique()->safeEmail,
                 'password' => Hash::make('password'),
                 'phone' => $faker->phoneNumber,
-                'avatar' => null,
+                'avatar' => User::getRandomImage(),
                 'address' => $faker->address,
                 'role' => 'user',
             ]);

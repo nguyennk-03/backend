@@ -5,12 +5,12 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Footcap - Find your footware</title>
+  <title>StepViet | Home</title>
 
   <!-- 
     - favicon
   -->
-  <link rel="shortcut icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="shortcut icon" href="{{asset('favicon.ico')  }}" type="images/favicon.ico">
 
   <!-- 
     - custom css link
@@ -41,7 +41,7 @@
       <div class="overlay" data-overlay></div>
 
       <a href="#" class="logo">
-        <img src="{{asset('images/logo.svg')  }}" width="160" height="50" alt="Footcap logo">
+        <img src="{{asset('images/logo-sm1.png')  }}" height="100" alt="Footcap logo">
       </a>
 
       <button class="nav-open-btn" data-nav-open-btn aria-label="Open Menu">
@@ -55,7 +55,7 @@
         </button>
 
         <a href="#" class="logo">
-          <img src="{{asset('images/logo.svg')  }}" width="190" height="50" alt="Footcap logo">
+          <img src="{{asset('images/logo-sm1.png')  }}" width="190" height="50" alt="Footcap logo">
         </a>
 
         <ul class="navbar-list">
@@ -87,44 +87,37 @@
         </ul>
 
         <ul class="nav-action-list">
-
           <li>
             <button class="nav-action-btn">
               <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
-
               <span class="nav-action-text">Search</span>
             </button>
           </li>
-
+        
           <li>
-            <a href="{{ route('auth.login') }}"><ion-icon name="person-outline" aria-hidden="true"></ion-icon></a>
-              
-
+            <button class="nav-action-btn" onclick="window.location.href='{{ route('auth.login') }}'">
+              <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
               <span class="nav-action-text">Login / Register</span>
-            </a>
+            </button>
           </li>
-
+        
           <li>
             <button class="nav-action-btn">
               <ion-icon name="heart-outline" aria-hidden="true"></ion-icon>
-
               <span class="nav-action-text">Wishlist</span>
-
               <data class="nav-action-badge" value="5" aria-hidden="true">5</data>
             </button>
           </li>
-
+        
           <li>
             <button class="nav-action-btn">
               <ion-icon name="bag-outline" aria-hidden="true"></ion-icon>
-
               <data class="nav-action-text" value="318.00">Basket: <strong>$318.00</strong></data>
-
               <data class="nav-action-badge" value="4" aria-hidden="true">4</data>
             </button>
           </li>
-
         </ul>
+
 
       </nav>
 
