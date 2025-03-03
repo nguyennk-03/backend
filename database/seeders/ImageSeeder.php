@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Image;
 use App\Models\ProductVariant;
-use App\Models\Product;
 use Faker\Factory as Faker;
 
 class ImageSeeder extends Seeder
@@ -18,7 +17,7 @@ class ImageSeeder extends Seeder
         for ($i = 1; $i <= 30; $i++) {
             Image::create([
                 'variant_id' => $faker->randomElement($productVariantIds),
-                'image_url' => Product::getRandomImage(),
+                'image_url' => Image::getRandomImage(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

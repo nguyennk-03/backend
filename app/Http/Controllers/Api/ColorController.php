@@ -8,48 +8,61 @@ use Illuminate\Http\Request;
 
 class ColorController extends Controller
 {
-    // Lấy tất cả các màu sắc
-    public function index()
+    public function index(Request $request)
     {
-        $colors = Color::all();
-        return response()->json($colors);
+        $query = Color::query();
+
+        if ($request->has('name')) {
+            $query->where('name', 'LIKE', '%' . $request->name . '%');
+        }
+
+        if ($request->has('in_use')) {
+            $inUse = filter_var($request->in_use, FILTER_VALIDATE_BOOLEAN);
+            if ($inUse) {
+                $query->whereHas('productVariants');
+            } else {
+                $query->whereDoesntHave('productVariants');
+            }
+        }
+
+        return response()->json($query->get());
     }
 
-    // Lấy chi tiết một màu sắc
+
     public function show($id)
     {
-        $color = Color::findOrFail($id);
-        return response()->json($color);
+        return response()->json(Color::findOrFail($id));
     }
 
-    // Tạo mới một màu sắc
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'color_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
         ]);
 
-        $color = Color::create($validated);
-        return response()->json($color, 201);
+        return response()->json(Color::create($validated), 201);
     }
 
-    // Cập nhật một màu sắc
     public function update(Request $request, $id)
     {
         $color = Color::findOrFail($id);
         $validated = $request->validate([
-            'color_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
         ]);
 
         $color->update($validated);
         return response()->json($color);
     }
 
-    // Xóa một màu sắc
     public function destroy($id)
     {
         $color = Color::findOrFail($id);
+
+        if ($color->productVariants()->exists()) {
+            return response()->json(['error' => 'Không thể xóa màu vì đang được sử dụng trong sản phẩm'], 400);
+        }
+
         $color->delete();
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Màu sắc đã được xóa'], 204);
     }
 }

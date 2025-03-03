@@ -12,15 +12,13 @@ class PaymentController extends Controller
 {
     use AuthorizesRequests;
 
-    // Lấy thông tin thanh toán của một đơn hàng
     public function show($orderId)
     {
         $order = Order::findOrFail($orderId);
 
-        // Kiểm tra quyền truy cập
         $this->authorize('view', $order);
 
-        $payment = $order->payments->first(); // Lấy thanh toán đầu tiên của đơn hàng
+        $payment = $order->payments()->latest()->first();
         if (!$payment) {
             return response()->json(['message' => 'Không tìm thấy thông tin thanh toán.'], 404);
         }
@@ -28,26 +26,25 @@ class PaymentController extends Controller
         return response()->json($payment);
     }
 
-    // Tạo thanh toán cho đơn hàng
     public function store(Request $request, $orderId)
     {
         $order = Order::findOrFail($orderId);
 
-        // Kiểm tra quyền truy cập
         $this->authorize('update', $order);
 
-        // Xác thực dữ liệu đầu vào
+        if ($order->payments()->where('status', 'completed')->exists()) {
+            return response()->json(['message' => 'Đơn hàng đã được thanh toán.'], 400);
+        }
+
         $validated = $request->validate([
             'payment_method' => 'required|in:momo,vnpay,paypal,cod',
             'amount' => 'required|numeric|min:0',
         ]);
 
-        // Kiểm tra xem tổng giá trị thanh toán có đúng không
         if ($validated['amount'] != $order->total_price) {
             return response()->json(['message' => 'Số tiền thanh toán không đúng.'], 400);
         }
 
-        // Tạo thanh toán mới
         $payment = Payment::create([
             'order_id' => $order->id,
             'user_id' => $order->user_id,
@@ -59,45 +56,47 @@ class PaymentController extends Controller
         return response()->json($payment, 201);
     }
 
-    // Cập nhật trạng thái thanh toán
     public function updateStatus(Request $request, $orderId)
     {
         $order = Order::findOrFail($orderId);
 
-        // Kiểm tra quyền truy cập
         $this->authorize('update', $order);
 
-        // Xác thực dữ liệu đầu vào
         $validated = $request->validate([
             'status' => 'required|in:pending,completed,failed',
         ]);
 
-        $payment = $order->payments->first(); // Lấy thanh toán đầu tiên của đơn hàng
+        $payment = $order->payments()->latest()->first();
         if (!$payment) {
             return response()->json(['message' => 'Không tìm thấy thông tin thanh toán.'], 404);
         }
 
-        // Cập nhật trạng thái thanh toán
-        $payment->status = $validated['status'];
-        $payment->save();
+        if ($payment->status === 'completed' && $validated['status'] !== 'completed') {
+            return response()->json(['message' => 'Không thể thay đổi trạng thái của thanh toán đã hoàn thành.'], 400);
+        }
+
+        $payment->update(['status' => $validated['status']]);
 
         return response()->json($payment);
     }
 
-    // Lấy danh sách tất cả các thanh toán
     public function index()
     {
-        $payments = Payment::all();
+        $payments = Payment::orderBy('created_at', 'desc')->paginate(10);
         return response()->json($payments);
     }
 
-    // Xóa thanh toán (nếu cần)
     public function destroy($paymentId)
     {
         $payment = Payment::findOrFail($paymentId);
-        $this->authorize('delete', $payment); // Kiểm tra quyền xóa
+        $this->authorize('delete', $payment); 
+
+        // Không cho phép xóa thanh toán đã hoàn thành
+        if ($payment->status === 'completed') {
+            return response()->json(['message' => 'Không thể xóa thanh toán đã hoàn thành.'], 400);
+        }
 
         $payment->delete();
-        return response()->json(['message' => 'Thanh toán đã được xóa.']);
+        return response()->json(['message' => 'Thanh toán đã được xóa.'], 200);
     }
 }

@@ -8,17 +8,21 @@ use Illuminate\Http\Request;
 
 class DiscountController extends Controller
 {
-    // Lấy tất cả các mã giảm giá
-    public function index()
+    public function index(Request $request)
     {
-        $discounts = Discount::all();
-        return response()->json($discounts);
+        $query = Discount::query();
+
+        // Lọc theo mã giảm giá (nếu có)
+        if ($request->has('code')) {
+            $query->where('code', $request->code);
+        }
+
+        return response()->json($query->get());
     }
 
-    // Áp dụng mã giảm giá
+
     public function applyDiscount(Request $request)
     {
-        // Xác thực mã giảm giá
         $validated = $request->validate([
             'code' => 'required|string|exists:discounts,code',
             'total_price' => 'required|numeric|min:0',
@@ -26,22 +30,28 @@ class DiscountController extends Controller
 
         $discount = Discount::where('code', $validated['code'])->first();
 
-        // Kiểm tra điều kiện mã giảm giá
-        $currentDate = now();
-
-        if ($currentDate < $discount->start_date || $currentDate > $discount->end_date) {
+        // Kiểm tra hiệu lực mã giảm giá
+        if (now() < $discount->start_date || now() > $discount->end_date) {
             return response()->json(['error' => 'Mã giảm giá không còn hiệu lực'], 400);
         }
 
-        // Áp dụng giảm giá vào tổng giá trị
-        $discountAmount = 0;
-        if ($discount->discount_type == 'fixed') {
-            $discountAmount = $discount->value;
-        } else if ($discount->discount_type == 'percentage') {
-            $discountAmount = ($discount->value / 100) * $validated['total_price'];
+        // Kiểm tra số lần sử dụng
+        if ($discount->max_uses !== null && $discount->max_uses <= 0) {
+            return response()->json(['error' => 'Mã giảm giá đã hết lượt sử dụng'], 400);
         }
 
-        $newTotalPrice = $validated['total_price'] - $discountAmount;
+        // Tính giảm giá
+        $discountAmount = ($discount->discount_type === 'percentage')
+            ? ($discount->value / 100) * $validated['total_price']
+            : $discount->value;
+
+        $newTotalPrice = max(0, $validated['total_price'] - $discountAmount);
+
+        // Giảm số lượt sử dụng
+        if ($discount->max_uses !== null) {
+            $discount->decrement('max_uses');
+        }
+
         return response()->json([
             'discount_amount' => $discountAmount,
             'new_total_price' => $newTotalPrice,
@@ -49,7 +59,6 @@ class DiscountController extends Controller
         ]);
     }
 
-    // Tạo mới một mã giảm giá
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -61,11 +70,9 @@ class DiscountController extends Controller
             'max_uses' => 'nullable|integer|min:1',
         ]);
 
-        $discount = Discount::create($validated);
-        return response()->json($discount, 201);
+        return response()->json(Discount::create($validated), 201);
     }
 
-    // Cập nhật một mã giảm giá
     public function update(Request $request, $id)
     {
         $discount = Discount::findOrFail($id);
@@ -83,11 +90,16 @@ class DiscountController extends Controller
         return response()->json($discount);
     }
 
-    // Xóa một mã giảm giá
     public function destroy($id)
     {
         $discount = Discount::findOrFail($id);
+
+        // Kiểm tra nếu mã đã được sử dụng trong đơn hàng
+        if ($discount->orders()->exists()) {
+            return response()->json(['error' => 'Không thể xóa mã giảm giá vì đã được sử dụng'], 400);
+        }
+
         $discount->delete();
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Mã giảm giá đã được xóa'], 204);
     }
 }

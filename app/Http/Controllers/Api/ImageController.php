@@ -15,8 +15,10 @@ class ImageController extends Controller
 
     public function show($id)
     {
-        $images = Image::with('productVariant.product')->get();
-        return $images ? response()->json($images) : response()->json(['message' => 'Image not found'], 404);
+        $image = Image::with('productVariant.product')->find($id);
+        return $image
+            ? response()->json($image)
+            : response()->json(['message' => 'Không tìm thấy hình ảnh!'], 404);
     }
 
     public function store(Request $request)
@@ -27,41 +29,58 @@ class ImageController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images'), $imageName);
+            $imageFile = $request->file('image');
+            $imageName = time() . '.' . $imageFile->getClientOriginalExtension();
+            $imagePath = 'images/products/' . $imageName;
 
-            Image::create([
+            // Lưu file vào thư mục public/images/products/
+            $imageFile->move(public_path('images/products'), $imageName);
+
+            // Tạo đường dẫn đầy đủ
+            $fullImageUrl = asset($imagePath);
+
+            // Lưu vào database
+            $image = Image::create([
                 'product_variant_id' => $request->product_variant_id,
-                'image_url' => $imageName, // Chỉ lưu tên file
+                'image_url' => $fullImageUrl,
             ]);
+
+            return response()->json([
+                'message' => 'Tải ảnh lên thành công!',
+                'data' => $image,
+            ], 201);
         }
 
-        return response()->json(['message' => 'Image uploaded successfully']);
+        return response()->json(['message' => 'Không có ảnh nào được tải lên!'], 400);
     }
-
 
     public function update(Request $request, $id)
     {
         $image = Image::find($id);
-        if (!$image) return response()->json(['message' => 'Image not found'], 404);
+        if (!$image)
+            return response()->json(['message' => 'Không tìm thấy hình ảnh!'], 404);
 
         $image->update($request->all());
-        return response()->json($image);
+        return response()->json([
+            'message' => 'Cập nhật ảnh thành công!',
+            'data' => $image,
+        ]);
     }
 
     public function destroy($id)
     {
-        $image = Image::findOrFail($id);
+        $image = Image::find($id);
+        if (!$image)
+            return response()->json(['message' => 'Không tìm thấy hình ảnh!'], 404);
 
-        // Xóa file trong thư mục public/images/
-        $imagePath = public_path('images/' . $image->image_url);
-        if (file_exists($imagePath)) {
+        // Kiểm tra và xóa file ảnh
+        $imagePath = public_path(str_replace(asset('/'), '', $image->image_url));
+        if (file_exists($imagePath) && is_file($imagePath)) {
             unlink($imagePath);
         }
 
         $image->delete();
 
-        return response()->json(['message' => 'Image deleted successfully']);
+        return response()->json(['message' => 'Xóa ảnh thành công!']);
     }
-
 }

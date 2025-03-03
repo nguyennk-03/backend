@@ -8,56 +8,56 @@ use Illuminate\Http\Request;
 
 class SizeController extends Controller
 {
-    // Lấy tất cả các kích thước
-    public function index()
+    // Lấy danh sách kích thước với phân trang
+    public function index(Request $request)
     {
-        $sizes = Size::all();
+        $query = Size::query();
 
-        return response()->json($sizes);
+        if ($request->has('size')) {
+            $query->where('size', 'like', '%' . $request->size . '%');
+        }
+
+        return response()->json($query->orderBy('size')->paginate(10));
     }
 
-    // Tạo mới một kích thước
     public function store(Request $request)
     {
-        // Xác thực dữ liệu đầu vào
         $validated = $request->validate([
             'size' => 'required|string|unique:sizes,size|max:50',
         ]);
 
-        // Tạo mới một kích thước
-        $size = Size::create([
-            'size' => $validated['size'],
-        ]);
+        $size = Size::create($validated);
 
-        return response()->json($size, 201);
+        return response()->json($size->only(['id', 'size']), 201);
     }
 
-    // Cập nhật kích thước
-    public function update(Request $request, $sizeId)
+    public function update(Request $request, $id)
     {
-        $size = Size::findOrFail($sizeId);
+        $size = Size::findOrFail($id);
 
-        // Xác thực dữ liệu đầu vào
         $validated = $request->validate([
             'size' => 'required|string|unique:sizes,size,' . $size->id . '|max:50',
         ]);
 
-        // Cập nhật kích thước
-        $size->update([
-            'size' => $validated['size'],
-        ]);
+        $size->update($validated);
 
-        return response()->json($size);
+        return response()->json($size->only(['id', 'size']));
     }
 
-    // Xóa kích thước
-    public function destroy($sizeId)
+    public function destroy($id)
     {
-        $size = Size::findOrFail($sizeId);
+        try {
+            $size = Size::findOrFail($id);
 
-        // Xóa kích thước
-        $size->delete();
+            if ($size->products()->count() > 0) {
+                return response()->json(['error' => 'Không thể xóa kích thước này vì đang được sử dụng.'], 400);
+            }
 
-        return response()->json(['message' => 'Kích thước đã được xóa.']);
+            $size->delete();
+
+            return response()->json(['message' => 'Kích thước đã được xóa.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Đã xảy ra lỗi khi xóa kích thước.'], 500);
+        }
     }
 }

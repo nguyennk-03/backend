@@ -8,21 +8,33 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    // Lấy tất cả các danh mục
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::with('children')->get();
-        return response()->json($categories);
+        $query = Category::with('children');
+
+        if ($request->filled('parent_id')) {
+            $query->where('parent_id', $request->parent_id);
+        }
+
+        if ($request->filled('name')) {
+            $query->where('name', 'LIKE', '%' . $request->name . '%');
+        }
+
+        if ($request->filled('sort_by') && in_array($request->sort_by, ['name', 'created_at'])) {
+            $sortOrder = $request->sort_order === 'desc' ? 'desc' : 'asc';
+            $query->orderBy($request->sort_by, $sortOrder);
+        }
+
+        return response()->json($query->get()); 
     }
 
-    // Lấy chi tiết một danh mục
+
     public function show($id)
     {
         $category = Category::with('children')->findOrFail($id);
         return response()->json($category);
     }
 
-    // Tạo mới một danh mục
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -35,7 +47,6 @@ class CategoryController extends Controller
         return response()->json($category, 201);
     }
 
-    // Cập nhật một danh mục
     public function update(Request $request, $id)
     {
         $category = Category::findOrFail($id);
@@ -49,7 +60,6 @@ class CategoryController extends Controller
         return response()->json($category);
     }
 
-    // Xóa một danh mục
     public function destroy($id)
     {
         $category = Category::findOrFail($id);

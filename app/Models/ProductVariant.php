@@ -27,7 +27,7 @@ class ProductVariant extends Model {
     public function images() {
         return $this->hasMany(Image::class,'variant_id');
     }
-    public function orderItems()
+    public function items()
     {
         return $this->hasMany(OrderItem::class, 'variant_id');
     }

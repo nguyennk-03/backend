@@ -5,24 +5,50 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ProductController extends Controller
 {
-    // Lấy tất cả các sản phẩm
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
+        $query = Product::query();
+
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->has('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->has('brand_id')) {
+            $query->where('brand_id', $request->brand_id);
+        }
+
+        if ($request->has(['start_date', 'end_date'])) {
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        if ($request->has('sort')) {
+            $sort = $request->sort === 'price_asc' ? 'asc' : 'desc';
+            $query->orderBy('price', $sort);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $products = $query->get();
+
         return response()->json($products);
     }
 
-    // Lấy chi tiết một sản phẩm
     public function show($id)
     {
-        $product = Product::all()->find($id);
+        $product = Product::findOrFail($id);
         return response()->json($product);
     }
 
-    // Tạo mới một sản phẩm
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -39,7 +65,6 @@ class ProductController extends Controller
         return response()->json($product, 201);
     }
 
-    // Cập nhật một sản phẩm
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
@@ -57,7 +82,6 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
-    // Xóa một sản phẩm
     public function destroy($id)
     {
         $product = Product::findOrFail($id);

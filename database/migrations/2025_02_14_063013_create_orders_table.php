@@ -13,9 +13,11 @@ class CreateOrdersTable extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('discount_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('payment_id')->nullable()->constrained('payments')->onDelete('set null');
-            $table->enum('status', ['pending', 'completed', 'canceled'])->default('pending');
-            $table->decimal('total_price', 10, 2);
+
+            $table->enum('status', ['pending', 'processing', 'completed', 'canceled'])->default('pending');
+            $table->decimal('total_price', 10, 2)->check('total_price >= 0');
             $table->enum('payment_method', ['momo', 'vnpay', 'paypal', 'cod'])->default('cod');
+
             $table->timestamps();
         });
 
