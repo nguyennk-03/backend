@@ -3,24 +3,32 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Brand;
 use Illuminate\Support\Str;
-use Faker\Factory as Faker;
+use App\Models\Brand;
 
 class BrandSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create();
+        $brands = [
+            ['id' => 1, 'name' => 'Adidas', 'slug' => 'adidas', 'logo' => 'images/brands/adidas.png'],
+            ['id' => 2, 'name' => 'Asics', 'slug' => 'asics', 'logo' => 'images/brands/asics.png'],
+            ['id' => 3, 'name' => 'Bata', 'slug' => 'bata', 'logo' => 'images/brands/bata.png'],
+            ['id' => 4, 'name' => 'Nike', 'slug' => 'nike', 'logo' => 'images/brands/nike.png'],
+            ['id' => 5, 'name' => 'Puma', 'slug' => 'puma', 'logo' => 'images/brands/puma.png'],
+        ];
 
-        for ($i = 1; $i <= 5; $i++) {
-            Brand::create([
-                'name' => $faker->company,
-                'slug' => Str::slug($faker->company),
-                'logo' => Brand::getRandomImage(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        foreach ($brands as $brand) {
+            Brand::updateOrCreate(
+                ['id' => $brand['id']],  
+                [
+                    'name' => $brand['name'],
+                    'slug' => Str::slug($brand['name']),
+                    'logo' => $brand['logo'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
     }
 }
