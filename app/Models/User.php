@@ -11,15 +11,11 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use Notifiable, HasFactory;
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = ['full_name', 'email', 'password', 'phone', 'address', 'avatar', 'role'];
+    use HasApiTokens, Notifiable, HasFactory;
+
+    const ROLE_ADMIN = 'admin';
+    const ROLE_USER = 'user';
+    protected $fillable = ['name', 'email', 'password', 'phone', 'address', 'avatar', 'role'];
 
 
     /**
@@ -28,7 +24,7 @@ class User extends Authenticatable
      * @var list<string>
      */
 
-    protected $table = 'users'; 
+    protected $table = 'users';
     protected $hidden = [
         'password',
         'remember_token',
@@ -48,7 +44,11 @@ class User extends Authenticatable
     }
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return $this->role === self::ROLE_ADMIN;
+    }
+    public function isUser()
+    {
+        return $this->role === self::ROLE_USER; 
     }
     public function orders()
     {

@@ -10,81 +10,57 @@ use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
-    /**
-     * Hiển thị trang đăng nhập
-     */
-    public function login()
-    {
-        return view('auth.login');
-    }
-
-    /**
-     * Xử lý đăng nhập
-     */
-    public function loginPost(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|min:6',
-        ]);
-
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
-            return redirect()->route('dashboard')->with('success', 'Đăng nhập thành công!');
-        }
-
-        return back()->withErrors(['email' => 'Email hoặc mật khẩu không đúng!']);
-    }
-
-    /**
-     * Hiển thị trang đăng ký
-     */
-    public function register()
-    {
-        return view('auth.register');
-    }
-
-    /**
-     * Xử lý đăng ký
-     */
-    public function registerPost(Request $request)
+    // Đăng ký tài khoản
+    public function register(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('auth.login')->with('success', 'Đăng ký thành công, hãy đăng nhập!');
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'User registered successfully',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
     }
 
-    /**
-     * Hiển thị trang dashboard (chỉ cho người đăng nhập)
-     */
-    public function dashboard()
+    // Đăng nhập
+    public function login(Request $request)
     {
-        if (Auth::check()) {
-            return view('dashboard');
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return redirect()->route('auth.login')->withErrors(['error' => 'Bạn cần đăng nhập trước!']);
+        $user = Auth::user();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login successful',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
     }
 
-    /**
-     * Xử lý đăng xuất
-     */
-    public function logout()
+    // Đăng xuất
+    public function logout(Request $request)
     {
-        Auth::logout();
-        Session::flush();
+        $request->user()->tokens()->delete();
 
-        return redirect()->route('auth.login')->with('success', 'Bạn đã đăng xuất thành công!');
+        return response()->json(['message' => 'Logged out successfully']);
     }
 }
