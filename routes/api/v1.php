@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
@@ -11,37 +12,41 @@ use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderItemController;
 use App\Http\Controllers\Api\PaymentController;
-use App\Http\Controllers\Api\SizeController;
+use App\Http\Controllers\Api\SizeController;    
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\ProductVariantController;
 use App\Http\Controllers\Api\ReviewController;
 use Illuminate\Support\Facades\Route;
 
-// Nhóm API với tiền tố "api/v1/"
 Route::prefix('v1')->group(function () {
 
-    // Routes quản lý sản phẩm
-    Route::apiResource('products', ProductController::class);
-    Route::apiResource('categories', CategoryController::class);
-    Route::apiResource('brands', BrandController::class);
+    Route::apiResource('products', ProductController::class)->only(['index', 'show']);
+    Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
+    Route::apiResource('brands', BrandController::class)->only(['index', 'show']);
+    Route::apiResource('reviews', ReviewController::class)->only(['index', 'show']);
 
-    // Routes quản lý giỏ hàng, đơn hàng, thanh toán
-    Route::apiResource('carts', CartController::class);
-    Route::apiResource('orders', OrderController::class);
-    Route::apiResource('order-items', OrderItemController::class);
-    Route::apiResource('payments', PaymentController::class);
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
 
-    // Routes quản lý biến thể sản phẩm
-    Route::apiResource('variants', ProductVariantController::class);
-    Route::apiResource('colors', ColorController::class);
-    Route::apiResource('sizes', SizeController::class);
+    Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+        Route::apiResources([
+            'products' => ProductController::class,
+            'categories' => CategoryController::class,
+            'brands' => BrandController::class,
+            'carts' => CartController::class,
+            'orders' => OrderController::class,
+            'order-items' => OrderItemController::class,
+            'payments' => PaymentController::class,
+            'variants' => ProductVariantController::class,
+            'colors' => ColorController::class,
+            'sizes' => SizeController::class,
+            'images' => ImageController::class,
+            'reviews' => ReviewController::class,
+            'discounts' => DiscountController::class,
+            'product-discounts' => ProductDiscountController::class,
+            'users' => UsersController::class,
+        ]);
+    });
 
-    // Routes quản lý hình ảnh, đánh giá, giảm giá
-    Route::apiResource('images', ImageController::class);
-    Route::apiResource('reviews', ReviewController::class);
-    Route::apiResource('discounts', DiscountController::class);
-    Route::apiResource('product-discounts', ProductDiscountController::class);
-
-    // Routes quản lý người dùng
-    Route::apiResource('users', UsersController::class);
+    Route::middleware(['auth:sanctum'])->post('/logout', [AuthController::class, 'logout']);
 });

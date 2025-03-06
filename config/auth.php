@@ -41,7 +41,7 @@ return [
             'provider' => 'users',
         ],
         'api' => [
-            'driver' => 'sanctum', // Đảm bảo đúng driver
+            'driver' => 'sanctum', 
             'provider' => 'users',
         ],
     ],

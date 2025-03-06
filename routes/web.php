@@ -10,7 +10,11 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\DiscountController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\AdminController;
+
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
+Auth::routes();
 
 Route::get("/", [HomeController::class,"index"]) ->name("home");
 Route::get('/login', [AuthController::class, 'login'])->name('auth.login');
@@ -78,3 +82,5 @@ Route::prefix('admin')->group(function () {
     Route::delete('/reviews/delete/{id}', [ReviewController::class, 'destroy'])->name('reviewDelete');
 
 });
+
+
