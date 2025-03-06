@@ -7,28 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StepViet | Home</title>
 
-    <!-- 
-    - favicon
-  -->
     <link rel="shortcut icon" href="{{asset('favicon.ico')  }}" type="images/favicon.ico">
 
-    <!-- 
-    - custom css link
-  -->
     <link rel="stylesheet" href="{{asset('css/style1.css')  }}">
 
-    <!-- 
-    - google font link
-  -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
         rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
-    <!-- 
-    - preload banner
-  -->
     <link rel="preload" href="{{asset('images/hero-banner.png')  }}" as="image">
 
 </head>
@@ -95,7 +87,7 @@
                     </li>
 
                     <li>
-                        <button class="nav-action-btn" onclick="window.location.href='{{ route('auth.login') }}'">
+                        <button class="nav-action-btn" onclick="window.location.href='{{ route('login') }}'">
                             <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
                             <span class="nav-action-text">Login / Register</span>
                         </button>
@@ -329,33 +321,16 @@
 
     </footer>
 
-
-
-
-
-    <!-- 
-    - #GO TO TOP
-  -->
-
     <a href="#top" class="go-top-btn" data-go-top>
         <ion-icon name="arrow-up-outline"></ion-icon>
     </a>
 
-
-
-
-
-    <!-- 
-    - custom js link
-  -->
     <script src="{{asset('js/script1.js')  }}"></script>
 
-    <!-- 
-    - ionicon link
-  -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-
+    <!-- Bootstrap 5 JS (Popper.js included) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

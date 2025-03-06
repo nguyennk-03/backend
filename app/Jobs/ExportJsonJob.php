@@ -16,7 +16,7 @@ use App\Models\Color;
 use App\Models\Size;
 use App\Models\Image;
 use App\Models\Order;
-use App\Models\CartItem;
+use App\Models\Cart;
 use App\Models\Payment;
 use App\Models\Review;
 use App\Models\User;
@@ -42,7 +42,7 @@ class ExportJsonJob implements ShouldQueue
             'sizes' => Size::all(),
             'images' => Image::all(),
             'orders' => Order::all(),
-            'cartitems' => CartItem::all(),
+            'carts' => Cart::all(),
             'payments' => Payment::all(),
             'users' => User::all(),
             'variants' => ProductVariant::all(),

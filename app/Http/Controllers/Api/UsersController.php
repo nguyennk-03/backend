@@ -21,8 +21,8 @@ class UsersController extends Controller
             $query->where('email', 'LIKE', '%' . $request->email . '%');
         }
 
-        if ($request->has('full_name')) {
-            $query->where('full_name', 'LIKE', '%' . $request->full_name . '%');
+        if ($request->has('name')) {
+            $query->where('name', 'LIKE', '%' . $request->name . '%');
         }
 
         if ($request->has('address')) {
@@ -45,7 +45,7 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'full_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|max:20',
             'role' => 'required|in:admin,user',
@@ -53,7 +53,7 @@ class UsersController extends Controller
         ]);
 
         $user = User::create([
-            'full_name' => $validated['full_name'],
+            'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
             'role' => $validated['role'],
@@ -68,7 +68,7 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
-            'full_name' => 'sometimes|string|max:255',
+            'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,' . $id,
             'phone' => 'sometimes|string|max:20',
             'role' => 'sometimes|in:admin,user',

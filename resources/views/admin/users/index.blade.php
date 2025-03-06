@@ -121,7 +121,7 @@
                         @foreach ($users as $user)
                             <tr>
                                 <td>{{ $user->id }}</td>
-                                <td>{{ $user->full_name }}</td>
+                                <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->phone }}</td>
                                 <td>
@@ -131,7 +131,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-warning btn-sm edit-user-btn" data-id="{{ $user->id }}"
-                                        data-name="{{ $user->full_name }}" data-email="{{ $user->email }}"
+                                        data-name="{{ $user->name }}" data-email="{{ $user->email }}"
                                         data-phone="{{ $user->phone }}" data-role="{{ $user->role }}" data-bs-toggle="modal"
                                         data-bs-target="#editUserModal">
                                         <i class="fas fa-edit">Sửa</i>

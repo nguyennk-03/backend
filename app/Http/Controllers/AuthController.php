@@ -5,72 +5,65 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    // Hiển thị form đăng nhập
+    public function formLogin()
     {
-        $request->validate([
+        return view('auth.login');
+    }
+
+    // Xử lý đăng nhập
+    public function handleLogin(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            return redirect()->route('dashboard')->with('success', 'Đăng nhập thành công!');
+        }
+
+        return back()->withErrors(['email' => 'Thông tin đăng nhập không chính xác.'])->withInput();
+    }
+
+    // Hiển thị form đăng ký
+    public function formRegister()
+    {
+        return view('auth.register');
+    }
+
+    // Xử lý đăng ký
+    public function handleRegister(Request $request)
+    {
+        $data = request()->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-            'phone' => 'nullable|string|max:15',
-            'avatar' => 'nullable|string', 
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6|confirmed',
         ]);
+        $user = User::query()->create($data);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-            'avatar' => $request->avatar ?? 'images/users/default.png',
-        ]);
+        Auth::login($user);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'User registered successfully',
-            'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ], 201);
+        request()->session()->regenerate();
+        // return response()->json($request->all());
+        return redirect()->route('user.dashboard');
     }
 
-    // Đăng nhập
-    public function login(Request $request)
+    public function dashboard(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
-
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            throw ValidationException::withMessages([
-                'email' => ['Invalid email or password.'],
-            ]);
-        }
-
-        $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Login successful',
-            'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
+       
+        return view('user.dashboard');
     }
-
-    // Đăng xuất
-    public function logout(Request $request)
+    // Xử lý đăng xuất
+    public function logout()
     {
-        if ($request->user()) {
-            $request->user()->tokens()->delete();
-            return response()->json(['message' => 'Logged out successfully']);
-        }
-
-        return response()->json(['message' => 'User not authenticated'], 401);
+        Auth::logout();
+        return redirect()->route('login')->with('success', 'Đăng xuất thành công!');
     }
 }
