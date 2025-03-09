@@ -28,7 +28,6 @@ Route::prefix('v1')->group(function () {
 
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
-    // Routes dành cho user
     Route::middleware(['auth:sanctum', 'user'])->group(function () {
         Route::apiResource('users', UsersController::class)->only(['index', 'show']);
         Route::apiResource('carts', CartController::class)->only(['index', 'store', 'update', 'destroy']);
@@ -38,7 +37,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('wishlists', WishlistController::class)->only(['index', 'store', 'show', 'destroy']);
     });
 
-    // Routes dành cho admin
     Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
         Route::apiResources([
             'products' => ProductController::class,
