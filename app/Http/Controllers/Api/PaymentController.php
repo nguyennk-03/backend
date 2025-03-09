@@ -3,73 +3,76 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PaymentResource;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Services\MomoService;
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PaymentController extends Controller
 {
-    use AuthorizesRequests;
+    protected $momoService;
 
-    public function show($orderId)
+    public function __construct(MomoService $momoService)
     {
-        $order = Order::findOrFail($orderId);
-
-        $this->authorize('view', $order);
-
-        $payment = $order->payments()->latest()->first();
-        if (!$payment) {
-            return response()->json(['message' => 'Không tìm thấy thông tin thanh toán.'], 404);
-        }
-
-        return response()->json($payment);
+        $this->momoService = $momoService;
     }
 
-    public function store(Request $request, $orderId)
+    // 🔹 Lấy danh sách thanh toán
+    public function index()
     {
-        $order = Order::findOrFail($orderId);
+        return PaymentResource::collection(Payment::latest()->get());
+    }
 
-        $this->authorize('update', $order);
+    // 🔹 Xem chi tiết thanh toán
+    public function show($id)
+    {
+        $payment = Payment::findOrFail($id);
+        return new PaymentResource($payment);
+    }
 
+    // 🔹 Tạo thanh toán mới (sử dụng QR MoMo cá nhân)
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'amount' => 'required|numeric|min:1000',
+        ]);
+
+        $order = Order::findOrFail($validated['order_id']);
+
+        // Kiểm tra nếu đơn hàng đã thanh toán
         if ($order->payments()->where('status', 'completed')->exists()) {
             return response()->json(['message' => 'Đơn hàng đã được thanh toán.'], 400);
         }
 
-        $validated = $request->validate([
-            'payment_method' => 'required|in:momo,vnpay,paypal,cod',
-            'amount' => 'required|numeric|min:0',
-        ]);
+        // Tạo QR MoMo
+        $qrCode = $this->momoService->generateQRCode($validated['amount']);
 
-        if ($validated['amount'] != $order->total_price) {
-            return response()->json(['message' => 'Số tiền thanh toán không đúng.'], 400);
-        }
-
+        // Lưu thông tin thanh toán vào database
         $payment = Payment::create([
             'order_id' => $order->id,
             'user_id' => $order->user_id,
-            'payment_method' => $validated['payment_method'],
+            'payment_method' => 'momo',
             'amount' => $validated['amount'],
-            'status' => 'pending', // Mặc định là pending
+            'status' => 'pending',
         ]);
 
-        return response()->json($payment, 201);
+        return response()->json([
+            'message' => 'Tạo thanh toán thành công.',
+            'qr_code' => $qrCode,
+            'payment' => new PaymentResource($payment),
+        ], 201);
     }
 
-    public function updateStatus(Request $request, $orderId)
+    // 🔹 Cập nhật trạng thái thanh toán
+    public function update(Request $request, $id)
     {
-        $order = Order::findOrFail($orderId);
-
-        $this->authorize('update', $order);
+        $payment = Payment::findOrFail($id);
 
         $validated = $request->validate([
             'status' => 'required|in:pending,completed,failed',
         ]);
-
-        $payment = $order->payments()->latest()->first();
-        if (!$payment) {
-            return response()->json(['message' => 'Không tìm thấy thông tin thanh toán.'], 404);
-        }
 
         if ($payment->status === 'completed' && $validated['status'] !== 'completed') {
             return response()->json(['message' => 'Không thể thay đổi trạng thái của thanh toán đã hoàn thành.'], 400);
@@ -77,21 +80,14 @@ class PaymentController extends Controller
 
         $payment->update(['status' => $validated['status']]);
 
-        return response()->json($payment);
+        return new PaymentResource($payment);
     }
 
-    public function index()
+    // 🔹 Xóa thanh toán (chỉ khi chưa hoàn thành)
+    public function destroy($id)
     {
-        $payments = Payment::orderBy('created_at', 'desc')->paginate(10);
-        return response()->json($payments);
-    }
+        $payment = Payment::findOrFail($id);
 
-    public function destroy($paymentId)
-    {
-        $payment = Payment::findOrFail($paymentId);
-        $this->authorize('delete', $payment); 
-
-        // Không cho phép xóa thanh toán đã hoàn thành
         if ($payment->status === 'completed') {
             return response()->json(['message' => 'Không thể xóa thanh toán đã hoàn thành.'], 400);
         }

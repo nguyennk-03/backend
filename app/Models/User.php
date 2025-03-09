@@ -68,7 +68,7 @@ class User extends Authenticatable
         $directory = public_path('images/users');
 
         if (!File::exists($directory)) {
-            return 'images/users/user-1.jpg'; 
+            return 'images/users/user-1.jpg';
         }
 
         $files = array_diff(scandir($directory), array('..', '.'));

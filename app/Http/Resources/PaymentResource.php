@@ -16,14 +16,8 @@ class PaymentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'order_id' => $this->order_id,
-            'user' => new UserResource($this->whenLoaded('user')),
-            'payment_method' => $this->payment_method,
-            'amount' => $this->amount,
-            'status' => $this->status,
-            'status_text' => $this->status_text,
+            'name' => $this->name,
             'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
         ];
     }
 }
