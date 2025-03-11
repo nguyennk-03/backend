@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Response;
 
 class AuthController extends Controller
 {
@@ -42,27 +45,44 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
 
-        $user = User::where('email', $request->email)->first();
+            $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Sai email hoặc mật khẩu'], 401);
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                throw ValidationException::withMessages([
+                    'email' => ['The provided credentials are incorrect.'],
+                ]);
+            }
+
+            // Tạo token kèm theo thông tin vai trò (role) của user
+            $token = $user->createToken('authToken', [$user->role])->plainTextToken;
+
+            return response()->json([
+                'message' => 'Login successful',
+                'user' => $user,
+                'token' => $token,
+                'redirect' => $user->role === 'admin' ? '/admin' : '/user/profile',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'errors' => $e->errors(),
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'errors' => $e->getMessage(),
+            ], Response::HTTP_UNAUTHORIZED);
         }
-
-        $token = $user->createToken('authToken')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ], 200);
     }
+
+
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
         return response()->json(['message' => 'Đăng xuất thành công'], 200);
     }
-} 
+}

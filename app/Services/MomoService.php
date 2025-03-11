@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Exception;
 
 class MomoService
 {
@@ -21,12 +23,17 @@ class MomoService
         $this->phone = env('MOMO_PHONE', '0397993624');
 
         // 🔹 Cấu hình MoMo Business (Payment Gateway)
-        $this->partnerCode = env('');
-        $this->accessKey = env('');
-        $this->secretKey = env('');
+        $this->partnerCode = env('MOMO_PARTNER_CODE');
+        $this->accessKey = env('MOMO_ACCESS_KEY');
+        $this->secretKey = env('MOMO_SECRET_KEY');
         $this->apiEndpoint = env('MOMO_API_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create');
-        $this->redirectUrl = env('MOMO_REDIRECT_URL');
-        $this->ipnUrl = env('MOMO_IPN_URL');
+        $this->redirectUrl = env('MOMO_REDIRECT_URL', 'https://your-redirect-url.com');
+        $this->ipnUrl = env('MOMO_IPN_URL', 'https://your-ipn-url.com');
+
+        // Kiểm tra nếu thiếu thông tin quan trọng
+        if (!$this->partnerCode || !$this->accessKey || !$this->secretKey) {
+            throw new Exception("⚠️ Missing MoMo API credentials. Please check your .env file.");
+        }
     }
 
     /**
@@ -59,29 +66,50 @@ class MomoService
      */
     public function createBusinessPayment($orderId, $amount, $orderInfo)
     {
-        $requestId = Str::uuid()->toString();
-        $extraData = ""; // Dữ liệu thêm (nếu có)
+        try {
+            $requestId = Str::uuid()->toString();
+            $extraData = ""; // Dữ liệu thêm (nếu có)
 
-        // 🔹 Tạo chữ ký (signature)
-        $rawData = "accessKey={$this->accessKey}&amount={$amount}&extraData={$extraData}&ipnUrl={$this->ipnUrl}&orderId={$orderId}&orderInfo={$orderInfo}&partnerCode={$this->partnerCode}&redirectUrl={$this->redirectUrl}&requestId={$requestId}&requestType=captureWallet";
-        $signature = hash_hmac("sha256", $rawData, $this->secretKey);
+            // 🔹 Tạo chữ ký (signature)
+            $rawData = "accessKey={$this->accessKey}&amount={$amount}&extraData={$extraData}&ipnUrl={$this->ipnUrl}&orderId={$orderId}&orderInfo={$orderInfo}&partnerCode={$this->partnerCode}&redirectUrl={$this->redirectUrl}&requestId={$requestId}&requestType=captureWallet";
+            $signature = hash_hmac("sha256", $rawData, $this->secretKey);
 
-        // 🔹 Gửi request đến MoMo API
-        $response = Http::post($this->apiEndpoint, [
-            "partnerCode" => $this->partnerCode,
-            "accessKey" => $this->accessKey,
-            "requestId" => $requestId,
-            "amount" => $amount,
-            "orderId" => $orderId,
-            "orderInfo" => $orderInfo,
-            "redirectUrl" => $this->redirectUrl,
-            "ipnUrl" => $this->ipnUrl,
-            "extraData" => $extraData,
-            "requestType" => "captureWallet",
-            "signature" => $signature,
-            "lang" => "vi"
-        ]);
+            // 🔹 Ghi log request gửi đến MoMo để debug nếu có lỗi
+            Log::info('🔹 MoMo API Request:', [
+                'partnerCode' => $this->partnerCode,
+                'accessKey' => $this->accessKey,
+                'requestId' => $requestId,
+                'amount' => $amount,
+                'orderId' => $orderId,
+                'orderInfo' => $orderInfo,
+                'redirectUrl' => $this->redirectUrl,
+                'ipnUrl' => $this->ipnUrl,
+                'signature' => $signature,
+            ]);
 
-        return $response->json();
+            // 🔹 Gửi request đến MoMo API
+            $response = Http::post($this->apiEndpoint, [
+                "partnerCode" => $this->partnerCode,
+                "accessKey" => $this->accessKey,
+                "requestId" => $requestId,
+                "amount" => $amount,
+                "orderId" => $orderId,
+                "orderInfo" => $orderInfo,
+                "redirectUrl" => $this->redirectUrl,
+                "ipnUrl" => $this->ipnUrl,
+                "extraData" => $extraData,
+                "requestType" => "captureWallet",
+                "signature" => $signature,
+                "lang" => "vi"
+            ]);
+
+            // 🔹 Ghi log phản hồi từ MoMo
+            Log::info('🔹 MoMo API Response:', $response->json());
+
+            return $response->json();
+        } catch (Exception $e) {
+            Log::error("❌ MoMo Payment Error: " . $e->getMessage());
+            return ['error' => 'Payment request failed. Please try again.'];
+        }
     }
 }

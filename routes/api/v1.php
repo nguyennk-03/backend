@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\ProductVariantController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WishlistController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -24,20 +25,23 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
     Route::apiResource('brands', BrandController::class)->only(['index', 'show']);
     Route::apiResource('reviews', ReviewController::class)->only(['index', 'show']);
-    // Route::apiResource('payments', PaymentController::class)->only(['index', 'show']);
+    Route::apiResource('payments', PaymentController::class)->only(['index', 'show']);
+    // Route::apiResource('users', UsersController::class)->only(['index', 'show']);
+
 
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
-    Route::middleware(['auth:sanctum', 'user'])->group(function () {
-        Route::apiResource('users', UsersController::class)->only(['index', 'show']);
-        Route::apiResource('carts', CartController::class)->only(['index', 'store', 'update', 'destroy']);
-        Route::apiResource('orders', OrderController::class)->only(['index', 'store', 'update', 'destroy']);
-        Route::apiResource('order-items', OrderItemController::class)->only(['index', 'show']);
-        Route::apiResource('payments', PaymentController::class)->only(['index', 'show']);
-        Route::apiResource('wishlists', WishlistController::class)->only(['index', 'store', 'show', 'destroy']);
-    });
+
+    Route::middleware('auth:sanctum')
+            ->get('/users',function(Request $request){
+                return $request->user();
+            });
 
     Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+        Route::get('/dashboard', function () {
+            return response()->json(['message' => 'Welcome to Admin Dashboard']);
+        });
+
         Route::apiResources([
             'products' => ProductController::class,
             'categories' => CategoryController::class,
@@ -54,9 +58,16 @@ Route::prefix('v1')->group(function () {
             'discounts' => DiscountController::class,
             'product-discounts' => ProductDiscountController::class,
             'users' => UsersController::class,
-            'wishlists'=> WishlistController::class,
+            'wishlists' => WishlistController::class,
         ]);
     });
 
-    Route::middleware(['auth:sanctum'])->post('/logout', [AuthController::class, 'logout']);
+    // Route::middleware(['auth:sanctum', 'user'])->group(function () {
+    //     Route::apiResource('users', UsersController::class)->only(['index']);
+    //     Route::apiResource('carts', CartController::class)->only(['index', 'store', 'update', 'destroy']);
+    //     Route::apiResource('orders', OrderController::class)->only(['index', 'store', 'update', 'destroy']);
+    //     Route::apiResource('order-items', OrderItemController::class)->only(['index', 'show']);
+    //     Route::apiResource('wishlists', WishlistController::class)->only(['index', 'store', 'show', 'destroy']);
+    //     Route::post('logout', [AuthController::class, 'logout']);
+    // });
 });

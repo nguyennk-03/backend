@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' =>  'sanctum',
+        'guard' => 'sanctum',
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
@@ -41,7 +41,7 @@ return [
             'provider' => 'users',
         ],
         'api' => [
-            'driver' => 'sanctum', 
+            'driver' => 'sanctum',
             'provider' => 'users',
         ],
     ],
@@ -67,7 +67,7 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
-            ],
+        ],
 
         // 'users' => [
         //     'driver' => 'database',

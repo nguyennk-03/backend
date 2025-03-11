@@ -8,6 +8,8 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Services\MomoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class PaymentController extends Controller
 {
@@ -43,26 +45,38 @@ class PaymentController extends Controller
 
         // Kiểm tra nếu đơn hàng đã thanh toán
         if ($order->payments()->where('status', 'completed')->exists()) {
-            return response()->json(['message' => 'Đơn hàng đã được thanh toán.'], 400);
+            return response()->json([
+                'message' => 'Đơn hàng đã được thanh toán.',
+                'status_code' => 400
+            ], 400);
         }
 
-        // Tạo QR MoMo
-        $qrCode = $this->momoService->generateQRCode($validated['amount']);
+        try {
+            // Tạo QR MoMo cá nhân
+            $qrCode = $this->momoService->generatePersonalQRCode($validated['amount']);
 
-        // Lưu thông tin thanh toán vào database
-        $payment = Payment::create([
-            'order_id' => $order->id,
-            'user_id' => $order->user_id,
-            'payment_method' => 'momo',
-            'amount' => $validated['amount'],
-            'status' => 'pending',
-        ]);
+            // Lưu thông tin thanh toán vào database
+            $payment = Payment::create([
+                'order_id' => $order->id,
+                'user_id' => $order->user_id,
+                'payment_method' => 'momo',
+                'amount' => $validated['amount'],
+                'status' => 'pending',
+            ]);
 
-        return response()->json([
-            'message' => 'Tạo thanh toán thành công.',
-            'qr_code' => $qrCode,
-            'payment' => new PaymentResource($payment),
-        ], 201);
+            return response()->json([
+                'message' => 'Tạo thanh toán thành công.',
+                'qr_code' => $qrCode,
+                'payment' => new PaymentResource($payment),
+                'status_code' => 201
+            ], 201);
+        } catch (Exception $e) {
+            Log::error("❌ Lỗi tạo thanh toán MoMo: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Lỗi tạo thanh toán. Vui lòng thử lại sau.',
+                'status_code' => 500
+            ], 500);
+        }
     }
 
     // 🔹 Cập nhật trạng thái thanh toán
@@ -75,12 +89,19 @@ class PaymentController extends Controller
         ]);
 
         if ($payment->status === 'completed' && $validated['status'] !== 'completed') {
-            return response()->json(['message' => 'Không thể thay đổi trạng thái của thanh toán đã hoàn thành.'], 400);
+            return response()->json([
+                'message' => 'Không thể thay đổi trạng thái của thanh toán đã hoàn thành.',
+                'status_code' => 400
+            ], 400);
         }
 
         $payment->update(['status' => $validated['status']]);
 
-        return new PaymentResource($payment);
+        return response()->json([
+            'message' => 'Cập nhật trạng thái thành công.',
+            'payment' => new PaymentResource($payment),
+            'status_code' => 200
+        ], 200);
     }
 
     // 🔹 Xóa thanh toán (chỉ khi chưa hoàn thành)
@@ -89,10 +110,16 @@ class PaymentController extends Controller
         $payment = Payment::findOrFail($id);
 
         if ($payment->status === 'completed') {
-            return response()->json(['message' => 'Không thể xóa thanh toán đã hoàn thành.'], 400);
+            return response()->json([
+                'message' => 'Không thể xóa thanh toán đã hoàn thành.',
+                'status_code' => 400
+            ], 400);
         }
 
         $payment->delete();
-        return response()->json(['message' => 'Thanh toán đã được xóa.'], 200);
+        return response()->json([
+            'message' => 'Thanh toán đã được xóa.',
+            'status_code' => 200
+        ], 200);
     }
 }

@@ -165,4 +165,8 @@ return [
         App\Providers\EventServiceProvider::class,
     ],
 
+    'aliases' => [
+        // ... other aliases ...
+        'Auth' => Illuminate\Support\Facades\Auth::class,
+    ],
 ];
