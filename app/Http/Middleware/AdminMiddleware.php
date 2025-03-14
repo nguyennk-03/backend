@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
@@ -16,8 +16,12 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized - Admin access only'], Response::HTTP_FORBIDDEN);
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Bạn chưa đăng nhập!'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if (Auth::user()->role !== 'admin') {
+            return response()->json(['message' => 'Bạn không có quyền truy cập!'], Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);

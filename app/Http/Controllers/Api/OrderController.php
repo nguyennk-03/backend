@@ -1,9 +1,10 @@
-<?php
+<?php 
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,94 +12,68 @@ use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
-    // Lấy danh sách tất cả đơn hàng (hỗ trợ lọc theo user và trạng thái)
-    public function index(Request $request)
+    public function processPayment(Request $request)
     {
-        $query = Order::with('items');
-
-        if ($request->has('user_id')) {
-            $query->where('user_id', $request->user_id);
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['status' => 401, 'message' => 'Bạn chưa đăng nhập'], 401);
         }
 
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        return response()->json($query->orderBy('created_at', 'desc')->get());
-    }
-
-    // Lấy thông tin chi tiết đơn hàng
-    public function show($id)
-    {
-        $order = Order::with('items')->find($id);
-        return $order ? response()->json($order) : response()->json(['message' => 'Đơn hàng không tồn tại'], 404);
-    }
-
-    // Tạo đơn hàng mới
-    public function store(Request $request)
-    {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'discount_id' => 'nullable|exists:discounts,id',
-            'payment_method' => ['required', Rule::in(['momo', 'vnpay', 'paypal', 'cod'])],
-            'total_price' => 'required|numeric|min:0',
+            'products' => 'required|array',
+            'products.*.variant_id' => 'required|integer',
+            'products.*.quantity' => 'required|integer|min:1',
+            'products.*.price' => 'required|numeric|min:0',
+            'phone' => 'required|numeric',
+            'address' => 'required|string',
+            'email' => 'required|email',
+            'payment_id' => ['required', Rule::in(['Cash', 'Momo', 'PayPal', 'ZaloPay'])],
+            'total_price' => 'required|numeric|min:1000',
         ]);
 
-        $validated['status'] = 'pending'; // Mặc định trạng thái là 'pending'
-
-        $order = Order::create($validated);
-        return response()->json($order, 201);
-    }
-
-    // Cập nhật thông tin đơn hàng
-    public function update(Request $request, $id)
-    {
-        $order = Order::find($id);
-        if (!$order)
-            return response()->json(['message' => 'Đơn hàng không tồn tại'], 404);
-
-        $validated = $request->validate([
-            'status' => ['nullable', Rule::in(['pending', 'processing', 'completed', 'canceled'])],
-            'total_price' => 'nullable|numeric|min:0',
-        ]);
-
-        $order->update($validated);
-        return response()->json($order);
-    }
-
-    // Xóa đơn hàng
-    public function destroy($id)
-    {
-        $order = Order::find($id);
-        if (!$order)
-            return response()->json(['message' => 'Đơn hàng không tồn tại'], 404);
-
-        $order->delete();
-        return response()->json(['message' => 'Đơn hàng đã được xóa']);
-    }
-
-    // Cập nhật trạng thái thanh toán
-    public function updatePaymentStatus(Request $request, $orderId)
-    {
-        $order = Order::findOrFail($orderId);
-
-        $validated = $request->validate([
-            'status' => ['required', Rule::in(['pending', 'completed', 'failed'])],
-        ]);
-
-        $payment = Payment::where('order_id', $orderId)->first();
-
+        $payment = Payment::where('name', $validated['payment_id'])->first();
         if (!$payment) {
-            return response()->json(['message' => 'Không tìm thấy thông tin thanh toán'], 404);
+            return response()->json(['status' => 400, 'message' => 'Phương thức thanh toán không hợp lệ.'], 400);
         }
 
-        $payment->update(['status' => $validated['status']]);
+        $order = Order::create([
+            'user_id' => $user->id,
+            'phone' => $validated['phone'],
+            'address' => $validated['address'],
+            'email' => $validated['email'],
+            'payment_id' => $payment->id, 
+            'total_price' => $validated['total_price'],
+            'status' => 'pending',
+        ]);
 
-        // Nếu thanh toán hoàn thành, cập nhật trạng thái đơn hàng
-        if ($validated['status'] === 'completed') {
-            $order->update(['status' => 'completed']);
+        foreach ($validated['products'] as $product) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'variant_id' => $product['variant_id'] ,
+                'quantity' => $product['quantity'],
+                'price' => $product['price'],
+            ]);
         }
 
-        return response()->json(['message' => 'Cập nhật trạng thái thanh toán thành công']);
+        switch ($validated['payment_id']) {
+            case 'Cash':
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Đơn hàng đã được tạo thành công.',
+                    'order_id' => $order->id,
+                ]);
+
+            case 'Momo':
+                return (new MoMoController())->createPayment($order);
+
+            case 'PayPal':
+                return (new PayPalController())->createPayment($order);
+
+            case 'ZaloPay':
+                return (new ZaloPayController())->createPayment($order);
+
+            default:
+                return response()->json(['status' => 400, 'message' => 'Phương thức thanh toán không hợp lệ.'], 400);
+        }
     }
 }

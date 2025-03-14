@@ -5,13 +5,19 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query();
+        $user = Auth::user(); 
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $query = User::where('id', $user->id); 
 
         if ($request->has('role')) {
             $query->where('role', $request->role);
@@ -35,6 +41,7 @@ class UsersController extends Controller
 
         return response()->json($query->orderBy('created_at', 'desc')->get());
     }
+
 
     public function show($id)
     {

@@ -7,16 +7,18 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\DiscountController;
-use App\Http\Controllers\Api\ProductDiscountController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderItemController;
-use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\SizeController;
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\ProductVariantController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WishlistController;
+use App\Http\Controllers\Api\MomoController;
+use App\Http\Controllers\Api\PayPalController;
+use App\Http\Controllers\Api\ZaloPayController;
+use Database\Seeders\ProductDiscountSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,49 +27,29 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
     Route::apiResource('brands', BrandController::class)->only(['index', 'show']);
     Route::apiResource('reviews', ReviewController::class)->only(['index', 'show']);
-    Route::apiResource('payments', PaymentController::class)->only(['index', 'show']);
-    // Route::apiResource('users', UsersController::class)->only(['index', 'show']);
-
+    Route::apiResource('variants', ProductVariantController::class)->only(['index', 'show']);
+    Route::apiResource('colors', ColorController::class)->only(['index', 'show']);
+    Route::apiResource('sizes', SizeController::class)->only(['index', 'show']);
+    Route::apiResource('images', ImageController::class)->only(['index', 'show']);
 
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
 
-    Route::middleware('auth:sanctum')
-            ->get('/users',function(Request $request){
-                return $request->user();
-            });
+    Route::middleware(['auth:sanctum', 'user'])->group(function () {
+        Route::apiResource('users', UsersController::class)->only(['index', 'show', 'update', 'destroy']);
+        Route::apiResource('carts', CartController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::post('orders', [OrderController::class, 'processPayment']);
+        Route::apiResource('order-items', OrderItemController::class)->only(['index', 'show']);
+        Route::get('momo/success', [MoMoController::class, 'MoMoSuccess']);
+        Route::get('momo/cancel', [MoMoController::class, 'MoMoCancel']);
+        Route::get('zalopay/cancel', [ZaloPayController::class, 'ZaloPayCancel']);
+        Route::get('zalopay/success', [ZaloPayController::class, 'ZaloPaySuccess']);
+        Route::get('paypal/success', [PayPalController::class, 'PayPalSuccess']);
+        Route::get('paypal/cancel', [PayPalController::class, 'PayPalCancel']);
+        Route::apiResource('wishlists', WishlistController::class)->only(['index', 'store', 'show', 'destroy']);
+        Route::apiResource('discounts', DiscountController::class)->only(['index', 'show']);
+        Route::apiResource('product-discounts', ProductDiscountSeeder::class)->only(['index', 'show']);
 
-    Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
-        Route::get('/dashboard', function () {
-            return response()->json(['message' => 'Welcome to Admin Dashboard']);
-        });
-
-        Route::apiResources([
-            'products' => ProductController::class,
-            'categories' => CategoryController::class,
-            'brands' => BrandController::class,
-            'carts' => CartController::class,
-            'orders' => OrderController::class,
-            'order-items' => OrderItemController::class,
-            'payments' => PaymentController::class,
-            'variants' => ProductVariantController::class,
-            'colors' => ColorController::class,
-            'sizes' => SizeController::class,
-            'images' => ImageController::class,
-            'reviews' => ReviewController::class,
-            'discounts' => DiscountController::class,
-            'product-discounts' => ProductDiscountController::class,
-            'users' => UsersController::class,
-            'wishlists' => WishlistController::class,
-        ]);
+        Route::post('logout', [AuthController::class, 'logout']);
     });
-
-    // Route::middleware(['auth:sanctum', 'user'])->group(function () {
-    //     Route::apiResource('users', UsersController::class)->only(['index']);
-    //     Route::apiResource('carts', CartController::class)->only(['index', 'store', 'update', 'destroy']);
-    //     Route::apiResource('orders', OrderController::class)->only(['index', 'store', 'update', 'destroy']);
-    //     Route::apiResource('order-items', OrderItemController::class)->only(['index', 'show']);
-    //     Route::apiResource('wishlists', WishlistController::class)->only(['index', 'store', 'show', 'destroy']);
-    //     Route::post('logout', [AuthController::class, 'logout']);
-    // });
 });

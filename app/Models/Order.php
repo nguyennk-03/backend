@@ -19,68 +19,56 @@ class Order extends Model
         'discount_id',
         'payment_id',
         'status',
-        'total_price', // tổng tiền 
-        'amount', // tiền một phần
-        'payment_method',
+        'total_price',  
         'payment_status',
     ];
 
     protected $casts = [
         'total_price' => 'decimal:2',
-        'amount' => 'decimal:2',
         'status' => OrderStatusEnum::class,
         'payment_status' => PaymentStatusEnum::class,
     ];
 
-    // 🔹 Quan hệ với User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // 🔹 Quan hệ với Discount
     public function discount()
     {
         return $this->belongsTo(Discount::class);
     }
 
-    // 🔹 Quan hệ với Order Items
     public function items()
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    // 🔹 Quan hệ với Payment (Cập nhật)
-    public function payment()
+    public function payments()
     {
-        return $this->hasOne(Payment::class, 'order_id'); // ✅ Thay belongsTo bằng hasOne
+        return $this->hasMany(Payment::class, 'order_id');
     }
 
-    // 🔹 Kiểm tra đơn hàng đã thanh toán hay chưa
     public function isPaid(): bool
     {
         return $this->payment_status === PaymentStatusEnum::PAID;
     }
 
-    // 🔹 Scope lọc theo trạng thái đơn hàng
     public function scopeStatus($query, OrderStatusEnum $status)
     {
         return $query->where('status', $status);
     }
 
-    // 🔹 Scope lọc đơn hàng đã thanh toán
     public function scopePaid($query)
     {
         return $query->where('payment_status', PaymentStatusEnum::PAID);
     }
 
-    // 🔹 Scope lấy đơn hàng của người dùng cụ thể
     public function scopeUserOrders($query, $userId)
     {
         return $query->where('user_id', $userId);
     }
 
-    // 🔹 Xử lý thanh toán MoMo
     public function processMomoPayment($momoService)
     {
         if ($this->isPaid()) {
@@ -89,7 +77,6 @@ class Order extends Model
 
         $qrCode = $momoService->generateQRCode($this->amount);
 
-        // Cập nhật trạng thái thanh toán
         $this->update([
             'payment_status' => PaymentStatusEnum::PENDING,
         ]);
@@ -101,7 +88,6 @@ class Order extends Model
         ];
     }
 
-    // 🔹 Xử lý cập nhật trạng thái thanh toán
     public function updatePaymentStatus($status)
     {
         if ($this->isPaid() && $status !== PaymentStatusEnum::PAID) {
@@ -113,7 +99,6 @@ class Order extends Model
         return $this;
     }
 
-    // 🔹 Mutator: Xử lý status
     protected function status(): Attribute
     {
         return Attribute::make(
@@ -121,7 +106,6 @@ class Order extends Model
         );
     }
 
-    // 🔹 Mutator: Xử lý payment_status
     protected function paymentStatus(): Attribute
     {
         return Attribute::make(

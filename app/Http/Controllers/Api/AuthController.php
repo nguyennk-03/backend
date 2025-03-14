@@ -19,6 +19,7 @@ class AuthController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|unique:users,email',
                 'password' => 'required|string|min:6|confirmed',
+                'role' => 'user',
             ]);
 
             $user = User::create([
@@ -30,18 +31,17 @@ class AuthController extends Controller
             $token = $user->createToken('authToken')->plainTextToken;
 
             return response()->json([
+                'message' => 'Đăng ký thành công!',
                 'user' => $user,
                 'token' => $token,
             ], 201);
         } catch (\Exception $e) {
-
             return response()->json([
                 'message' => 'Đăng ký thất bại!',
                 'error' => $e->getMessage(),
             ], 500);
         }
     }
-
 
     public function login(Request $request)
     {
@@ -55,34 +55,34 @@ class AuthController extends Controller
 
             if (!$user || !Hash::check($request->password, $user->password)) {
                 throw ValidationException::withMessages([
-                    'email' => ['The provided credentials are incorrect.'],
+                    'email' => ['Email hoặc mật khẩu không chính xác.'],
                 ]);
             }
 
-            // Tạo token kèm theo thông tin vai trò (role) của user
             $token = $user->createToken('authToken', [$user->role])->plainTextToken;
 
             return response()->json([
-                'message' => 'Login successful',
+                'message' => 'Đăng nhập thành công!',
                 'user' => $user,
                 'token' => $token,
-                'redirect' => $user->role === 'admin' ? '/admin' : '/user/profile',
+                'redirect' => $user->role === 'admin' ? '/admin/dashboard' : '/user/profile',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
+                'message' => 'Đăng nhập thất bại!',
                 'errors' => $e->errors(),
             ], Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $e) {
             return response()->json([
+                'message' => 'Có lỗi xảy ra trong quá trình đăng nhập!',
                 'errors' => $e->getMessage(),
             ], Response::HTTP_UNAUTHORIZED);
         }
     }
 
-
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
-        return response()->json(['message' => 'Đăng xuất thành công'], 200);
+        return response()->json(['message' => 'Đăng xuất thành công!'], 200);
     }
 }

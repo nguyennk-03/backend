@@ -16,8 +16,12 @@ class UserMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check() || Auth::user()->role !== 'user') {
-            return response()->json(['message' => 'Unauthorized - User access only'], Response::HTTP_FORBIDDEN);
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Bạn chưa đăng nhập!'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if (Auth::user()->role !== 'user' && Auth::user()->role !== 'admin' ) {
+            return response()->json(['message' => 'Bạn không có quyền truy cập!'], Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);

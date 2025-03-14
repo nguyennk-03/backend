@@ -13,9 +13,6 @@ class PaymentSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create();
-        $orders = Order::all();
-        $users = User::all();
         $paymentMethods = ['Momo', 'VNPay', 'PayPal', 'COD'];
 
         foreach ($paymentMethods as $method) {

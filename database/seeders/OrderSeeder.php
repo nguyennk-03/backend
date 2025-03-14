@@ -15,7 +15,6 @@ class OrderSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        // Lấy danh sách ID của users, discounts và payments
         $userIds = User::pluck('id')->toArray();
         $discountIds = Discount::pluck('id')->toArray();
         $paymentIds = Payment::pluck('id')->toArray();
@@ -25,9 +24,8 @@ class OrderSeeder extends Seeder
             $orderCount = rand(1, 3);
 
             for ($i = 0; $i < $orderCount; $i++) {
-                $totalPrice = rand(5000000, 10000000); // Tổng tiền đơn hàng ngẫu nhiên
+                $totalPrice = rand(5000000, 10000000); 
                 $status = $faker->randomElement(['pending', 'completed', 'canceled']);
-                $paymentMethod = $faker->randomElement(['momo', 'vnpay', 'paypal', 'cod']);
                 $discountId = $faker->optional(0.5)->randomElement($discountIds);
                 $paymentId = $faker->optional(0.8)->randomElement($paymentIds);
 
@@ -37,7 +35,6 @@ class OrderSeeder extends Seeder
                     'payment_id' => $paymentId,
                     'status' => $status,
                     'total_price' => $totalPrice,
-                    'payment_method' => $paymentMethod,
                 ]);
             }
         }
