@@ -13,7 +13,7 @@ class PaymentSeeder extends Seeder
 {
     public function run()
     {
-        $paymentMethods = ['Momo', 'VNPay', 'PayPal', 'COD'];
+        $paymentMethods = ['COD', 'Momo', 'VNPay', 'PayPal'];
 
         foreach ($paymentMethods as $method) {
             Payment::create([

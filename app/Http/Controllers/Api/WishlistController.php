@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Validator;
 
@@ -13,9 +14,20 @@ class WishlistController extends Controller
     /**
      * Hiển thị danh sách wishlist của người dùng
      */
-    public function index()
+    public function index(Request $request)
     {
-        $wishlists = Wishlist::all();
+        $user = Auth::user(); // Lấy thông tin user đã đăng nhập
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        // Lấy wishlist theo user_id
+        $wishlists = Wishlist::where('user_id', $user->id)->get();
+
         return response()->json([
             'success' => true,
             'data' => $wishlists
