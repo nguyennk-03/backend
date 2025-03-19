@@ -16,9 +16,10 @@ use App\Http\Controllers\Api\ProductVariantController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\Api\MomoController;
-use App\Http\Controllers\Api\PayPalController;
+use App\Http\Controllers\Api\VNPayController;
 use App\Http\Controllers\Api\ZaloPayController;
-use Database\Seeders\ProductDiscountSeeder;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ProductDiscountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -44,11 +45,12 @@ Route::prefix('v1')->group(function () {
         Route::get('momo/cancel', [MoMoController::class, 'MoMoCancel']);
         Route::get('zalopay/cancel', [ZaloPayController::class, 'ZaloPayCancel']);
         Route::get('zalopay/success', [ZaloPayController::class, 'ZaloPaySuccess']);
-        Route::get('paypal/success', [PayPalController::class, 'PayPalSuccess']);
-        Route::get('paypal/cancel', [PayPalController::class, 'PayPalCancel']);
+        Route::get('vnpay/success', [VNPayController::class, 'returnpayment']);
+        Route::get('vnpay/cancel', [VNPayController::class, 'VNPayCancel']);
         Route::apiResource('wishlists', WishlistController::class)->only(['index', 'store', 'show', 'destroy']);
         Route::apiResource('discounts', DiscountController::class)->only(['index', 'show']);
-        Route::apiResource('product-discounts', ProductDiscountSeeder::class)->only(['index', 'show']);
+        Route::apiResource('product-discounts', ProductDiscountController::class)->only(['index', 'show']);
+        Route::apiResource('notifications', NotificationController::class);
 
         Route::post('logout', [AuthController::class, 'logout']);
     });

@@ -13,7 +13,8 @@ class CreateProductVariantsTable extends Migration
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->foreignId('size_id')->constrained('sizes')->onDelete('cascade');
             $table->foreignId('color_id')->constrained('colors')->onDelete('cascade');
-            $table->integer('stock')->default(0);
+            $table->integer('stock')->default(100);
+            $table->integer('sold')->default(0);
             $table->timestamps();
         });
 

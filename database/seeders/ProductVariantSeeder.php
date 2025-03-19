@@ -24,6 +24,7 @@ class ProductVariantSeeder extends Seeder
                 'size_id' => $faker->randomElement($sizeIds),       
                 'color_id' => $faker->randomElement($colorIds),
                 'stock' => $faker->numberBetween(10, 100),
+                'sold' => $faker->numberBetween(10, 100),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

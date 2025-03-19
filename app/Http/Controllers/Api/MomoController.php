@@ -1,104 +1,183 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use App\Models\Order;
+use App\Models\Discount;
 
 class MoMoController extends Controller
 {
-    public function createPayment(Order $order)
+    private $phone;
+    private $partner_code;
+    private $access_key;
+    private $secret_key;
+    private $endpoint;
+    private $return_url;
+    private $notify_url;
+
+    public function __construct()
     {
-        $endpoint = env('MOMO_ENDPOINT');
-        $partnerCode = env('MOMO_PARTNER_CODE');
-        $accessKey = env('MOMO_ACCESS_KEY');
-        $secretKey = env('MOMO_SECRET_KEY');
-        $orderId = $order->id . "_" . time();
-        $amount = number_format($order->total_price, 0, '', '');
-        $orderInfo = "Thanh toán đơn hàng #{$order->id}";
-        $redirectUrl = env('MOMO_RETURN_URL');
-        $ipnUrl = env('MOMO_NOTIFY_URL');
-        $requestId = time();
-        $extraData = "";
+        $this->phone = config('services.momo.phone');
+        $this->partner_code = config('services.momo.partner_code');
+        $this->access_key = config('services.momo.access_key');
+        $this->secret_key = config('services.momo.secret_key');
+        $this->endpoint = config('services.momo.endpoint');
+        $this->return_url = config('services.momo.return_url');
+        $this->notify_url = config('services.momo.notify_url');
 
-        // Tạo chữ ký bảo mật
-        $rawHash = "accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=captureWallet";
-        $signature = hash_hmac("sha256", $rawHash, $secretKey);
+        if (
+            empty($this->phone) || empty($this->partner_code) || empty($this->access_key) ||
+            empty($this->secret_key) || empty($this->endpoint) || empty($this->return_url) ||
+            empty($this->notify_url)
+        ) {
+            throw new \Exception('Cấu hình MoMo bị thiếu hoặc không hợp lệ.');
+        }
+    }
 
-        // Gửi dữ liệu lên MoMo
-        $response = Http::post($endpoint, [
-            'partnerCode' => $partnerCode,
-            'requestId' => $requestId,
-            'amount' => $amount,
-            'orderId' => $orderId,
-            'orderInfo' => $orderInfo,
-            'redirectUrl' => $redirectUrl,
-            'ipnUrl' => $ipnUrl,
-            'extraData' => $extraData,
-            'requestType' => 'captureWallet',
-            'signature' => $signature,
-        ]);
+    public function createPayment($validated, $order)
+    {
+        try {
+            $discountCode = $validated['discount_code'] ?? null;
+            $totalPrice = $validated['total_price'];
+            $totalVND = $this->applyDiscount($discountCode, $totalPrice);
 
-        // Kiểm tra phản hồi từ MoMo
-        if ($response->successful()) {
-            $jsonResult = $response->json();
+            $orderId = $order->id . '_' . time();
+            $requestId = time() . '';
+            $requestType = "payWithATM"; // Thanh toán bằng thẻ ATM nội địa
+            $extraData = base64_encode(json_encode(['email' => 'test@example.com'])); // Dữ liệu bổ sung
+
+            $rawHash = "accessKey={$this->access_key}&amount={$totalVND}&extraData={$extraData}&ipnUrl={$this->notify_url}&orderId={$orderId}&orderInfo=Thanh toán đơn hàng #{$order->id}&partnerCode={$this->partner_code}&redirectUrl={$this->return_url}&requestId={$requestId}&requestType={$requestType}";
+            $signature = hash_hmac("sha256", $rawHash, $this->secret_key);
+
+            $data = [
+                "partnerCode" => $this->partner_code,
+                "partnerName" => "Your Partner Name",
+                "storeId" => "MoMoTestStore",
+                "requestId" => $requestId,
+                "amount" => $totalVND,
+                "orderId" => $orderId,
+                "orderInfo" => "Thanh toán đơn hàng #{$order->id}",
+                "redirectUrl" => $this->return_url,
+                "ipnUrl" => $this->notify_url,
+                "lang" => "vi",
+                "extraData" => $extraData,
+                "requestType" => $requestType,
+                "signature" => $signature
+            ];
+
+            $response = \Illuminate\Support\Facades\Http::post($this->endpoint, $data)->json();
+
+            if (isset($response['resultCode']) && $response['resultCode'] == 0) {
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Yêu cầu thanh toán MoMo đã được tạo',
+                    'redirect_url' => $response['payUrl'],
+                    'order_id' => $order->id,
+                ]);
+            }
+
             return response()->json([
-                'status' => 200,
-                'message' => 'Tạo thanh toán MoMo thành công.',
-                'pay_url' => $jsonResult['payUrl'] ?? '',
-                'order_id' => $order->id,
-            ]);
+                'status' => 400,
+                'message' => 'Lỗi khi tạo yêu cầu thanh toán MoMo: ' . ($response['message'] ?? 'Lỗi không xác định.'),
+                'error_code' => $response['resultCode'] ?? null,
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Lỗi khi xử lý thanh toán MoMo: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    private function applyDiscount(?string $discountCode, float $totalPrice): int
+    {
+        if (!$discountCode) {
+            return (int) round($totalPrice);
+        }
+
+        $now = new \DateTime();
+        $discount = Discount::where('code', $discountCode)
+            ->where('start_date', '<=', $now->format('Y-m-d H:i:s'))
+            ->where('end_date', '>=', $now->format('Y-m-d H:i:s'))
+            ->first();
+
+        if (!$discount) {
+            throw new \Exception('Mã giảm giá không hợp lệ hoặc đã hết hạn.');
+        }
+
+        if ($discount->discount_type === 'percentage') {
+            $discountValue = $discount->value;
+            if ($discountValue > 100 || $discountValue < 0) {
+                throw new \Exception('Phần trăm giảm giá phải nằm trong khoảng từ 0 đến 100');
+            }
+            $discountAmount = $totalPrice * ($discountValue / 100);
         } else {
-            Log::error("Lỗi tạo thanh toán MoMo: " . $response->body());
-            return response()->json(['status' => 500, 'message' => 'Lỗi khi tạo thanh toán MoMo.'], 500);
-        }
-    }
-
-    public function paymentReturn(Request $request)
-    {
-        return response()->json($request->all());
-    }
-
-    public function MoMoSuccess(Request $request)
-    {
-        $orderId = explode("_", $request->input('orderId'))[0]; // Lấy ID đơn hàng gốc
-        $status = $request->input('status');
-
-        $order = Order::find($orderId);
-        if (!$order) {
-            return response()->json(['message' => 'Không tìm thấy đơn hàng.'], 404);
+            $discountAmount = $discount->value;
         }
 
-        if ($status == "success") {
-            $order->update(['payment_status' => 'paid']);
+        $finalPrice = $totalPrice - $discountAmount;
+        return (int) round(max(0, $finalPrice));
+    }
+
+    public function handleReturn(Request $request)
+    {
+        try {
+            $data = $request->all();
+            $rawHash = "accessKey={$this->access_key}&amount={$data['amount']}&extraData={$data['extraData']}&message={$data['message']}&orderId={$data['orderId']}&orderInfo={$data['orderInfo']}&orderType={$data['orderType']}&partnerCode={$data['partnerCode']}&payType={$data['payType']}&requestId={$data['requestId']}&responseTime={$data['responseTime']}&resultCode={$data['resultCode']}&transId={$data['transId']}";
+            $signature = hash_hmac("sha256", $rawHash, $this->secret_key);
+
+            if ($signature !== $data['signature']) {
+                return response()->json(['status' => 400, 'message' => 'Invalid signature']);
+            }
+
+            $orderId = explode('_', $data['orderId'])[0];
+            $order = Order::findOrFail($orderId);
+
+            if ($order->payment_status === 'pending') {
+                if ($data['resultCode'] == 0) {
+                    $order->payment_status = 'paid';
+                } else {
+                    $order->payment_status = 'failed';
+                }
+                $order->save();
+            }
+
             return response()->json([
-                'status' => 200,
-                'message' => 'Thanh toán MoMo thành công!',
-                'order_id' => $order->id,
+                'status' => $order->payment_status === 'paid' ? 200 : 400,
+                'message' => $order->payment_status === 'paid' ? 'Thanh toán thành công' : 'Thanh toán thất bại hoặc đã được xử lý'
             ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 500, 'message' => 'Lỗi: ' . $e->getMessage()]);
         }
-
-        return response()->json(['status' => 400, 'message' => 'Thanh toán không hợp lệ.'], 400);
     }
 
-    public function MoMoCancel(Request $request)
+    public function handleNotify(Request $request)
     {
-        $orderId = explode("_", $request->input('orderId'))[0];
+        try {
+            $data = $request->all();
+            $rawHash = "accessKey={$this->access_key}&amount={$data['amount']}&extraData={$data['extraData']}&message={$data['message']}&orderId={$data['orderId']}&orderInfo={$data['orderInfo']}&orderType={$data['orderType']}&partnerCode={$data['partnerCode']}&payType={$data['payType']}&requestId={$data['requestId']}&responseTime={$data['responseTime']}&resultCode={$data['resultCode']}&transId={$data['transId']}";
+            $signature = hash_hmac("sha256", $rawHash, $this->secret_key);
 
-        $order = Order::find($orderId);
-        if (!$order) {
-            return response()->json(['message' => 'Không tìm thấy đơn hàng.'], 404);
+            if ($signature !== $data['signature']) {
+                return response()->json(['status' => 400, 'message' => 'Invalid signature']);
+            }
+
+            $orderId = explode('_', $data['orderId'])[0];
+            $order = Order::findOrFail($orderId);
+
+            if ($order->payment_status === 'pending') {
+                if ($data['resultCode'] == 0) {
+                    $order->payment_status = 'paid';
+                } else {
+                    $order->payment_status = 'failed';
+                }
+                $order->save();
+            }
+
+            return response()->json(['status' => 200, 'message' => 'Xử lý thành công']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 500, 'message' => 'Lỗi: ' . $e->getMessage()]);
         }
-
-        $order->update(['payment_status' => 'failed']);
-
-        return response()->json([
-            'status' => 200,
-            'message' => 'Giao dịch bị hủy.',
-            'order_id' => $order->id,
-        ]);
     }
 }
