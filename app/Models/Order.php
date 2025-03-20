@@ -27,6 +27,7 @@ class Order extends Model
         'total_price' => 'decimal:2',
         'status' => OrderStatusEnum::class,
         'payment_status' => PaymentStatusEnum::class,
+        'created_at' => 'datetime',
     ];
 
     public function user()

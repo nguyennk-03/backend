@@ -31,7 +31,7 @@
                                 </div>
                             @endif
 
-                            <form action="{{ route('register') }}" method="POST">
+                            <form action="{{ route('dang-ky') }}" method="POST">
                                 @csrf
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Họ và tên</label>
@@ -81,7 +81,7 @@
 
                             <div class="text-center mt-3">
                                 <p class="text-muted">Đã có tài khoản?
-                                    <a href="{{ route('login') }}" class="fw-bold text-primary">Đăng nhập</a>
+                                    <a href="{{ route('dang-nhap') }}" class="fw-bold text-primary">Đăng nhập</a>
                                 </p>
                             </div>
                         </div>

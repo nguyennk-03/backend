@@ -30,7 +30,7 @@
                     <div class="col-12 d-flex justify-content-between align-items-center">
                         <h4 class="header-title font-weight-bold mb-0">Danh Sách Danh Mục</h4>
                         <div class="d-flex align-items-center">
-                            <form action="{{ route('categories.index') }}" method="GET" class="d-flex">
+                            <form action="{{ route('danh-muc.index') }}" method="GET" class="d-flex">
                                 <div class="input-group">
                                     <input type="text" name="search" class="form-control" placeholder="Tìm kiếm danh mục..." value="{{ request('search') }}">
                                     <button type="submit" class="btn btn-primary">Tìm</button>
@@ -51,7 +51,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form action="{{ route('categoryAdd') }}" method="POST">
+                                <form action="{{ route('danh-muc.store') }}" method="POST">
                                     @csrf
                                     <div class="mb-3">
                                         <label for="name">Tên danh mục</label>
@@ -77,15 +77,15 @@
                     </thead>
                     <tbody>
                         @foreach ($categories as $category)
-                        <tr>
-                            <td>{{ $category->id }}</td>
-                            <td>{{ $category->name }}</td>
-                            <td class="action-icons">
-                                <a href="{{ route('categoryEdit', $category->id) }}" class="btn btn-warning btn-sm">Sửa</a>
-                                <a href="{{ route('categoryDelete', $category->id) }}" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?')">Xóa</a>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>{{ $category->id }}</td>
+                                <td>{{ $category->name }}</td>
+                                <td class="action-icons">
+                                    <a href="{{ route('danh-muc.edit', $category->id) }}" class="btn btn-warning btn-sm">Sửa</a>
+                                    <a href="{{ route('danh-muc.destroy', $category->id) }}" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?')">Xóa</a>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>

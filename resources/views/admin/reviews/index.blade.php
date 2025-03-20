@@ -19,7 +19,7 @@
         <!-- Tìm kiếm & Lọc trạng thái -->
         <div class="card shadow-sm rounded-lg mb-3">
             <div class="card-body">
-                <form action="{{ route('reviews') }}" method="GET">
+                <form action="{{ route('danh-gia.index') }}" method="GET">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Tìm kiếm</label>
@@ -43,7 +43,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-search"></i> Tìm kiếm
                             </button>
-                            <a href="{{ route('reviews') }}" class="btn btn-secondary">
+                            <a href="{{ route('danh-gia.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-sync"></i> Làm mới
                             </a>
                         </div>
@@ -64,7 +64,7 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                             aria-label="Close"></button>
                                     </div>
-                                    <form action="{{ route('reviewAdd') }}" method="POST">
+                                    <form action="{{ route('danh-gia.store') }}" method="POST">
                                         @csrf
                                         <div class="modal-body">
                                             <div class="mb-3">
@@ -127,17 +127,17 @@
                         @forelse ($reviews as $review)
                             <tr>
                                 <td class="text-center">{{ $review->id }}</td>
-                                <td>{{ $review->user ? $review->user->full_name : 'Ẩn danh' }}</td>
+                                <td>{{ $review->user ? $review->user->name : 'Ẩn danh' }}</td>
                                 <td>{{ $review->product->name ?? 'Sản phẩm không tồn tại' }}</td>
                                 <td class="text-center">{{ $review->rating }} ⭐</td>
                                 <td>{{ $review->comment }}</td>
                                 <td class="text-center">{{ $review->created_at->format('d/m/Y H:i') }}</td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <a href="{{ route('reviewEdit', $review->id) }}" class="btn btn-info btn-sm">
+                                        <a href="{{ route('danh-gia.edit', $review->id) }}" class="btn btn-info btn-sm">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('reviewDelete', $review->id) }}" method="POST"
+                                        <form action="{{ route('danh-gia.destroy', $review->id) }}" method="POST"
                                             class="d-inline-block">
                                             @csrf
                                             @method('DELETE')
@@ -156,19 +156,6 @@
                         @endforelse
                     </tbody>
                 </table>
-
-                <!-- Phân trang -->
-                <div class="d-flex justify-content-between align-items-center"
-                    style="background-color: #343a40; color: #fff;">
-                    <div>
-                        Hiển thị <strong>{{ $reviews->firstItem() }}</strong> đến
-                        <strong>{{ $reviews->lastItem() }}</strong> trong tổng số
-                        <strong>{{ $reviews->total() }}</strong> đánh giá
-                    </div>
-                    <div class="pagination-container">
-                        {{ $reviews->links('pagination::bootstrap-5') }}
-                    </div>
-                </div>
             </div>
         </div>
     </div>

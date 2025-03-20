@@ -13,7 +13,7 @@ class ReviewController extends Controller
     // Hiển thị danh sách đánh giá
     public function index()
     {
-        $reviews = Review::with('user', 'product')->paginate(10);
+        $reviews = Review::with('user', 'product')->get();
         $products = Product::all();
         return view('admin.reviews.index', compact('reviews','products'));
     }

@@ -1,7 +1,7 @@
 <header class="header" data-header>
     <div class="container">
 
-        <a href="{{ route('home') }}" class="logo">
+        <a href="{{ route('trang-chu') }}" class="logo">
             <img src="{{ asset('images/logo-sm1.png') }}" height="100" alt="Footcap logo">
         </a>
 
@@ -10,13 +10,13 @@
                 <ion-icon name="close-outline"></ion-icon>
             </button>
 
-            <a href="{{ route('home') }}" class="logo">
+            <a href="{{ route('trang-chu') }}" class="logo">
                 <img src="{{ asset('images/logo-sm1.png') }}" width="190" height="50" alt="Footcap logo">
             </a>
 
             <ul class="navbar-list">
                 <li class="navbar-item">
-                    <a href="{{ route('home') }}" class="navbar-link">Trang chủ</a>
+                    <a href="{{ route('trang-chu') }}" class="navbar-link">Trang chủ</a>
                 </li>
                 <li class="navbar-item">
                     <a href="#" class="navbar-link">Giới thiệu</a>
@@ -46,21 +46,21 @@
                 <li>
                     @if (Auth::check())
                             <button class="nav-action-btn"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                onclick="event.preventDefault(); document.getElementById('dang-xuat-form').submit();">
                                 <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
-                                <span class="nav-action-text">{{ Auth::user()->name }} (Logout)</span>
+                                <span class="nav-action-text">{{ Auth::user()->name }} (Đăng xuất)</span>
                             </button>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        <form id="dang-xuat-form" action="{{ route('dang-xuat') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
 
-                        <button class="btn btn-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <button class="btn btn-danger" onclick="event.preventDefault(); document.getElementById('dang-xuat-form').submit();">
                             Đăng xuất
                         </button>
                     @else
-                        <button class="nav-action-btn" onclick="window.location.href='/login'">
+                        <button class="nav-action-btn" onclick="window.location.href='/dang-nhap'">
                             <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
-                            <span class="nav-action-text">Login / Register</span>
+                            <span class="nav-action-text">Đăng nhập / Đăng ký</span>
                         </button>
                     @endif
                 </li>

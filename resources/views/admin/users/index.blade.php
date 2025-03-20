@@ -41,7 +41,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
-                                <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
+                                <form action="{{ route('nguoi-dung.store') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <div class="modal-body">
                                         <div class="row">
@@ -136,7 +136,7 @@
                                         data-bs-target="#editUserModal">
                                         <i class="fas fa-edit">Sửa</i>
                                     </button>
-                                    <a href="{{ route('userDelete', $user->id) }}" class="btn btn-danger btn-sm"
+                                    <a href="{{ route('nguoi-dung.destroy', $user->id) }}" class="btn btn-danger btn-sm"
                                         onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')"><i class="fas fa-trash-alt">Xóa</i></a>
                                 </td>
                             </tr>

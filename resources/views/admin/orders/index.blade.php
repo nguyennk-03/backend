@@ -18,7 +18,7 @@
 
         <div class="card shadow-sm rounded-lg mb-3">
             <div class="card-body">
-                <form action="{{ route('orders') }}" method="GET">
+                <form action="{{ route('don-hang.index') }}" method="GET">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Tìm kiếm</label>
@@ -40,7 +40,8 @@
 
                         <div class="col-md-3 d-flex gap-2">
                             <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tìm kiếm</button>
-                            <a href="{{ route('orders') }}" class="btn btn-secondary"><i class="fas fa-sync"></i> Làm
+                            <a href="{{ route('don-hang.index') }}" class="btn btn-secondary"><i class="fas fa-sync"></i>
+                                Làm
                                 mới</a>
                         </div>
 
@@ -73,27 +74,27 @@
                         @forelse ($orders as $order)
                             <tr>
                                 <td class="text-center">{{ $order->id }}</td>
-                                <td>{{ $order->user ? $order->user->full_name : 'Khách vãng lai' }}</td>
+                                <td>{{ $order->user ? $order->user->name : 'Khách vãng lai' }}</td>
                                 <td class="text-end">{{ number_format($order->total_price, 0, ',', '.') }} VNĐ</td>
                                 <td class="text-center">
-                                    <span class="badge @if($order->status == 'completed') badge-success
-                                    @elseif($order->status == 'pending') badge-warning
-                                    @elseif($order->status == 'shipped') badge-primary
-                                    @elseif($order->status == 'canceled') badge-danger
+                                    <span class="badge @if($order->status->value == 'completed') badge-success
+                                    @elseif($order->status->value == 'pending') badge-warning
+                                    @elseif($order->status->value == 'shipped') badge-primary
+                                    @elseif($order->status->value == 'canceled') badge-danger
                                     @else badge-secondary @endif">
-                                        {{ ucfirst($order->status) }}
+                                        {{ ucfirst($order->status->value) }}
                                     </span>
                                 </td>
                                 <td class="text-center">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <a href="{{ route('orderView', $order->id) }}" class="btn btn-warning btn-sm">
+                                        <a href="{{ route('don-hang.show', $order->id) }}" class="btn btn-warning btn-sm">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('orderEdit', $order->id) }}" class="btn btn-info btn-sm">
+                                        <a href="{{ route('don-hang.edit', $order->id) }}" class="btn btn-info btn-sm">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('orderDelete', $order->id) }}" method="POST"
+                                        <form action="{{ route('don-hang.destroy', $order->id) }}" method="POST"
                                             class="d-inline-block">
                                             @csrf
                                             @method('DELETE')
@@ -112,17 +113,6 @@
                         @endforelse
                     </tbody>
                 </table>
-                <div class="d-flex justify-content-between align-items-center"
-                    style="background-color: #343a40; color: #fff;">
-                    <div>
-                        Hiển thị <strong>{{ $orders->firstItem() }}</strong> đến
-                        <strong>{{ $orders->lastItem() }}</strong> trong tổng số
-                        <strong>{{ $orders->total() }}</strong> đơn hàng
-                    </div>
-                    <div class="pagination-container">
-                        {{ $orders->links('pagination::bootstrap-5') }}
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -135,7 +125,7 @@
                     <h5 class="modal-title" id="addOrderModalLabel">Thêm Đơn Hàng Mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('orderAdd') }}" method="POST">
+                <form action="{{ route('don-hang.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="row">
@@ -208,6 +198,5 @@
             </div>
         </div>
     </div>
-
 
 @endsection

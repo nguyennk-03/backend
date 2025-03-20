@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Upvex - Responsive Admin Dashboard Template</title>
+    <title>Admin Dashboard | @yield('title')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description">
     <meta content="Coderthemes" name="author">
@@ -166,49 +166,49 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('users') }}">
+                            <a href="{{ route('nguoi-dung.index') }}">
                                 <i class="icon-people"></i>
                                 <span> Người dùng </span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('products') }}">
+                            <a href="{{ route('san-pham.index') }}">
                                 <i class="icon-heart"></i>
                                 <span> Sản phẩm </span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('categories') }}">
+                            <a href="{{ route('danh-muc.index') }}">
                                 <i class="la la-diamond"></i>
                                 <span> Danh mục </span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('brands') }}">
+                            <a href="{{ route('thuong-hieu.index') }}">
                                 <i class="fe-zap"></i>
                                 <span> Thương hiệu </span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('orders') }}">
+                            <a href="{{ route('don-hang.index') }}">
                                 <i class="icon-basket-loaded"></i>
                                 <span> Đơn hàng </span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('discounts') }}">
+                            <a href="{{ route('khuyen-mai.index') }}">
                                 <i class="fe-tag"></i>
                                 <span> Khuyến mãi </span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('reviews') }}">
+                            <a href="{{ route('danh-gia.index') }}">
                                 <i class="icon-speech"></i>
                                 <span> Bình luận </span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('reviews') }}">
+                            <a href="{{ route('danh-gia.index') }}">
                                 <i class="icon-star"></i>
                                 <span> Đánh giá </span>
                             </a>

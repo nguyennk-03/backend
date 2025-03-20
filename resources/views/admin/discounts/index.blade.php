@@ -19,7 +19,7 @@
         <!-- Tìm kiếm & Lọc giảm giá -->
         <div class="card shadow-sm rounded-lg mb-3">
             <div class="card-body">
-                <form action="{{ route('discounts') }}" method="GET">
+                <form action="{{ route('khuyen-mai.index') }}" method="GET">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Tìm kiếm</label>
@@ -42,7 +42,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-search"></i> Tìm kiếm
                             </button>
-                            <a href="{{ route('discounts') }}" class="btn btn-secondary">
+                            <a href="{{ route('khuyen-mai.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-sync"></i> Làm mới
                             </a>
                         </div>
@@ -77,36 +77,36 @@
                     </thead>
                     <tbody>
                         @forelse ($discounts as $discount)
-                                        <tr>
-                                            <td class="text-center">{{ $discount->id }}</td>
-                                            <td>{{ $discount->code }}</td>
-                                            <td class="text-center">
-                                                {{ $discount->discount_type == 'percentage' ? 'Giảm %' : 'Giảm tiền' }}
-                                            </td>
-                                            <td>
-                                                {{ $discount->discount_type == 'percentage'
-                                                    ? round($discount->value) . '%'
-                                                    : number_format(ceil($discount->value / 1000) * 1000, 0, ',', '.') . ' VNĐ' }}
-                                            </td>
-                                            <td class="text-center">{{ date('d/m/Y', strtotime($discount->start_date)) }}</td>
-                                            <td class="text-center">{{ date('d/m/Y', strtotime($discount->end_date)) }}</td>
-                                            <td class="text-center">
-                                                <div class="d-flex justify-content-center gap-2">
-                                                    <a href="{{ route('discountEdit', $discount->id) }}" class="btn btn-info btn-sm">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <form action="{{ route('discountDelete', $discount->id) }}" method="POST"
-                                                        class="d-inline-block">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm"
-                                                            onclick="return confirm('Bạn có chắc chắn muốn xóa mã giảm giá này?')">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
+                            <tr>
+                                <td class="text-center">{{ $discount->id }}</td>
+                                <td>{{ $discount->code }}</td>
+                                <td class="text-center">
+                                    {{ $discount->discount_type == 'percentage' ? 'Giảm %' : 'Giảm tiền' }}
+                                </td>
+                                <td>
+                                    {{ $discount->discount_type == 'percentage'
+                                        ? round($discount->value) . '%'
+                                        : number_format(ceil($discount->value / 1000) * 1000, 0, ',', '.') . ' VNĐ' }}
+                                </td>
+                                <td class="text-center">{{ date('d/m/Y', strtotime($discount->start_date)) }}</td>
+                                <td class="text-center">{{ date('d/m/Y', strtotime($discount->end_date)) }}</td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ route('khuyen-mai.edit', $discount->id) }}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('khuyen-mai.destroy', $discount->id) }}" method="POST"
+                                            class="d-inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Bạn có chắc chắn muốn xóa mã giảm giá này?')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
                         @empty
                             <tr>
                                 <td colspan="7" class="text-center text-muted">Không có mã giảm giá nào.</td>
@@ -114,19 +114,6 @@
                         @endforelse
                     </tbody>
                 </table>
-
-                <!-- Phân trang -->
-                <div class="d-flex justify-content-between align-items-center"
-                    style="background-color: #343a40; color: #fff;">
-                    <div>
-                        Hiển thị <strong>{{ $discounts->firstItem() }}</strong> đến
-                        <strong>{{ $discounts->lastItem() }}</strong> trong tổng số
-                        <strong>{{ $discounts->total() }}</strong> mã giảm giá
-                    </div>
-                    <div class="pagination-container">
-                        {{ $discounts->links('pagination::bootstrap-5') }}
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -139,7 +126,7 @@
                     <h5 class="modal-title" id="addDiscountModalLabel">Thêm Mã Giảm Giá</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('discountAdd') }}" method="POST">
+                <form action="{{ route('khuyen-mai.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">

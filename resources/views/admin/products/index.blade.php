@@ -50,7 +50,7 @@
                                         </ul>
                                     </div>
                                 @endif
-                                <form action="{{ route('productAdd') }}" method="POST" enctype="multipart/form-data">
+                                <form action="{{ route('san-pham.store') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <div class="mb-3">
                                         <label class="form-label">Danh mục</label>
@@ -129,10 +129,10 @@
                                     <td>{{ optional($item->category)->name ?? 'Chưa có danh mục' }}</td>
                                     <td>{{ optional($item->brand)->name ?? 'Chưa có thương hiệu' }}</td>
                                     <td class="d-flex">
-                                        <a href="{{ route('productEdit', $item->id) }}" class="btn btn-warning btn-sm">
+                                        <a href="{{ route('san-pham.edit', $item->id) }}" class="btn btn-warning btn-sm">
                                             <i class="fas fa-edit"></i> Sửa
                                         </a>
-                                        <a href="{{ route('productDelete', $item->id) }}" class="btn btn-danger btn-sm"
+                                        <a href="{{ route('san-pham.destroy', $item->id) }}" class="btn btn-danger btn-sm"
                                             onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">
                                             <i class="fas fa-trash-alt"></i> Xóa
                                         </a>

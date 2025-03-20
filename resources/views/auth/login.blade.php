@@ -14,7 +14,7 @@
                                 <h4 class="text-primary fw-bold">Đăng Nhập</h4>
                             </div>
 
-                            <form action="{{ route('login') }}" method="POST">
+                            <form action="{{ route('dang-nhap') }}" method="POST">
                                 @csrf
 
                                 <div class="mb-3">
@@ -34,7 +34,7 @@
                                         <input type="checkbox" class="form-check-input" id="checkbox-signin">
                                         <label class="form-check-label" for="checkbox-signin">Ghi nhớ đăng nhập</label>
                                     </div>
-                                    <a href="{{ route('password.request') }}" class="text-muted small">Quên mật khẩu?</a>
+                                    <a href="{{ route('hien-thi-form-quen-mat-khau') }}" class="text-muted small">Quên mật khẩu?</a>
                                 </div>
 
                                 <div class="text-center">
@@ -59,7 +59,7 @@
 
                         <div class="text-center mt-3">
                             <p class="mb-1 text-muted">Chưa có tài khoản?
-                                <a href="{{ route('register') }}" class="fw-bold text-primary">Đăng ký ngay</a>
+                                <a href="{{ route('dang-ky') }}" class="fw-bold text-primary">Đăng ký ngay</a>
                             </p>
                         </div>
 
