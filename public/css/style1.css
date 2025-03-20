@@ -144,7 +144,7 @@ body {
  * #REUSED STYLE
 \*-----------------------------------*/
 
-.container { padding-inline: 15px; }
+.container { padding-inline: 5px; }
 
 .section { padding-block: var(--section-padding); }
 
@@ -381,7 +381,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-block: 20px;
+  padding-block: 10px;
 }
 
 .nav-open-btn {
@@ -776,9 +776,9 @@ body {
 .footer-top { background: var(--cultured); }
 
 .footer-brand {
-  padding-bottom: 50px;
+  padding-bottom: 5px;
   border-bottom: 1px solid var(--gainsboro);
-  margin-bottom: 50px;
+  margin-bottom: 40px;
 }
 
 .footer-brand .logo { margin-bottom: 15px; }

@@ -12,12 +12,12 @@ class UserSeeder extends Seeder
     public function run()
     {
         $users = [
-            ['name' => 'Ngô Khánh Nguyên', 'email' => 'nguyennkps27609@fpt.edu.vn', 'password' => 'PS27609',],
-            ['name' => 'Nguyễn Hữu Kiệt', 'email' => 'kietnhps27657@fpt.edu.vn', 'password' => 'PS27657',],
-            ['name' => 'Nguyễn Tuấn Anh', 'email' => 'anhntps35235@fpt.edu.vn', 'password' => 'PS35235',],
-            ['name' => 'Trần Văn Nhân', 'email' => 'nhantvps33579@fpt.edu.vn', 'password' => 'PS33579',],
-            ['name' => 'Văn Đức Anh', 'email' => 'anhvdps34505@fpt.edu.vn', 'password' => 'PS34505',],
-            ['name' => 'Lê Nguyễn Hoàng Khiêm', 'email' => 'khiemlnhps33864@fpt.edu.vn', 'password' => 'PS33864',],
+            ['name' => 'Ngô Khánh Nguyên', 'email' => 'nguyennkps27609@fpt.edu.vn', 'password' => 'nguyennkps27609@fpt.edu.vn',],
+            ['name' => 'Nguyễn Hữu Kiệt', 'email' => 'kietnhps27657@fpt.edu.vn', 'password' => 'kietnhps27657@fpt.edu.vn',],
+            ['name' => 'Nguyễn Tuấn Anh', 'email' => 'anhntps35235@fpt.edu.vn', 'password' => 'anhntps35235@fpt.edu.vn',],
+            ['name' => 'Trần Văn Nhân', 'email' => 'nhantvps33579@fpt.edu.vn', 'password' => 'nhantvps33579@fpt.edu.vn',],
+            ['name' => 'Văn Đức Anh', 'email' => 'anhvdps34505@fpt.edu.vn', 'password' => 'anhvdps34505@fpt.edu.vn',],
+            ['name' => 'Lê Nguyễn Hoàng Khiêm', 'email' => 'khiemlnhps33864@fpt.edu.vn', 'password' => 'khiemlnhps33864@fpt.edu.vn',],
         ];
 
         foreach ($users as $index => $user) {

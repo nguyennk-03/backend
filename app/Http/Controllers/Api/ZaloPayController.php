@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Order;
 use App\Models\Discount;
+use App\Models\OrderItem;
+use App\Models\ProductVariant;
 
 class ZaloPayController extends Controller
 {
@@ -39,7 +41,7 @@ class ZaloPayController extends Controller
             $totalPrice = $validated['total_price'];
             $totalVND = $this->applyDiscount($discountCode, $totalPrice);
 
-            $embeddata = json_encode(['redirecturl' => 'http://localhost:3000/payment-check']);
+            $embeddata = json_encode(['redirecturl' => 'http://127.0.0.1:8000/dashboard']);
             $item = json_encode($validated['products']);
             $order_id = date("ymd") . "_" . time();
             Cache::put("zalopay_order_{$order_id}", $order->id, now()->addHour());
@@ -123,7 +125,7 @@ class ZaloPayController extends Controller
         return (int) round(max(0, $finalPrice));
     }
 
-    public function handleCallback(Request $request)
+    public function ZaloPaySuccess(Request $request)
     {
         try {
             $data = $request->input('data');
@@ -139,6 +141,7 @@ class ZaloPayController extends Controller
             $orderId = Cache::get("zalopay_order_{$apptransid}");
 
             if (!$orderId || !($order = Order::find($orderId))) {
+                // dd($orderId);
                 return response()->json(['returncode' => -1, 'returnmessage' => 'Order not found']);
             }
 
@@ -154,6 +157,61 @@ class ZaloPayController extends Controller
             return response()->json(['returncode' => 1, 'returnmessage' => 'Success']);
         } catch (\Exception $e) {
             return response()->json(['returncode' => -1, 'returnmessage' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+    public function ZaloPayCancel(Request $request)
+    {
+        try {
+            // Lấy order_id từ request (giả sử frontend gửi order_id khi hủy)
+            $orderId = $request->input('order_id');
+
+            if (!$orderId || !($order = Order::find($orderId))) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Đơn hàng không tồn tại'
+                ], 404);
+            }
+
+            // Kiểm tra trạng thái đơn hàng
+            if ($order->payment_status !== 'pending') {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Đơn hàng không thể hủy vì không ở trạng thái chờ thanh toán'
+                ], 400);
+            }
+
+            // Lấy danh sách sản phẩm từ đơn hàng
+            $orderItems = OrderItem::where('order_id', $order->id)->get();
+
+            if ($orderItems->isEmpty()) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Không tìm thấy sản phẩm trong đơn hàng'
+                ], 400);
+            }
+
+            // Hoàn lại số lượng sản phẩm vào kho
+            foreach ($orderItems as $item) {
+                $product = ProductVariant::find($item->product_id);
+                if ($product) {
+                    $product->stock += $item->quantity;
+                    $product->save();
+                }
+            }
+
+            // Cập nhật trạng thái đơn hàng thành 'cancelled'
+            $order->payment_status = 'cancelled';
+            $order->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Đơn hàng đã được hủy và sản phẩm đã được hoàn lại kho'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Lỗi khi hủy đơn hàng: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

@@ -16,14 +16,9 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check()) {
-            return response()->json(['message' => 'Bạn chưa đăng nhập!'], Response::HTTP_UNAUTHORIZED);
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            return redirect()->route('dashboard')->with('error', 'Bạn không có quyền truy cập trang admin');
         }
-
-        if (Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'Bạn không có quyền truy cập!'], Response::HTTP_FORBIDDEN);
-        }
-
         return $next($request);
     }
 }

@@ -1,12 +1,14 @@
 @extends('layouts.app')
-
+@section('title', 'Bảng điều khiển')
 @section('content')
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1>Dashboard</h1>
-                <p>Welcome to your dashboard user, {{ Auth::user()->name }}!</p>
-            </div>
-        </div>
+    <div class="container mt-5">
+        <h2>Bảng điều khiển</h2>
+        @if (session('message'))
+            <div class="alert alert-success">{{ session('message') }}</div>
+        @endif
+        <p>Xin chào, {{ $user->name }}</p>
+        @if ($user->role === 'admin')
+            <a href="{{ route('admin') }}" class="btn btn-primary">Đi đến trang Quản trị</a>
+        @endif
     </div>
 @endsection

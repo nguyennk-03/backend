@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Discount;
+use App\Models\OrderItem;
+use App\Models\ProductVariant;
 
 class MoMoController extends Controller
 {
@@ -120,7 +122,7 @@ class MoMoController extends Controller
         return (int) round(max(0, $finalPrice));
     }
 
-    public function handleReturn(Request $request)
+    public function MoMoSuccess(Request $request)
     {
         try {
             $data = $request->all();
@@ -152,7 +154,7 @@ class MoMoController extends Controller
         }
     }
 
-    public function handleNotify(Request $request)
+    public function MoMoNotify(Request $request)
     {
         try {
             $data = $request->all();
@@ -178,6 +180,54 @@ class MoMoController extends Controller
             return response()->json(['status' => 200, 'message' => 'Xử lý thành công']);
         } catch (\Exception $e) {
             return response()->json(['status' => 500, 'message' => 'Lỗi: ' . $e->getMessage()]);
+        }
+    }
+    public function MoMoCancel(Request $request)
+    {
+        try {
+            $orderId = $request->input('order_id');
+            if (!$orderId || !($order = Order::find($orderId))) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Đơn hàng không tồn tại'
+                ], 404);
+            }
+
+            if ($order->payment_status !== 'pending') {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Đơn hàng không thể hủy vì không ở trạng thái chờ thanh toán'
+                ], 400);
+            }
+
+            $orderItems = OrderItem::where('order_id', $order->id)->get();
+            if ($orderItems->isEmpty()) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Không tìm thấy sản phẩm trong đơn hàng'
+                ], 400);
+            }
+
+            foreach ($orderItems as $item) {
+                $product = ProductVariant::find($item->product_id);
+                if ($product) {
+                    $product->stock += $item->quantity;
+                    $product->save();
+                }
+            }
+
+            $order->payment_status = 'cancelled';
+            $order->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Đơn hàng đã được hủy và sản phẩm đã được hoàn lại kho'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Lỗi khi hủy đơn hàng: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

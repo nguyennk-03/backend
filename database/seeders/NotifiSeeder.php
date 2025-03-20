@@ -3,11 +3,11 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Notification;
+use App\Models\Notifi;
 use App\Models\User;
 use Faker\Factory as Faker;
 
-class NotificationSeeder extends Seeder
+class NotifiSeeder extends Seeder
 {
     public function run()
     {
@@ -15,7 +15,7 @@ class NotificationSeeder extends Seeder
         $userIds = User::pluck('id')->toArray(); 
 
         for ($i = 1; $i <= 20; $i++) {
-            Notification::create([
+            Notifi::create([
                 'user_id' => $faker->randomElement($userIds), 
                 'title' => $faker->sentence(6),
                 'message' => $faker->paragraph(2),
