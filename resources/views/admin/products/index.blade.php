@@ -321,11 +321,8 @@
                                                             @method('PUT')
                                                             <div class="row">
                                                                 <div class="col-md-6 mb-3">
-                                                                    <label for="brand_id_{{ $item->id }}"
-                                                                        class="form-label">Thương
-                                                                        hiệu</label>
-                                                                    <select name="brand_id" id="brand_id_{{ $item->id }}"
-                                                                        class="form-select" required>
+                                                                    <label for="brand_id_{{ $item->id }}" class="form-label">Thương hiệu</label>
+                                                                    <select name="brand_id" id="brand_id_{{ $item->id }}" class="form-select">
                                                                         <option value="">Chọn thương hiệu</option>
                                                                         @foreach ($brands as $brand)
                                                                             <option value="{{ $brand->id }}" {{ old('brand_id', $item->brand_id) == $brand->id ? 'selected' : '' }}>
@@ -339,11 +336,8 @@
                                                                 </div>
 
                                                                 <div class="col-md-6 mb-3">
-                                                                    <label for="category_id_{{ $item->id }}"
-                                                                        class="form-label">Danh
-                                                                        mục</label>
-                                                                    <select name="category_id" id="category_id_{{ $item->id }}"
-                                                                        class="form-select" required>
+                                                                    <label for="category_id_{{ $item->id }}" class="form-label">Danh mục</label>
+                                                                    <select name="category_id" id="category_id_{{ $item->id }}" class="form-select">
                                                                         <option value="">Chọn danh mục</option>
                                                                         @foreach ($categories as $category)
                                                                             <option value="{{ $category->id }}" {{ old('category_id', $item->category_id) == $category->id ? 'selected' : '' }}>
@@ -420,7 +414,6 @@
                                                                     @enderror
                                                                 </div>
                                                             </div>
-
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary"
                                                                     data-bs-dismiss="modal">Đóng</button>
