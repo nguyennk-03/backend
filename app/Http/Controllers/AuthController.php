@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -13,23 +13,11 @@ use Illuminate\Auth\Events\PasswordReset;
 
 class AuthController extends Controller
 {
-    // Hiển thị trang bảng điều khiển
-    public function dashboard()
+    public function index()
     {
-        $user = Auth::guard('web')->user();
-
-        // Kiểm tra vai trò của người dùng
-        if ($user->role === 'user') {
-            return view('user.dashboard', compact('user')); // Nếu là user, hiển thị user/dashboard.blade.php
-        } elseif ($user->role === 'admin') {
-            return view('admin.dashboard', compact('user')); // Nếu là admin, hiển thị admin/dashboard.blade.php
-        }
-
-        // Trường hợp không xác định được vai trò
-        return redirect()->route('dang-nhap')->withErrors(['role' => 'Vai trò không hợp lệ.']);
+        $user = Auth::user(); 
+        return view('user.dashboard', compact('user')); 
     }
-
-    // Hiển thị form đăng nhập
     public function formLogin()
     {
         if (Auth::guard('web')->check()) {
@@ -38,7 +26,6 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    // Xử lý đăng nhập
     public function handleLogin(Request $request)
     {
         $request->validate([
@@ -54,7 +41,6 @@ class AuthController extends Controller
         return back()->withErrors(['email' => 'Thông tin đăng nhập không chính xác.'])->onlyInput('email');
     }
 
-    // Hiển thị form đăng ký
     public function formRegister()
     {
         if (Auth::guard('web')->check()) {
@@ -63,7 +49,6 @@ class AuthController extends Controller
         return view('auth.register'); // Khớp với auth/register.blade.php
     }
 
-    // Xử lý đăng ký
     public function handleRegister(Request $request)
     {
         $request->validate([
@@ -86,13 +71,11 @@ class AuthController extends Controller
         return redirect()->route('bang-dieu-khien')->with('success', 'Đăng ký thành công!');
     }
 
-    // Hiển thị form quên mật khẩu
     public function showForgotPasswordForm()
     {
         return view('auth.passwords.email'); // Khớp với auth/passwords/email.blade.php
     }
 
-    // Gửi email đặt lại mật khẩu
     public function sendResetLink(Request $request)
     {
         $request->validate(['email' => 'required|email']);
@@ -104,13 +87,11 @@ class AuthController extends Controller
             : back()->withErrors(['email' => __($status)]);
     }
 
-    // Hiển thị form đặt lại mật khẩu
     public function showResetForm($token)
     {
         return view('auth.passwords.reset', ['token' => $token]); // Khớp với auth/passwords/reset.blade.php
     }
 
-    // Xử lý đặt lại mật khẩu
     public function resetPassword(Request $request)
     {
         $request->validate([
@@ -136,7 +117,6 @@ class AuthController extends Controller
             : back()->withErrors(['email' => [__($status)]]);
     }
 
-    // Xử lý đăng xuất
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();

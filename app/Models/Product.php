@@ -6,14 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-
 class Product extends Model
 {
     use HasFactory;
 
     protected $table = 'products';
 
-    protected $fillable = ['name', 'slug', 'description', 'price', 'category_id', 'brand_id', 'image_url'];
+    protected $fillable = [
+        'name',
+        'slug',
+        'price',
+        'category_id',
+        'brand_id',
+        'image_url',
+        'description'
+    ];
 
     public static function boot()
     {
@@ -41,6 +48,30 @@ class Product extends Model
     public function variants()
     {
         return $this->hasMany(ProductVariant::class, 'product_id');
+    }
+    public function getTotalStockAttribute()
+    {
+        return $this->variants->sum('stock');
+    }
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = $value;
+        $this->attributes['slug'] = $this->generateUniqueSlug($value);
+    }
+
+    // Hàm tạo slug duy nhất
+    protected function generateUniqueSlug($name)
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $count = 1;
+
+        // Kiểm tra xem slug đã tồn tại chưa, nếu có thì thêm hậu tố
+        while (static::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $count++;
+        }
+
+        return $slug;
     }
 
     public function reviews()

@@ -2,42 +2,52 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\User;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
-        return view('admin.users.index', compact('users'));
-    }
+        $query = User::query();
 
-    public function create()
-    {
-        return view('admin.users.create');
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        $users = $query->get();
+        return view('admin.users.index', compact('users'));
     }
 
     public function store(Request $request)
     {
-        // Validate dữ liệu đầu vào
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'role' => 'required|in:admin,user',
+            'phone' => 'nullable|string|max:15',
+            'role' => 'required|in:user,admin',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'password' => 'required|string|min:8',
         ]);
 
-        // Tạo người dùng mới
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password), // Mã hóa mật khẩu
-            'role' => $request->role,
-        ]);
+        $data = $request->only(['name', 'email', 'phone', 'role']);
+        $data['password'] = bcrypt($request->password);
 
-        return redirect()->route('admin.users.index')->with('success', 'Thêm người dùng thành công');
+        if ($request->hasFile('avatar')) {
+            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = basename($avatarPath);
+        }
+
+        User::create($data);
+
+        return redirect()->route('nguoi-dung.index')->with('success', 'Thêm người dùng thành công!');
     }
 
     public function edit($id)
@@ -48,30 +58,44 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
-
-        // Validate dữ liệu đầu vào
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
-            'role' => 'required|in:admin,user',
+            'phone' => 'nullable|string|max:15',
+            'role' => 'required|in:user,admin',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Cập nhật thông tin người dùng
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
-        ]);
+        $user = User::findOrFail($id);
+        $data = $request->only(['name', 'email', 'phone', 'role']);
 
-        return redirect()->route('admin.users.index')->with('success', 'Cập nhật người dùng thành công');
+        if ($request->hasFile('avatar')) {
+            // Xóa ảnh cũ nếu có
+            if ($user->avatar) {
+                Storage::disk('public')->delete('avatars/' . $user->avatar);
+            }
+            // Upload ảnh mới
+            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = basename($avatarPath);
+        }
+
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        $user->update($data);
+
+        return redirect()->route('nguoi-dung.index')->with('success', 'Cập nhật người dùng thành công!');
     }
 
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+        if ($user->avatar) {
+            Storage::disk('public')->delete('avatars/' . $user->avatar);
+        }
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'Xóa người dùng thành công');
+        return redirect()->route('nguoi-dung.index')->with('success', 'Xóa người dùng thành công!');
     }
 }

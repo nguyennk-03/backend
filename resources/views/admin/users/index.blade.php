@@ -1,5 +1,5 @@
 @extends('admin.layout')
-@section('titlepage', 'Danh sách người dùng')
+@section('title', 'Danh sách người dùng')
 @section('content')
 
     <div class="container-fluid">
@@ -19,95 +19,52 @@
         @if (session('success'))
             <div id="success-message" class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
 
-        <div class="card shadow-sm rounded-lg">
+        <div class="card shadow-sm rounded-lg mb-3">
             <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-12 d-flex justify-content-between align-items-center">
-                        <h4 class="header-title">Danh Sách Người Dùng</h4>
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                            <i class="bi bi-plus-circle"></i> Thêm người dùng
-                        </button>
-                    </div>
-                    <!-- Modal Thêm Người Dùng -->
-                    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header bg-success text-white">
-                                    <h5 class="modal-title"><i class="fas fa-user-plus"></i> Thêm Người Dùng</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <form action="{{ route('nguoi-dung.store') }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold"><i class="fas fa-user"></i> Họ &
-                                                    Tên</label>
-                                                <input type="text" name="name" class="form-control" required>
-                                            </div>
+                <form action="{{ route('nguoi-dung.index') }}" method="GET">
+                    <div class="row g-3">
+                        <!-- Bộ lọc theo vai trò -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Vai trò</label>
+                            <select name="role" class="form-select">
+                                <option value="">-- Tất cả --</option>
+                                <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>Người dùng</option>
+                                <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Quản trị viên
+                                </option>
+                            </select>
+                        </div>
 
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold"><i class="fas fa-envelope"></i>
-                                                    Email</label>
-                                                <input type="email" name="email" class="form-control" required>
-                                            </div>
+                        <!-- Nút tìm kiếm & làm mới -->
+                        <div class="col-md-4 d-flex gap-2 align-items-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Tìm kiếm
+                            </button>
+                            <a href="{{ route('nguoi-dung.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-sync"></i> Làm mới
+                            </a>
+                        </div>
 
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold"><i class="fas fa-phone"></i> Số điện
-                                                    thoại</label>
-                                                <input type="text" name="phone" class="form-control">
-                                            </div>
-
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold"><i class="fas fa-user-tag"></i> Vai
-                                                    trò</label>
-                                                <select name="role" class="form-select">
-                                                    <option value="user">Người dùng</option>
-                                                    <option value="admin">Quản trị viên</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold"><i class="fas fa-image"></i> Ảnh đại
-                                                    diện</label>
-                                                <input type="file" name="avatar" class="form-control">
-                                            </div>
-
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold"><i class="fas fa-lock"></i> Mật
-                                                    khẩu</label>
-                                                <input type="password" name="password" class="form-control" required>
-                                            </div>
-
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold"><i class="fas fa-lock"></i> Xác nhận mật
-                                                    khẩu</label>
-                                                <input type="password" name="password_confirmation" class="form-control"
-                                                    required>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
-                                                class="fas fa-times"></i> Đóng</button>
-                                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Thêm Người
-                                            Dùng</button>
-                                    </div>
-                                </form>
-                            </div>
+                        <div class="col-md-4 d-flex justify-content-end align-items-end">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                data-bs-target="#addUserModal">
+                                <i class="fas fa-plus"></i> Thêm người dùng
+                            </button>
                         </div>
                     </div>
-                </div>
+                </form>
+            </div>
+        </div>
 
-                <!-- Bảng danh sách người dùng -->
-                <table id="UserTable" class="table table-striped">
-                    <thead>
+
+        <div class="card shadow-sm rounded-lg">
+            <div class="card-body">
+                <h4 class="header-title mb-3">Danh Sách Người Dùng</h4>
+                <table id="UserTable" class="table table-striped table-bordered align-middle">
+                    <thead class="table-dark">
                         <tr>
                             <th>ID</th>
                             <th>Họ và Tên</th>
@@ -118,103 +75,46 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($users as $user)
+                        @forelse ($users as $user)
                             <tr>
                                 <td>{{ $user->id }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
-                                <td>{{ $user->phone }}</td>
+                                <td>{{ $user->phone ?? 'N/A' }}</td>
                                 <td>
                                     <span class="badge bg-{{ $user->role === 'admin' ? 'danger' : 'primary' }}">
                                         {{ ucfirst($user->role) }}
                                     </span>
                                 </td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm edit-user-btn" data-id="{{ $user->id }}"
-                                        data-name="{{ $user->name }}" data-email="{{ $user->email }}"
-                                        data-phone="{{ $user->phone }}" data-role="{{ $user->role }}" data-bs-toggle="modal"
-                                        data-bs-target="#editUserModal">
-                                        <i class="fas fa-edit">Sửa</i>
-                                    </button>
-                                    <a href="{{ route('nguoi-dung.destroy', $user->id) }}" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')"><i class="fas fa-trash-alt">Xóa</i></a>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ route('nguoi-dung.show', $user->id) }}" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('nguoi-dung.edit', $user->id) }}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('nguoi-dung.destroy', $user->id) }}" method="POST"
+                                            class="d-inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Không có người dùng nào.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="editUserModalLabel"><i class="fas fa-edit"></i> Cập Nhật Người Dùng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="editUserForm" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="modal-body">
-                        <input type="hidden" id="userId" name="id">
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label fw-bold"><i class="fas fa-user"></i> Họ & Tên</label>
-                                <input type="text" name="name" class="form-control" id="editName" required>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label fw-bold"><i class="fas fa-envelope"></i> Email</label>
-                                <input type="email" name="email" class="form-control" id="editEmail" required>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label fw-bold"><i class="fas fa-phone"></i> Số điện
-                                    thoại</label>
-                                <input type="text" name="phone" class="form-control" id="editPhone">
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold"><i class="fas fa-user-tag"></i> Vai trò</label>
-                                <select name="role" class="form-select" id="editRole">
-                                    <option value="user">Người dùng</option>
-                                    <option value="admin">Quản trị viên</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold"><i class="fas fa-image"></i> Ảnh đại diện</label>
-                                <input type="file" name="avatar" class="form-control">
-                                <div class="mt-2">
-                                    <img id="previewAvatar" src="" alt="Avatar" class="img-thumbnail" width="100">
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label fw-bold"><i class="fas fa-lock"></i> Mật khẩu (Để
-                                    trống nếu không đổi)</label>
-                                <input type="password" name="password" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>
-                            Đóng</button>
-                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Lưu thay đổi</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript xử lý Modal -->
-    <script>
-
-    </script>
 
 @endsection

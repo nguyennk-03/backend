@@ -1,5 +1,5 @@
 @extends('admin.layout')
-@section('titlepage', 'Danh sách danh mục')
+@section('title', 'Danh sách danh mục')
 @section('content')
 
     <div class="container-fluid">
@@ -67,8 +67,8 @@
                     </div>
                 </div>
 
-                <table id="CategoryTable" class="table table-striped table-hover">
-                    <thead class="bg-dark text-white">
+                <table id="CategoryTable" class="table table-striped table-bordered align-middle">
+                    <thead class="table-dark">
                         <tr>
                             <th>ID</th>
                             <th>Tên Danh Mục</th>
@@ -80,10 +80,23 @@
                             <tr>
                                 <td>{{ $category->id }}</td>
                                 <td>{{ $category->name }}</td>
-                                <td class="action-icons">
-                                    <a href="{{ route('danh-muc.edit', $category->id) }}" class="btn btn-warning btn-sm">Sửa</a>
-                                    <a href="{{ route('danh-muc.destroy', $category->id) }}" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?')">Xóa</a>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ route('danh-muc.show', $order->id) }}" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('danh-muc.edit', $order->id) }}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('danh-muc.destroy', $order->id) }}" method="POST" class="d-inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

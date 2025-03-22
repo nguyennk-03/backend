@@ -10,7 +10,7 @@ class ProductVariant extends Model {
 
     protected $table = 'product_variants';
 
-    protected $fillable = ['product_id', 'size_id', 'color_id', 'stock'];
+    protected $fillable = ['product_id', 'size_id', 'color_id', 'stock', 'sold'];
 
     public function size() {
         return $this->belongsTo(Size::class);
