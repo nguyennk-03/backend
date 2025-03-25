@@ -35,7 +35,7 @@ class ProductController extends Controller
             $sort = $request->sort === 'price_asc' ? 'asc' : 'desc';
             $query->orderBy('price', $sort);
         } else {
-            $query->orderBy('created_at', 'desc');
+            $query->orderBy('id', 'desc');
         }
 
         $products = $query->get();
