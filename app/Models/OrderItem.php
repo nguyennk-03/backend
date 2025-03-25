@@ -17,12 +17,14 @@ class OrderItem extends Model {
         'price' => 'decimal:2',
     ];
 
-    public function order() {
-        return $this->belongsTo(Order::class);
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 
-    public function productVariant() {
-        return $this->belongsTo(ProductVariant::class, 'variant_id');
+    public function variant()
+    {
+        return $this->belongsTo(ProductVariant::class, 'variant_id', 'id');
     }
     
     public function getTotalPriceAttribute()

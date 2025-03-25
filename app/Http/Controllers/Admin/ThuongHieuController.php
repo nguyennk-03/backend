@@ -6,7 +6,7 @@ use App\Models\Brand;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class BrandController extends Controller
+class ThuongHieuController extends Controller
 {
     public function index()
     {

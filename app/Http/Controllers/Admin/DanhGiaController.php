@@ -8,9 +8,8 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 
-class ReviewController extends Controller
+class DanhGiaController extends Controller
 {
-    // Hiển thị danh sách đánh giá
     public function index()
     {
         $reviews = Review::with('user', 'product')->get();
@@ -18,7 +17,6 @@ class ReviewController extends Controller
         return view('admin.reviews.index', compact('reviews','products'));
     }
 
-    // Lưu review mới
     public function store(Request $request)
     {
         $request->validate([
@@ -37,14 +35,12 @@ class ReviewController extends Controller
         return redirect()->route('reviews')->with('success', 'Đánh giá đã được thêm!');
     }
 
-    // Hiển thị form chỉnh sửa review
     public function edit($id)
     {
         $review = Review::findOrFail($id);
         return view('admin.reviews.edit', compact('review'));
     }
 
-    // Cập nhật review
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -61,7 +57,6 @@ class ReviewController extends Controller
         return redirect()->route('reviews')->with('success', 'Đánh giá đã được cập nhật!');
     }
 
-    // Xóa review
     public function destroy($id)
     {
         Review::findOrFail($id)->delete();

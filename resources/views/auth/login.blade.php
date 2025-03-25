@@ -34,7 +34,7 @@
                                         <input type="checkbox" class="form-check-input" id="checkbox-signin">
                                         <label class="form-check-label" for="checkbox-signin">Ghi nhớ đăng nhập</label>
                                     </div>
-                                    <a href="{{ route('hien-thi-form-quen-mat-khau') }}" class="text-muted small">Quên mật khẩu?</a>
+                                    <a href="{{ route('quen-mat-khau') }}" class="text-muted small">Quên mật khẩu?</a>
                                 </div>
 
                                 <div class="text-center">

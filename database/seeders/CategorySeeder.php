@@ -11,9 +11,6 @@ class CategorySeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create();
-
-        // Tạo danh mục cha
         $categories = [
             1 => ['name' => 'Nam', 'slug' => 'nam', 'image_url' => 'images/categories/Men.jpg'],
             2 => ['name' => 'Nữ', 'slug' => 'nu', 'image_url' => 'images/categories/Women.jpg'],
@@ -31,7 +28,6 @@ class CategorySeeder extends Seeder
             );
         }
 
-        // Tạo danh mục con
         $subCategories = [
             4  => ['name' => 'Yêu thích Nam', 'parent_id' => 1, 'slug' => 'yeu-thich-nam'],
             5  => ['name' => 'Nổi bật Nam', 'parent_id' => 1, 'slug' => 'noi-bat-nam'],
@@ -48,7 +44,7 @@ class CategorySeeder extends Seeder
             Category::updateOrCreate(
                 ['id' => $id],
                 array_merge($data, [
-                    'image_url' => $faker->imageUrl(200, 200, 'fashion'),
+                    'image_url' => null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ])

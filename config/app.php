@@ -149,10 +149,12 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
+
 
         /*
-    * Package Service Providers...
-    */
+         * Package Service Providers...
+         */
 
         /*
     * Application Service Providers...

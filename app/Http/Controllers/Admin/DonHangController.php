@@ -8,7 +8,7 @@ use App\Models\Product;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
+class DonHangController extends Controller
 {
     public function index(Request $request)
     {
