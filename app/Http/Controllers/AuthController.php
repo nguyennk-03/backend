@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use App\Mail\ResetPasswordLink;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -216,7 +217,7 @@ class AuthController extends Controller
             );
 
             if ($status === Password::PASSWORD_RESET) {
-                \DB::table('password_reset_tokens')
+                DB::table('password_reset_tokens')
                     ->where('email', $request->email)
                     ->delete();
 
