@@ -91,7 +91,7 @@
             <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản của mình.</p>
             <p>Vui lòng nhấn vào nút bên dưới để đặt lại mật khẩu:</p>
 
-            <a href="{{ $frontend_url }}" class="btn-reset">🔑 Đặt lại mật khẩu</a>
+            <a href="{{ $url }}" class="btn-reset">🔑 Đặt lại mật khẩu</a>
 
             <p class="footer">
                 Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.<br>

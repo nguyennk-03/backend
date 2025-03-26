@@ -162,7 +162,6 @@ class AuthController extends Controller
             ]);
 
             $email = $request->email;
-
             $user = User::where('email', $email)->first();
 
             if (!$user) {
@@ -170,8 +169,9 @@ class AuthController extends Controller
             }
 
             $token = Password::broker()->createToken($user);
-            $fontendUrl = config('app.frontend_url');
-            $url = url($fontendUrl . "/password/reset/{$token}?email=" . urlencode($email));
+            $frontendUrl = config('app.frontend_url');
+            $url = "{$frontendUrl}/password/reset/{$token}?email=" . urlencode($email);
+
             Mail::to($email)->send(new ResetPasswordLink($url));
 
             return response()->json(['message' => 'Vào email của bạn để xác nhận yêu cầu đổi mật khẩu!'], 200);
