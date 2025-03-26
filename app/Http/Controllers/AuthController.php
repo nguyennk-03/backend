@@ -170,8 +170,8 @@ class AuthController extends Controller
             }
 
             $token = Password::broker()->createToken($user);
-
-            $url = url(config('app.url') . "/password/reset/{$token}?email=" . urlencode($email));
+            $fontendUrl = config('app.frontend_url');
+            $url = url($fontendUrl . "/password/reset/{$token}?email=" . urlencode($email));
             Mail::to($email)->send(new ResetPasswordLink($url));
 
             return response()->json(['message' => 'Vào email của bạn để xác nhận yêu cầu đổi mật khẩu!'], 200);
@@ -187,7 +187,6 @@ class AuthController extends Controller
             ], 500);
         }
     }
-
 
     public function resetPasswordApi(Request $request)
     {

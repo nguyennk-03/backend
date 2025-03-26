@@ -53,6 +53,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+    'font_url' => env('APP_FONT_URL', 'https://localhost:4200'),
 
     /*
     |-------------------------------------------------------------------------- 

@@ -19,7 +19,7 @@ class DanhMucController extends Controller
     public function show($slug)
     {
         $category = Category::where('slug', $slug)->firstOrFail();
-        $products = $category->products()->paginate(12); // Ví dụ
+        $products = $category->products()->get(); // Ví dụ
 
         return view('categories.show', [
             'category' => $category,

@@ -17,7 +17,7 @@ class ThuongHieuController extends Controller
     {
         $brand = Brand::where('slug', $slug)->firstOrFail();
 
-        $products = $brand->products()->paginate(12); // Ví dụ
+        $products = $brand->products()->get(); // Ví dụ
 
         return view('brands.show', [
             'brand' => $brand,

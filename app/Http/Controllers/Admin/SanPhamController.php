@@ -18,22 +18,23 @@ class SanPhamController extends Controller
 
         return view('admin.products.index', compact('categories', 'brands', 'products'));
     }
-
-    public function show($slug)
+    public function show(Request $request, $id)
     {
-        $product = Product::where('slug', $slug)->firstOrFail();
+        try {
+            $product = Product::with([
+                'category:id,name',
+                'brand:id,name',
+                'variants:size_id,color_id,stock,sold'
+            ])->findOrFail($id);
 
-        $relatedProducts = Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->limit(4)
-            ->get(); 
+            $categories = $request->has('edit') ? Category::orderBy('name', 'ASC')->get() : null;
+            $brands = $request->has('edit') ? Brand::orderBy('name', 'ASC')->get() : null;
 
-        return view('products.show', [
-            'product' => $product,
-            'relatedProducts' => $relatedProducts
-        ]);
+            return view('admin.products.show', compact('product', 'categories', 'brands'));
+        } catch (\Exception $e) {
+            return redirect()->route('san-pham.index')->with('error', 'Không tìm thấy sản phẩm.');
+        }
     }
-
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -42,35 +43,35 @@ class SanPhamController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'variant.*.stock' => 'required|integer|min:0',
+            'stock' => 'required|integer|min:0', // Added consistency with update()
             'img' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         try {
+            // Handle image upload consistently with update()
             if ($request->hasFile('img')) {
-                $file = $request->file('img');
-                $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('images/products/new'), $fileName);
-                $validatedData['image'] = 'images/products/new/' . $fileName;
+                $imagePath = $request->file('img')->store('images/products/new', 'public');
+                $validatedData['image'] = $imagePath;
             }
 
             $product = Product::create($validatedData);
+
             $product->variants()->create([
-                'size_id' => Size::value('id') ?? 1,
-                'color_id' => Color::value('id') ?? 1,
-                'stock' => $request->input('stock', 0),
+                'size_id' => $request->input('size_id', 1),  // Make configurable
+                'color_id' => $request->input('color_id', 1), // Make configurable
+                'stock' => $validatedData['stock'],
                 'sold' => 0,
             ]);
 
             return redirect()->route('san-pham.index')->with('success', 'Thêm sản phẩm thành công');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Có lỗi xảy ra: ' . $e->getMessage()])->withInput();
+            Log::error('Product creation failed: ' . $e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage())->withInput();
         }
     }
 
     public function update(Request $request, $id)
     {
-        // Validate dữ liệu
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
@@ -82,39 +83,39 @@ class SanPhamController extends Controller
         ]);
 
         try {
-            // Tìm sản phẩm
             $product = Product::findOrFail($id);
 
-            // Xử lý upload ảnh
+            // Handle image upload
             if ($request->hasFile('img')) {
-                // Xóa ảnh cũ nếu tồn tại
-                if ($product->image && file_exists(public_path($product->image))) {
-                    unlink(public_path($product->image));
+                // Delete old image if exists
+                if ($product->image && Storage::disk('public')->exists($product->image)) {
+                    Storage::disk('public')->delete($product->image);
                 }
-                $file = $request->file('img');
-                $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('images/products/new'), $fileName);
-                $validatedData['image'] = 'images/products/new/' . $fileName;
+
+                $imagePath = $request->file('img')->store('images/products/new', 'public');
+                $validatedData['image'] = $imagePath;
+            } else {
+                unset($validatedData['img']);
             }
 
-            // Cập nhật sản phẩm
+            // Update product
             $product->update($validatedData);
 
-            // Cập nhật hoặc tạo variant (giả sử có bảng variants)
+            // Update or create variant with more flexible parameters
             $product->variants()->updateOrCreate(
                 ['product_id' => $product->id],
                 [
                     'stock' => $validatedData['stock'],
-                    'size_id' => 1,  
-                    'color_id' => 1, // Thay bằng logic thực tế nếu cần
-                    'sold' => 0
+                    'size_id' => $request->input('size_id', 1),  // Make configurable
+                    'color_id' => $request->input('color_id', 1), // Make configurable
+                    'sold' => $product->variants()->first()->sold ?? 0 // Preserve existing sold value
                 ]
             );
 
             return redirect()->route('san-pham.index')->with('success', 'Cập nhật sản phẩm thành công');
         } catch (\Exception $e) {
-            Log::error('Lỗi khi cập nhật sản phẩm: ' . $e->getMessage());
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage())->withInput();
+            Log::error('Product update failed: ' . $e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra khi cập nhật sản phẩm')->withInput();
         }
     }
 

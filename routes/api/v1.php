@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\Api\MomoController;
 use App\Http\Controllers\Api\VNPayController;
 use App\Http\Controllers\Api\ZaloPayController;
-use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\NotifiController;
 use App\Http\Controllers\Api\ProductDiscountController;
 use App\Http\Controllers\Api\NewsController;
 use Illuminate\Http\Request;
@@ -60,7 +60,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('wishlists', WishlistController::class)->only(['index', 'store', 'show', 'destroy']);
         Route::apiResource('discounts', DiscountController::class)->only(['index', 'show']);
         Route::apiResource('product-discounts', ProductDiscountController::class)->only(['index', 'show']);
-        Route::apiResource('notifications', NotificationController::class);
+        Route::apiResource('notifis', NotifiController::class);
 
         Route::post('logout', [AuthController::class, 'logout']);
     });

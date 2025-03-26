@@ -365,16 +365,10 @@
                                                                     </div>
                                                                     <div class="col-md-12">
                                                                         <div class="custom-file-upload">
-                                                                            <label for="img_{{ $item->id }}" class="form-label">Chọn hình ảnh</label>
-                                                                            <input type="file" name="img" id="img_{{ $item->id }}" class="form-control"
-                                                                                accept="image/*">
+                                                                            <label for="img" class="form-label">Chọn hình ảnh</label>
+                                                                            <input type="file" name="img" id="img" class="form-control" accept="image/*" style="display: none;">
                                                                         </div>
-                                                                        <div class="image-preview mt-2" id="preview_{{ $item->id }}">
-                                                                            @if ($item->image)
-                                                                                <img src="{{ asset($item->image) }}" class="img-thumbnail" alt="{{ $item->name }}"
-                                                                                    style="max-width: 200px;">
-                                                                            @endif
-                                                                        </div>
+                                                                        <div class="image-preview mt-2" id="preview_add"></div>
                                                                         @error('img')
                                                                             <span class="text-danger small">{{ $message }}</span>
                                                                         @enderror
