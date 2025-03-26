@@ -282,12 +282,21 @@
                                                 <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title fw-bold" id="editModalLabel{{ $item->id }}">Chỉnh sửa sản phẩm #{{ $item->id }}</h5>
+                                                            <h5 class="modal-title fw-bold" id="editModalLabel{{ $item->id }}">Chỉnh sửa sản phẩm #{{ $item->id }}
+                                                            </h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="{{ route('san-pham.update', $item->id) }}" method=" POST"
-                                                                enctype="multipart/form-data">
+                                                            @if ($errors->any())
+                                                                <div class="alert alert-danger">
+                                                                    <ul>
+                                                                        @foreach ($errors->all() as $error)
+                                                                            <li>{{ $error }}</li>
+                                                                        @endforeach
+                                                                    </ul>
+                                                                </div>
+                                                            @endif
+                                                            <form action="{{ route('san-pham.update', $item->id) }}" method="POST" enctype="multipart/form-data">
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <div class="row g-4">
@@ -310,8 +319,8 @@
                                                                         <select name="category_id" id="category_id_{{ $item->id }}" class="form-select">
                                                                             <option value="">Chọn danh mục</option>
                                                                             @foreach ($categories as $category)
-                                                                                    <option value=" {{ $category->id }}" {{ old('category_id', $item->category_id) == $category->id ? 'selected' : '' }}>
-                                                                                {{ $category->name }}
+                                                                                <option value="{{ $category->id }}" {{ old('category_id', $item->category_id) == $category->id ? 'selected' : '' }}>
+                                                                                    {{ $category->name }}
                                                                                 </option>
                                                                             @endforeach
                                                                         </select>
@@ -321,48 +330,49 @@
                                                                     </div>
                                                                     <div class="col-md-12">
                                                                         <label for="name_{{ $item->id }}" class="form-label">Tên sản phẩm</label>
-                                                                            <input type="text" name="name" id="name_{{ $item->id }}"
-                                                                                class="form-control" value="{{ old('name', $item->name) }}"
-                                                                                placeholder="Nhập tên sản phẩm" required>
-                                                                            @error('name')
-                                                                                <span class="text-danger small">{{ $message }}</span>
-                                                                            @enderror
+                                                                        <input type="text" name="name" id="name_{{ $item->id }}" class="form-control"
+                                                                            value="{{ old('name', $item->name) }}" placeholder="Nhập tên sản phẩm" required>
+                                                                        @error('name')
+                                                                            <span class="text-danger small">{{ $message }}</span>
+                                                                        @enderror
                                                                     </div>
                                                                     <div class="col-md-6">
                                                                         <label for="price_{{ $item->id }}" class="form-label">Giá</label>
-                                                                            <input type="number" name="price" id="price_{{ $item->id }}"
-                                                                                class="form-control" value="{{ old('price', $item->price) }}"
-                                                                                placeholder="Nhập giá sản phẩm" min="0" required>
-                                                                            @error('price')
-                                                                                <span class="text-danger small">{{ $message }}</span>
-                                                                            @enderror
+                                                                        <input type="number" name="price" id="price_{{ $item->id }}" class="form-control"
+                                                                            value="{{ old('price', $item->price) }}" placeholder="Nhập giá sản phẩm" min="0"
+                                                                            required>
+                                                                        @error('price')
+                                                                            <span class="text-danger small">{{ $message }}</span>
+                                                                        @enderror
                                                                     </div>
                                                                     <div class="col-md-6">
                                                                         <label for="stock_{{ $item->id }}" class="form-label">Số lượng tồn kho</label>
-                                                                            <input type="number" name="stock" id="stock_{{ $item->id }}"
-                                                                                class="form-control" value="{{ old('stock', $item->total_stock) }}"
-                                                                                placeholder="Nhập số lượng tồn kho" min="0">
-                                                                            @error('stock')
-                                                                                <span class="text-danger small">{{ $message }}</span>
-                                                                            @enderror
+                                                                        <input type="number" name="stock" id="stock_{{ $item->id }}" class="form-control"
+                                                                            value="{{ old('stock', $item->total_stock) }}" placeholder="Nhập số lượng tồn kho"
+                                                                            min="0" required>
+                                                                        @error('stock')
+                                                                            <span class="text-danger small">{{ $message }}</span>
+                                                                        @enderror
                                                                     </div>
                                                                     <div class="col-md-12">
-                                                                        <label for="description_{{ $item->id }}"  class="form-label">Mô tả</label>
-                                                                            <textarea name="description" id="description_{{ $item->id }}"
-                                                                                class="form-control" placeholder=" Nhập mô tả sản phẩm"
-                                                                                rows="3">{{ old('description', $item->description) }}</textarea>
-                                                                            @error('description')
-                                                                                <span class="text-danger small">{{ $message }}</span>
-                                                                            @enderror
+                                                                        <label for="description_{{ $item->id }}" class="form-label">Mô tả</label>
+                                                                        <textarea name="description" id="description_{{ $item->id }}" class="form-control"
+                                                                            placeholder="Nhập mô tả sản phẩm"
+                                                                            rows="3">{{ old('description', $item->description) }}</textarea>
+                                                                        @error('description')
+                                                                            <span class="text-danger small">{{ $message }}</span>
+                                                                        @enderror
                                                                     </div>
                                                                     <div class="col-md-12">
                                                                         <div class="custom-file-upload">
                                                                             <label for="img_{{ $item->id }}" class="form-label">Chọn hình ảnh</label>
-                                                                            <input type="file" name="img" id="img_{{ $item->id }}" class="form-control" accept="image/*" style="display: none;">
+                                                                            <input type="file" name="img" id="img_{{ $item->id }}" class="form-control"
+                                                                                accept="image/*">
                                                                         </div>
                                                                         <div class="image-preview mt-2" id="preview_{{ $item->id }}">
                                                                             @if ($item->image_url)
-                                                                                <img src="{{ asset($item->image_url) }}" class="img-thumbnail" alt="{{ $item->name }}">
+                                                                                <img src="{{ asset($item->image_url) }}" class="img-thumbnail" alt="{{ $item->name }}"
+                                                                                    style="max-width: 200px;">
                                                                             @endif
                                                                         </div>
                                                                         @error('img')

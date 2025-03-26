@@ -12,14 +12,9 @@ class SanPhamController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = Category::orderBy('name')->get();
-        $brands = Brand::orderBy('name')->get();
-
-        $products = Product::with('category', 'brand', 'variants')
-            ->when($request->search_name, fn($q) => $q->where('name', 'like', "%{$request->search_name}%"))
-            ->when($request->category_id, fn($q) => $q->where('category_id', $request->category_id))
-            ->get()
-            ->map(fn($product) => $product->setAttribute('image_display_url', $product->image_url ? Storage::url($product->image_url) : null));
+        $categories = category::orderBy('name', 'ASC')->get();
+        $brands = Brand::orderBy('name', 'ASC')->get();
+        $products = Product::with(['category:id,name', 'brand:id,name'])->orderBy('id', 'DESC')->get();
 
         return view('admin.products.index', compact('categories', 'brands', 'products'));
     }
@@ -32,7 +27,6 @@ class SanPhamController extends Controller
                 'variants:size_id,color_id,stock,sold'
             ])->findOrFail($id);
 
-            // Chỉ lấy categories và brands nếu cần cho chỉnh sửa
             $categories = $request->has('edit') ? Category::orderBy('name', 'ASC')->get() : null;
             $brands = $request->has('edit') ? Brand::orderBy('name', 'ASC')->get() : null;
 
@@ -77,6 +71,7 @@ class SanPhamController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Validate dữ liệu
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
@@ -88,9 +83,12 @@ class SanPhamController extends Controller
         ]);
 
         try {
+            // Tìm sản phẩm
             $product = Product::findOrFail($id);
 
+            // Xử lý upload ảnh
             if ($request->hasFile('img')) {
+                // Xóa ảnh cũ nếu tồn tại
                 if ($product->image_url && file_exists(public_path($product->image_url))) {
                     unlink(public_path($product->image_url));
                 }
@@ -100,15 +98,24 @@ class SanPhamController extends Controller
                 $validatedData['image_url'] = 'images/products/new/' . $fileName;
             }
 
+            // Cập nhật sản phẩm
             $product->update($validatedData);
+
+            // Cập nhật hoặc tạo variant (giả sử có bảng variants)
             $product->variants()->updateOrCreate(
                 ['product_id' => $product->id],
-                ['stock' => $validatedData['stock'], 'size_id' => 1, 'color_id' => 1, 'sold' => 0]
+                [
+                    'stock' => $validatedData['stock'],
+                    'size_id' => 1,  
+                    'color_id' => 1, // Thay bằng logic thực tế nếu cần
+                    'sold' => 0
+                ]
             );
 
             return redirect()->route('san-pham.index')->with('success', 'Cập nhật sản phẩm thành công');
         } catch (\Exception $e) {
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+            Log::error('Lỗi khi cập nhật sản phẩm: ' . $e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage())->withInput();
         }
     }
 

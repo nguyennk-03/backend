@@ -12,10 +12,7 @@ class DanhMucController extends Controller
 {
     public function index()
     {
-        $categories = Category::orderBy('id', 'desc')->get()->map(function ($category) {
-            $category->image_display_url = $category->img_url ? Storage::url($category->img_url) : null;
-            return $category;
-        });
+        $categories = Category::orderBy('id', 'asc')->get();
         return view('admin.categories.index', compact('categories'));
     }
 
