@@ -13,7 +13,17 @@ class ThuongHieuController extends Controller
         $brands = Brand::all();
         return view('admin.brands.index', compact('brands'));
     }
+    public function show($slug)
+    {
+        $brand = Brand::where('slug', $slug)->firstOrFail();
 
+        $products = $brand->products()->paginate(12); // Ví dụ
+
+        return view('brands.show', [
+            'brand' => $brand,
+            'products' => $products
+        ]);
+    }
     public function store(Request $request)
     {
         Brand::create($request->all());

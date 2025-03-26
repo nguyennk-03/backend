@@ -16,6 +16,17 @@ class DanhMucController extends Controller
         return view('admin.categories.index', compact('categories'));
     }
 
+    public function show($slug)
+    {
+        $category = Category::where('slug', $slug)->firstOrFail();
+        $products = $category->products()->paginate(12); // Ví dụ
+
+        return view('categories.show', [
+            'category' => $category,
+            'products' => $products
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([

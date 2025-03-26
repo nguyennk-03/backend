@@ -18,6 +18,7 @@ class SanPhamController extends Controller
 
         return view('admin.products.index', compact('categories', 'brands', 'products'));
     }
+    
     public function show(Request $request, $id)
     {
         try {
