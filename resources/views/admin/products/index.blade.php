@@ -208,8 +208,8 @@
                                     <tr>
                                         <td class="text-center">{{ $item->id }}</td>
                                         <td class="text-center">
-                                            @if (!empty($item->image_url))
-                                                <img src="{{ asset($item->image_url) }}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;" alt="{{ $item->name }}">
+                                            @if (!empty($item->image))
+                                                <img src="{{ asset($item->image) }}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;" alt="{{ $item->name }}">
                                             @else
                                                 <span class="text-muted">Chưa có ảnh</span>
                                             @endif
@@ -250,8 +250,8 @@
                                                         <div class="modal-body">
                                                             <div class="row g-4">
                                                                 <div class="col-md-4 d-flex justify-content-center align-items-center">
-                                                                    @if (!empty($item->image_url))
-                                                                        <img src=" {{ asset($item->image_url) }}" class="img-fluid" alt="{{ $item->name }}">
+                                                                    @if (!empty($item->image))
+                                                                        <img src=" {{ asset($item->image) }}" class="img-fluid" alt="{{ $item->name }}">
                                                                     @else
                                                                         <div class="bg-light rounded p-3 text-muted text-center"
                                                                             style="width: 200px; height: 200px; line-height: 200px;">Chưa có ảnh</div>
@@ -370,8 +370,8 @@
                                                                                 accept="image/*">
                                                                         </div>
                                                                         <div class="image-preview mt-2" id="preview_{{ $item->id }}">
-                                                                            @if ($item->image_url)
-                                                                                <img src="{{ asset($item->image_url) }}" class="img-thumbnail" alt="{{ $item->name }}"
+                                                                            @if ($item->image)
+                                                                                <img src="{{ asset($item->image) }}" class="img-thumbnail" alt="{{ $item->name }}"
                                                                                     style="max-width: 200px;">
                                                                             @endif
                                                                         </div>

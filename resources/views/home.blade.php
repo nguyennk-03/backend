@@ -25,7 +25,7 @@
       <ul class="collection-list has-scrollbar">
         @foreach($categories as $category)
       <li>
-      <div class="collection-card" style="background-image: url('{{ asset($category->image_url) }}')">
+      <div class="collection-card" style="background-image: url('{{ asset($category->image) }}')">
         <h3 class="h4 card-title">{{ $category->name }} Collections</h3>
         <a href="{{ route('category.show', $category->slug) }}" class="btn btn-secondary">
         <span>Explore All</span>
@@ -52,7 +52,7 @@
         @foreach($bestsellers as $product)
         @php
         $variant = $product->variants->first(); // Get the first variant
-        $image = $variant->images->first()->image_url ?? asset('images/default-product.jpg');
+        $image = $variant->images->first()->image ?? asset('images/default-product.jpg');
         $price = $variant->price;
         $oldPrice = null; // Add logic for discounts if applicable
       @endphp
@@ -163,7 +163,7 @@
         @foreach($specialProducts as $product)
         @php
         $variant = $product->variants->first();
-        $image = $variant->images->first()->image_url ?? asset('images/default-product.jpg');
+        $image = $variant->images->first()->image ?? asset('images/default-product.jpg');
         $price = $variant->price;
     @endphp
         <li class="product-item">

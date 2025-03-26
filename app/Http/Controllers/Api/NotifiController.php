@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Notification;
+use App\Models\Notifi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class NotificationController extends Controller
+class NotifiController extends Controller
 {
     public function index()
     {
-        $notifications = Notification::where('user_id', Auth::id())
+        $Notifis = Notifi::where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return response()->json(['status' => 200, 'notifications' => $notifications]);
+        return response()->json(['status' => 200, 'Notifis' => $Notifis]);
     }
 
     public function store(Request $request)
@@ -27,7 +27,7 @@ class NotificationController extends Controller
             'link' => 'nullable|string|max:255',
         ]);
 
-        $notification = Notification::create([
+        $Notifi = Notifi::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
             'message' => $request->message,
@@ -38,41 +38,41 @@ class NotificationController extends Controller
         return response()->json([
             'status' => 201,
             'message' => 'Thông báo đã được tạo.',
-            'notification' => $notification,
+            'Notifi' => $Notifi,
         ], 201);
     }
 
     public function show($id)
     {
-        $notification = Notification::where('id', $id)
+        $Notifi = Notifi::where('id', $id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        return response()->json(['status' => 200, 'notification' => $notification]);
+        return response()->json(['status' => 200, 'Notifi' => $Notifi]);
     }
 
     public function update(Request $request, $id)
     {
-        $notification = Notification::where('id', $id)
+        $Notifi = Notifi::where('id', $id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        $notification->update(['status' => 'read']);
+        $Notifi->update(['status' => 'read']);
 
         return response()->json([
             'status' => 200,
             'message' => 'Thông báo đã được cập nhật.',
-            'notification' => $notification,
+            'Notifi' => $Notifi,
         ]);
     }
 
     public function destroy($id)
     {
-        $notification = Notification::where('id', $id)
+        $Notifi = Notifi::where('id', $id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        $notification->delete();
+        $Notifi->delete();
 
         return response()->json([
             'status' => 200,

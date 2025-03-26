@@ -12,9 +12,8 @@ class CategorySeeder extends Seeder
     public function run()
     {
         $categories = [
-            1 => ['name' => 'Nam', 'slug' => 'nam', 'image_url' => 'images/categories/Men.jpg'],
-            2 => ['name' => 'Nữ', 'slug' => 'nu', 'image_url' => 'images/categories/Women.jpg'],
-            3 => ['name' => 'Trẻ Em', 'slug' => 'tre-em', 'image_url' => 'images/categories/Kids.jpg'],
+            1 => ['name' => 'Nam', 'slug' => 'nam', 'image' => 'images/categories/Men.jpg'],
+            2 => ['name' => 'Nữ', 'slug' => 'nu', 'image' => 'images/categories/Women.jpg'],
         ];
 
         foreach ($categories as $id => $data) {
@@ -29,22 +28,19 @@ class CategorySeeder extends Seeder
         }
 
         $subCategories = [
-            4  => ['name' => 'Yêu thích Nam', 'parent_id' => 1, 'slug' => 'yeu-thich-nam'],
-            5  => ['name' => 'Nổi bật Nam', 'parent_id' => 1, 'slug' => 'noi-bat-nam'],
-            6  => ['name' => 'Bán chạy Nam', 'parent_id' => 1, 'slug' => 'ban-chay-nam'],
-            7  => ['name' => 'Yêu thích Nữ', 'parent_id' => 2, 'slug' => 'yeu-thich-nu'],
-            8  => ['name' => 'Nổi bật Nữ', 'parent_id' => 2, 'slug' => 'noi-bat-nu'],
-            9  => ['name' => 'Bán chạy Nữ', 'parent_id' => 2, 'slug' => 'ban-chay-nu'],
-            10 => ['name' => 'Yêu thích Trẻ Em', 'parent_id' => 3, 'slug' => 'yeu-thich-tre-em'],
-            11 => ['name' => 'Nổi bật Trẻ Em', 'parent_id' => 3, 'slug' => 'noi-bat-tre-em'],
-            12 => ['name' => 'Bán chạy Trẻ Em', 'parent_id' => 3, 'slug' => 'ban-chay-tre-em'],
+            3  => ['name' => 'Yêu thích Nam', 'parent_id' => 1, 'slug' => 'yeu-thich-nam'],
+            4  => ['name' => 'Nổi bật Nam', 'parent_id' => 1, 'slug' => 'noi-bat-nam'],
+            5  => ['name' => 'Bán chạy Nam', 'parent_id' => 1, 'slug' => 'ban-chay-nam'],
+            6  => ['name' => 'Yêu thích Nữ', 'parent_id' => 2, 'slug' => 'yeu-thich-nu'],
+            7  => ['name' => 'Nổi bật Nữ', 'parent_id' => 2, 'slug' => 'noi-bat-nu'],
+            8  => ['name' => 'Bán chạy Nữ', 'parent_id' => 2, 'slug' => 'ban-chay-nu'],
         ];
 
         foreach ($subCategories as $id => $data) {
             Category::updateOrCreate(
                 ['id' => $id],
                 array_merge($data, [
-                    'image_url' => null,
+                    'image' => null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ])

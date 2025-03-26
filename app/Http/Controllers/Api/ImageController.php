@@ -42,7 +42,7 @@ class ImageController extends Controller
             // Lưu vào database
             $image = Image::create([
                 'product_variant_id' => $request->product_variant_id,
-                'image_url' => $fullImageUrl,
+                'image' => $fullImageUrl,
             ]);
 
             return response()->json([
@@ -74,7 +74,7 @@ class ImageController extends Controller
             return response()->json(['message' => 'Không tìm thấy hình ảnh!'], 404);
 
         // Kiểm tra và xóa file ảnh
-        $imagePath = public_path(str_replace(asset('/'), '', $image->image_url));
+        $imagePath = public_path(str_replace(asset('/'), '', $image->image));
         if (file_exists($imagePath) && is_file($imagePath)) {
             unlink($imagePath);
         }

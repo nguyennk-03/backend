@@ -11,13 +11,12 @@ class ImageSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create();
-        $productVariantIds = ProductVariant::pluck('id')->toArray();
+        $variants = ProductVariant::all();
 
-        for ($i = 1; $i <= 30; $i++) {
+        foreach ($variants as $variant) {
             Image::create([
-                'variant_id' => $faker->randomElement($productVariantIds),
-                'image_url' => Image::getRandomImage(),
+                'variant_id' => $variant->id,
+                'image' => Image::getRandomImage(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

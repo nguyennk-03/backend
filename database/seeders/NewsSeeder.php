@@ -98,7 +98,7 @@ class NewsSeeder extends Seeder
                 'title' => 'Asics Gel-Kayano – Bước tiến vượt bậc trong công nghệ giày chạy',
                 'content' => 'Asics Gel-Kayano nổi tiếng với sự ổn định và khả năng giảm chấn tuyệt vời. Công nghệ GEL đặc trưng giúp
                 bảo vệ chân khỏi tác động mạnh, mang lại cảm giác thoải mái ngay cả khi chạy đường dài.',
-                'category_id' => 9,
+                'category_id' => 1,
                 'brand_id' => 2,
                 'image' => 'images/news/asics_gelkayano.jpg'
             ],
@@ -106,7 +106,7 @@ class NewsSeeder extends Seeder
                 'title' => 'Nike Air Max Kids – Giải pháp hoàn hảo cho trẻ em năng động',
                 'content' => 'Nike Air Max Kids mang đến sự thoải mái tối đa với lớp đệm khí Air. Đôi giày này không chỉ giúp bé vận
                 động linh hoạt mà còn đảm bảo độ bám tốt nhờ thiết kế đế chống trượt.',
-                'category_id' => 10,
+                'category_id' => 2,
                 'brand_id' => 4,
                 'image' => 'images/news/nike_airmax_kids.jpg'
             ],

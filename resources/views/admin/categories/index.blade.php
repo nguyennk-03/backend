@@ -120,8 +120,8 @@
                                 <tr>
                                     <td class="text-center">{{ $item->id }}</td>
                                     <td class="text-center">
-                                        @if (!empty($item->image_url))
-                                            <img src="{{ $item->image_url }}" class="img-thumbnail"
+                                        @if (!empty($item->image))
+                                            <img src="{{ $item->image }}" class="img-thumbnail"
                                                 style="width: 80px; height: 80px; object-fit: cover;" alt="{{ $item->name }}">
                                         @else
                                             <span class="text-muted">Chưa có ảnh</span>
@@ -164,8 +164,8 @@
                                                         <div class="row g-4">
                                                             <div
                                                                 class="col-md-4 d-flex justify-content-center align-items-center">
-                                                                @if (!empty($item->image_url))
-                                                                    <img src="{{ $item->image_url }}" class="img-fluid"
+                                                                @if (!empty($item->image))
+                                                                    <img src="{{ $item->image }}" class="img-fluid"
                                                                         alt="{{ $item->name }}">
                                                                 @else
                                                                     <div class="bg-light rounded p-3 text-muted text-center"

@@ -34,7 +34,7 @@ class Image extends Model
         $directory = public_path('images/products');
 
         if (!is_dir($directory)) {
-            return null; // Nếu thư mục không tồn tại
+            return null; 
         }
 
         $files = array_diff(scandir($directory), ['.', '..']);

@@ -18,24 +18,22 @@ class SanPhamController extends Controller
 
         return view('admin.products.index', compact('categories', 'brands', 'products'));
     }
-    
-    public function show(Request $request, $id)
+
+    public function show($slug)
     {
-        try {
-            $product = Product::with([
-                'category:id,name',
-                'brand:id,name',
-                'variants:size_id,color_id,stock,sold'
-            ])->findOrFail($id);
+        $product = Product::where('slug', $slug)->firstOrFail();
 
-            $categories = $request->has('edit') ? Category::orderBy('name', 'ASC')->get() : null;
-            $brands = $request->has('edit') ? Brand::orderBy('name', 'ASC')->get() : null;
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->limit(4)
+            ->get(); 
 
-            return view('admin.products.show', compact('product', 'categories', 'brands'));
-        } catch (\Exception $e) {
-            return redirect()->route('san-pham.index')->with('error', 'Không tìm thấy sản phẩm.');
-        }
+        return view('products.show', [
+            'product' => $product,
+            'relatedProducts' => $relatedProducts
+        ]);
     }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -53,7 +51,7 @@ class SanPhamController extends Controller
                 $file = $request->file('img');
                 $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('images/products/new'), $fileName);
-                $validatedData['image_url'] = 'images/products/new/' . $fileName;
+                $validatedData['image'] = 'images/products/new/' . $fileName;
             }
 
             $product = Product::create($validatedData);
@@ -90,13 +88,13 @@ class SanPhamController extends Controller
             // Xử lý upload ảnh
             if ($request->hasFile('img')) {
                 // Xóa ảnh cũ nếu tồn tại
-                if ($product->image_url && file_exists(public_path($product->image_url))) {
-                    unlink(public_path($product->image_url));
+                if ($product->image && file_exists(public_path($product->image))) {
+                    unlink(public_path($product->image));
                 }
                 $file = $request->file('img');
                 $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('images/products/new'), $fileName);
-                $validatedData['image_url'] = 'images/products/new/' . $fileName;
+                $validatedData['image'] = 'images/products/new/' . $fileName;
             }
 
             // Cập nhật sản phẩm
@@ -124,8 +122,8 @@ class SanPhamController extends Controller
     {
         try {
             $product = Product::findOrFail($id);
-            if ($product->image_url && file_exists(public_path($product->image_url))) {
-                unlink(public_path($product->image_url));
+            if ($product->image && file_exists(public_path($product->image))) {
+                unlink(public_path($product->image));
             }
             $product->delete();
 
