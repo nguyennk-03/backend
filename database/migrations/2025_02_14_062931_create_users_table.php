@@ -19,11 +19,9 @@ class CreateUsersTable extends Migration
             $table->string('avatar')->nullable();
             $table->text('address')->nullable(); 
             $table->string('role')->default(User::ROLE_USER);
-            $table->string('google_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
-
     }
 
     public function down()

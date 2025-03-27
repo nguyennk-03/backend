@@ -121,34 +121,6 @@ class AuthController extends Controller
         return response()->json(['message' => 'Đăng xuất thành công!'], 200);
     }
 
-    public function redirectToGoogleApi()
-    {
-        return response()->json([
-            'message' => 'URL đăng nhập Google',
-            'url' => Socialite::driver('google')->redirect()->getTargetUrl(),
-        ]);
-    }
-
-    public function handleGoogleCallbackApi(Request $request)
-    {
-        try {
-            $socialUser = Socialite::driver('google')->user();
-            $user = $this->createOrUpdateUserFromSocial('google', $socialUser);
-            $token = $user->createToken('authToken', [$user->role])->plainTextToken;
-
-            return response()->json([
-                'message' => 'Đăng nhập Google thành công!',
-                'user' => $user,
-                'token' => $token,
-                'redirect' => $this->getRedirectUrl($user),
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Đăng nhập Google thất bại!',
-                'error' => $e->getMessage(),
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-    }
 
     public function sendResetLinkApi(Request $request)
     {
@@ -205,31 +177,28 @@ class AuthController extends Controller
                 'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
             ]);
 
-            $status = Password::reset(
-                $request->only('email', 'password', 'password_confirmation', 'token'),
-                function ($user, $password) {
-                    $user->forceFill(['password' => Hash::make($password)])
-                        ->setRememberToken(Str::random(60))
-                        ->save();
-                    event(new PasswordReset($user));
-                }
-            );
+            $tokenData = DB::table('password_resets')
+                ->where('email', $request->email)
+                ->first();
 
-            if ($status === Password::PASSWORD_RESET) {
-                DB::table('password_reset_tokens')
-                    ->where('email', $request->email)
-                    ->delete();
-
-                return response()->json(['message' => 'Đặt lại mật khẩu thành công!'], 200);
+            if (!$tokenData || !Hash::check($request->token, $tokenData->token)) {
+                return response()->json(['message' => 'Token đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.'], 400);
             }
 
-            $errorMessages = [
-                Password::INVALID_USER => 'Địa chỉ email này không tồn tại.',
-                Password::INVALID_TOKEN => 'Token đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.',
-            ];
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return response()->json(['message' => 'Người dùng không tồn tại.'], 404);
+            }
 
-            $message = $errorMessages[$status] ?? 'Không thể đặt lại mật khẩu. Vui lòng thử lại.';
-            return response()->json(['message' => $message], 400);
+            $user->password = Hash::make($request->password);
+            $user->setRememberToken(Str::random(60));
+            $user->save();
+
+            event(new PasswordReset($user));
+
+            DB::table('password_resets')->where('email', $request->email)->delete();
+
+            return response()->json(['message' => 'Đặt lại mật khẩu thành công!'], 200);
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Xác thực thất bại.',
