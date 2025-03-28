@@ -22,12 +22,12 @@ class CommentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'variant_id' => 'required|exists:products,id',
+            'product_id' => 'required|exists:products,id',
             'message' => 'required|string',
         ]);
 
         $comment = Comment::create([
-            'variant_id' => $request->variant_id,
+            'product_id' => $request->product_id,
             'user_id' => Auth::id(),
             'message' => $request->message,
             'is_staff' => Auth::user()->role === 'admin' ? true : false,

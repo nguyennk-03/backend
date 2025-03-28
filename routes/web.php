@@ -15,9 +15,6 @@ use Illuminate\Support\Facades\Route;
 
 // Trang chu
 Route::get('/', [HomeController::class, 'index'])->name('trang-chu');
-Route::get('/category/{slug}', [DanhMucController::class, 'show'])->name('category.show');
-Route::get('/brand/{slug}', [ThuongHieuController::class, 'show'])->name('brand.show');
-Route::get('/product/{slug}', [SanPhamController::class, 'show'])->name('product.show');
 
 Route::get('dang-nhap', [AuthController::class, 'formLogin'])->name('dang-nhap');
 Route::post('dang-nhap', [AuthController::class, 'handleLogin']);
