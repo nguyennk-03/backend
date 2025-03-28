@@ -7,37 +7,85 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class DanhMucController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::orderBy('id', 'asc')->get();
+        $query = Category::query();
+
+        if ($request->has('parent_id') && $request->parent_id != '') {
+            $query->where('parent_id', $request->parent_id);
+        }
+
+        if ($request->has('sort_by')) {
+            switch ($request->sort_by) {
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('name', 'desc');
+                    break;
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'oldest':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+                default:
+                    $query->orderBy('id', 'asc');
+                    break;
+            }
+        } else {
+            $query->orderBy('id', 'asc');
+        }
+
+        $categories = $query->get();
         return view('admin.categories.index', compact('categories'));
     }
 
     public function show($slug)
     {
         $category = Category::where('slug', $slug)->firstOrFail();
-        $products = $category->products()->get(); // Ví dụ
-
-        return view('categories.show', [
-            'category' => $category,
-            'products' => $products
-        ]);
+        $products = $category->products()->get();
+        return view('categories.show', compact('category', 'products'));
     }
 
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:categories,slug',
-            'img_url' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'parent_id' => 'nullable|exists:categories,id',
+            'description' => 'nullable|string',
         ]);
 
         try {
-            if ($request->hasFile('img_url')) {
-                $validatedData['img_url'] = $request->file('img_url')->store('categories', 'public');
+            $validatedData['name'] = trim($validatedData['name']);
+            $validatedData['slug'] = Str::slug($validatedData['name']);
+
+            $originalSlug = $validatedData['slug'];
+            $count = 1;
+            while (Category::where('slug', $validatedData['slug'])->exists()) {
+                $validatedData['slug'] = $originalSlug . '-' . $count++;
+            }
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+
+                if (!$file->isValid()) {
+                    throw new \Exception('File ảnh không hợp lệ: ' . $file->getErrorMessage());
+                }
+
+                $publicPath = public_path('images/categories/store');
+                if (!file_exists($publicPath)) {
+                    mkdir($publicPath, 0755, true);
+                }
+
+                $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move($publicPath, $fileName);
+                $validatedData['image'] = 'images/categories/store/' . $fileName;
             }
 
             Category::create($validatedData);
@@ -48,25 +96,41 @@ class DanhMucController extends Controller
         }
     }
 
-
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:categories,slug,' . $id,
-            'img_url' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'parent_id' => 'nullable|exists:categories,id',
+            'description' => 'nullable|string',
         ]);
 
         try {
             $category = Category::findOrFail($id);
+            $validatedData['name'] = trim($validatedData['name']);
+            $validatedData['slug'] = Str::slug($validatedData['name']);
 
-            if ($request->hasFile('img_url')) {
-                if ($category->img_url) {
-                    Storage::disk('public')->delete($category->img_url);
+            $originalSlug = $validatedData['slug'];
+            $count = 1;
+            while (Category::where('slug', $validatedData['slug'])->where('id', '!=', $id)->exists()) {
+                $validatedData['slug'] = $originalSlug . '-' . $count++;
+            }
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+
+                if (!$file->isValid()) {
+                    throw new \Exception('File ảnh không hợp lệ: ' . $file->getErrorMessage());
                 }
-                $validatedData['img_url'] = $request->file('img_url')->store('categories', 'public');
-            } else {
-                $validatedData['img_url'] = $category->img_url; // Giữ ảnh cũ nếu không upload mới
+
+                $publicPath = public_path('images/categories/update');
+                if (!file_exists($publicPath)) {
+                    mkdir($publicPath, 0755, true);
+                }
+
+                $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move($publicPath, $fileName);
+                $validatedData['image'] = 'images/categories/update/' . $fileName;
             }
 
             $category->update($validatedData);
@@ -82,8 +146,8 @@ class DanhMucController extends Controller
         try {
             $category = Category::findOrFail($id);
 
-            if ($category->img_url) {
-                Storage::disk('public')->delete($category->img_url);
+            if ($category->image) {
+                Storage::disk('public')->delete($category->image);
             }
 
             $category->delete();

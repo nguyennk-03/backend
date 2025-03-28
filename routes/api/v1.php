@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\ZaloPayController;
 use App\Http\Controllers\Api\NotifiController;
 use App\Http\Controllers\Api\ProductDiscountController;
 use App\Http\Controllers\Api\NewsController;
+use App\Http\Controllers\Api\CommentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,7 +29,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('products', ProductController::class)->only(['index', 'show']);
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
     Route::apiResource('brands', BrandController::class)->only(['index', 'show']);
-    Route::apiResource('reviews', ReviewController::class)->only(['index', 'show']);
+    
     Route::apiResource('variants', ProductVariantController::class)->only(['index', 'show']);
     Route::apiResource('colors', ColorController::class)->only(['index', 'show']);
     Route::apiResource('sizes', SizeController::class)->only(['index', 'show']);
@@ -61,6 +62,8 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('discounts', DiscountController::class)->only(['index', 'show']);
         Route::apiResource('product-discounts', ProductDiscountController::class)->only(['index', 'show']);
         Route::apiResource('notifis', NotifiController::class);
+        Route::apiResource('reviews', ReviewController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+        Route::apiResource('comments', CommentController::class);
 
         Route::post('logout', [AuthController::class, 'logout']);
     });

@@ -11,7 +11,7 @@ class Image extends Model
 
     protected $table = 'images';
 
-    protected $fillable = ['variant_id', 'image_url'];
+    protected $fillable = ['variant_id', 'image'];
     
     public function variant()
     {
