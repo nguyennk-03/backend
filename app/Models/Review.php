@@ -10,14 +10,14 @@ class Review extends Model {
 
     protected $table = 'reviews';
 
-    protected $fillable = ['user_id', 'product_id', 'rating', 'comment'];
+    protected $fillable = ['user_id', 'variant_id', 'rating', 'comment'];
 
     public function user() {
         return $this->belongsTo(User::class);
     }
 
-    public function product() {
-        return $this->belongsTo(Product::class,'product_id');
+    public function variant_id() {
+        return $this->belongsTo(ProductVariant::class,'variant_id');
     }
 }
 

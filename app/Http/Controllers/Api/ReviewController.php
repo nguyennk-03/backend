@@ -14,8 +14,8 @@ class ReviewController extends Controller
     {
         $query = Review::with('user');
 
-        if ($request->has('product_id')) {
-            $query->where('product_id', $request->product_id);
+        if ($request->has('variant_id')) {
+            $query->where('variant_id', $request->variant_id);
         }
 
         if ($request->has('rating')) {
@@ -48,18 +48,18 @@ class ReviewController extends Controller
         }
 
         $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
+            'variant_id' => 'required|exists:products,id',
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string',
         ]);
 
-        if (Review::where('product_id', $validated['product_id'])->where('user_id', Auth::id())->exists()) {
+        if (Review::where('variant_id', $validated['variant_id'])->where('user_id', Auth::id())->exists()) {
             return response()->json(['error' => 'Bạn đã đánh giá sản phẩm này rồi.'], 400);
         }
 
         $review = Review::create([
             'user_id' => Auth::id(),
-            'product_id' => $validated['product_id'],
+            'variant_id' => $validated['variant_id'],
             'rating' => $validated['rating'],
             'comment' => $validated['comment'] ?? null,
         ]);

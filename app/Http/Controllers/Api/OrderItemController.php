@@ -25,7 +25,7 @@ class OrderItemController extends Controller
     {
         $validated = $request->validate([
             'order_id' => 'required|exists:orders,id',
-            'product_variant_id' => 'required|exists:product_variants,id',
+            'variant_id' => 'required|exists:product_variants,id',
             'quantity' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
         ]);
