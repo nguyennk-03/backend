@@ -15,9 +15,8 @@
             </div>
         </div>
 
-        <!-- Thông báo thành công -->
         @if (session('success'))
-        <div id="success-message" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <div id="success-message" class="alert alert-success alPert-dismissible fade show mb-4" role="alert">
             <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -99,14 +98,6 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-12">
-                                    <label for="description" class="form-label fw-semibold">Mô tả</label>
-                                    <textarea name="description" id="description" class="form-control border-0 shadow-sm"
-                                        placeholder="Nhập mô tả thương hiệu" rows="4">{{ old('description') }}</textarea>
-                                    @error('description')
-                                    <span class="text-danger small">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                                <div class="col-md-12">
                                     <label for="logo" class="form-label fw-semibold">Chọn logo</label>
                                     <div class="input-group">
                                         <input type="file" name="logo" id="logo" class="form-control border-0 shadow-sm"
@@ -155,14 +146,14 @@
                                     <td class="text-center">{{ $item->id }}</td>
                                     <td class="text-center">
                                         @if (!empty($item->logo))
-                                            <img src="{{ asset($item->logo) }}" class="img-thumbnail rounded" style="width: 150px; height: 100px; object-fit: cover;"
+                                            <img src="{{ asset($item->logo) }}" class="img-thumbnail rounded" style="object-fit: cover; max-width: 100px; max-height: 100px;"
                                                 alt="{{ $item->name }}">
                                         @else
                                         <span class="text-muted">Chưa có logo</span>
                                         @endif
                                     </td>
                                     <td>{{ $item->name }}</td>
-                                    <td>{{ $item->description ?? 'Chưa có mô tả' }}</td>
+                                    <td>{{ $item->slug ?? 'Chưa có mô tả' }}</td>
                                     <td>
                                         <div class="d-flex justify-content-center gap-2">
                                             <button type="button" class="btn btn-warning btn-sm shadow-sm"
@@ -211,14 +202,6 @@
                                                                     Chưa có logo</div>
                                                                 @endif
                                                             </div>
-                                                            <div class="col-md-8">
-                                                                <div class="card border-0 p-3 rounded shadow-sm">
-                                                                    <p class="mb-2"><strong>Tên:</strong> {{ $item->name }}</p>
-                                                                    <p class="mb-0"><strong>Mô tả:</strong>
-                                                                        {{ $item->description ?? 'Chưa có mô tả' }}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer border-0">
@@ -266,18 +249,6 @@
                                                                         value="{{ old('name', $item->name) }}"
                                                                         placeholder="Nhập tên thương hiệu" required>
                                                                     @error('name')
-                                                                    <span class="text-danger small">{{ $message }}</span>
-                                                                    @enderror
-                                                                </div>
-                                                                <div class="col-md-12">
-                                                                    <label for="description_{{ $item->id }}"
-                                                                        class="form-label fw-semibold">Mô tả</label>
-                                                                    <textarea name="description"
-                                                                        id="description_{{ $item->id }}"
-                                                                        class="form-control border-0 shadow-sm"
-                                                                        placeholder="Nhập mô tả thương hiệu"
-                                                                        rows="4">{{ old('description', $item->description) }}</textarea>
-                                                                    @error('description')
                                                                     <span class="text-danger small">{{ $message }}</span>
                                                                     @enderror
                                                                 </div>

@@ -169,7 +169,7 @@
                                         <td class="text-center">{{ $item->id }}</td>
                                         <td class="text-center">
                                             @if (!empty($item->image))
-                                                <img src="{{ asset($item->image) }}" class="img-thumbnail rounded" style="width: 60px; height: 60px; object-fit: cover;" alt="{{ $item->name }}">
+                                                <img src="{{ asset($item->image) }}" class="img-thumbnail rounded" style="object-fit: cover; max-width: 100px; max-height: 100px;" alt="{{ $item->name }}">
                                             @else
                                                 <span class="text-muted">Chưa có ảnh</span>
                                             @endif

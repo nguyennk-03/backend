@@ -19,7 +19,7 @@ class ReviewSeeder extends Seeder
         for ($i = 1; $i <= 50; $i++) {
             Review::create([
                 'user_id' => $users->random()->id,
-                'variant_id' => $products->random()->id,
+                'product_id' => $products->random()->id,
                 'rating' => $faker->numberBetween(1, 5),
                 'comment' => $faker->sentence(10),
                 'created_at' => $faker->dateTimeBetween('-6 months', 'now'),

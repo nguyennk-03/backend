@@ -8,15 +8,15 @@ class Comment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['variant_id', 'user_id', 'message', 'is_staff'];
+    protected $fillable = ['product_id', 'user_id', 'message', 'is_staff'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function variant()
+    public function product()
     {
-        return $this->belongsTo(ProductVariant::class);
+        return $this->belongsTo(Product::class);
     }
 }
