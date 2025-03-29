@@ -81,11 +81,9 @@ class OrderController extends Controller
     private function handleOrderCreation(array $validated, $user)
     {
         try {
-            // Tải trước tất cả variants để kiểm tra stock
             $variantIds = array_column($validated['products'], 'variant_id');
             $variants = ProductVariant::whereIn('id', $variantIds)->lockForUpdate()->get();
 
-            // Kiểm tra stock
             foreach ($validated['products'] as $product) {
                 $variant = $variants->firstWhere('id', $product['variant_id']);
                 if (!$variant || $variant->stock < $product['quantity']) {
