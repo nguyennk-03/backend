@@ -3,19 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Payment;
-use App\Models\ProductVariant;
+use App\Models\{Order, OrderItem, Payment, ProductVariant, Cart};
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\{Auth, DB, Log};
 use Symfony\Component\HttpFoundation\Response;
 
 class OrderController extends Controller
 {
-
     public function index()
     {
         $orders = Order::where('user_id', Auth::id())
@@ -25,6 +19,7 @@ class OrderController extends Controller
                 'payment' => fn($query) => $query->select('id', 'name')
             ])
             ->select('id', 'user_id', 'total_price', 'status', 'payment_id')
+            ->latest() // Add ordering
             ->get();
 
         return response()->json($orders, Response::HTTP_OK);
@@ -58,43 +53,48 @@ class OrderController extends Controller
         $validated = $request->validate([
             'products' => 'required|array|min:1',
             'products.*.variant_id' => 'required|integer|exists:product_variants,id',
-            'products.*.quantity' => 'required|integer|min:1|max:1000', 
+            'products.*.quantity' => 'required|integer|min:1|max:1000',
             'products.*.price' => 'required|numeric|min:0',
-            'phone' => 'required|numeric|digits_between:9,12',
+            'phone' => 'required|regex:/^[0-9]{9,12}$/', // Improved phone validation
             'address' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'payment_id' => 'required|integer|exists:payments,id',
             'total_price' => 'required|numeric|min:1000',
-        ], [
-            'products.required' => 'Vui lòng chọn ít nhất một sản phẩm.',
-            'products.*.quantity.min' => 'Số lượng phải lớn hơn 0.',
-            'phone.required' => 'Số điện thoại là bắt buộc.',
-            'address.required' => 'Địa chỉ là bắt buộc.',
-            'email.required' => 'Email là bắt buộc.',
-            'payment_id.exists' => 'Phương thức thanh toán không hợp lệ.',
-            'total_price.min' => 'Tổng giá trị đơn hàng phải ít nhất 1,000.',
         ]);
+
+        // Verify total price matches sum of products
+        $calculatedTotal = collect($validated['products'])->sum(fn($product) => 
+            $product['price'] * $product['quantity']
+        );
+
+        if (abs($calculatedTotal - $validated['total_price']) > 0.01) {
+            return response()->json([
+                'status' => Response::HTTP_BAD_REQUEST,
+                'message' => 'Tổng giá không khớp với giá sản phẩm.',
+            ], Response::HTTP_BAD_REQUEST);
+        }
 
         return $this->handleOrderCreation($validated, $user);
     }
 
     private function handleOrderCreation(array $validated, $user)
     {
-        try {
-            $variantIds = array_column($validated['products'], 'variant_id');
-            $variants = ProductVariant::whereIn('id', $variantIds)->lockForUpdate()->get();
+        return DB::transaction(function () use ($validated, $user) {
+            try {
+                $variantIds = array_column($validated['products'], 'variant_id');
+                $variants = ProductVariant::whereIn('id', $variantIds)
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
 
-            foreach ($validated['products'] as $product) {
-                $variant = $variants->firstWhere('id', $product['variant_id']);
-                if (!$variant || $variant->stock < $product['quantity']) {
-                    return response()->json([
-                        'status' => Response::HTTP_BAD_REQUEST,
-                        'message' => "Sản phẩm ID: {$product['variant_id']} không đủ hàng (còn: " . ($variant->stock ?? 0) . ").",
-                    ], Response::HTTP_BAD_REQUEST);
+                // Check stock availability
+                foreach ($validated['products'] as $product) {
+                    $variant = $variants->get($product['variant_id']);
+                    if (!$variant || $variant->stock < $product['quantity']) {
+                        throw new \Exception("Sản phẩm ID: {$product['variant_id']} không đủ hàng (còn: " . ($variant->stock ?? 0) . ").");
+                    }
                 }
-            }
 
-            return DB::transaction(function () use ($validated, $user, $variants) {
                 $order = Order::create([
                     'user_id' => $user->id,
                     'phone' => $validated['phone'],
@@ -105,38 +105,81 @@ class OrderController extends Controller
                     'status' => 'pending',
                 ]);
 
-                foreach ($validated['products'] as $product) {
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'variant_id' => $product['variant_id'],
-                        'quantity' => $product['quantity'],
-                        'price' => $product['price'],
-                    ]);
+                $orderItems = array_map(fn($product) => [
+                    'order_id' => $order->id,
+                    'variant_id' => $product['variant_id'],
+                    'quantity' => $product['quantity'],
+                    'price' => $product['price'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ], $validated['products']);
 
-                    $variant = $variants->firstWhere('id', $product['variant_id']);
-                    $variant->stock -= $product['quantity'];
-                    $variant->sold += $product['quantity'];
-                    $variant->save();
+                OrderItem::insert($orderItems);
+
+                // Update variants
+                foreach ($validated['products'] as $product) {
+                    $variant = $variants->get($product['variant_id']);
+                    $variant->update([
+                        'stock' => $variant->stock - $product['quantity'],
+                        'sold' => $variant->sold + $product['quantity'],
+                    ]);
                 }
 
+                Cart::where('user_id', $user->id)->delete();
+
                 Log::info('Tạo đơn hàng thành công', ['order_id' => $order->id]);
-                $payment = Payment::find($validated['payment_id']);
+                $payment = Payment::findOrFail($validated['payment_id']);
 
                 return $this->handlePayment($payment->name, $order);
-            });
-        } catch (\Throwable $e) {
-            Log::error("Lỗi tạo đơn hàng: {$e->getMessage()}", [
-                'user_id' => $user->id,
-                'request' => $validated,
-            ]);
+            } catch (\Throwable $e) {
+                Log::error("Lỗi tạo đơn hàng: {$e->getMessage()}", [
+                    'user_id' => $user->id,
+                    'request' => $validated,
+                ]);
 
-            return response()->json([
-                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
-                'message' => 'Lỗi hệ thống. Vui lòng thử lại sau.',
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+                return response()->json([
+                    'status' => $e instanceof \Exception ? Response::HTTP_BAD_REQUEST : Response::HTTP_INTERNAL_SERVER_ERROR,
+                    'message' => $e instanceof \Exception ? $e->getMessage() : 'Lỗi hệ thống. Vui lòng thử lại sau.',
+                ], $e instanceof \Exception ? Response::HTTP_BAD_REQUEST : Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        });
     }
 
+    public function cancelPayment(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            return response()->json([
+                'status' => Response::HTTP_FORBIDDEN,
+                'message' => 'Bạn không có quyền hủy đơn hàng này.',
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        if ($order->status !== 'pending') {
+            return response()->json([
+                'status' => Response::HTTP_BAD_REQUEST,
+                'message' => 'Chỉ có thể hủy đơn hàng khi đang chờ thanh toán.',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return DB::transaction(function () use ($order) {
+            foreach ($order->items as $item) {
+                ProductVariant::where('id', $item->variant_id)->update([
+                    'stock' => DB::raw("stock + {$item->quantity}"),
+                    'sold' => DB::raw("sold - {$item->quantity}"),
+                ]);
+            }
+
+            $order->delete();
+
+            Log::info('Hủy đơn hàng thành công', ['order_id' => $order->id]);
+
+            return response()->json([
+                'status' => Response::HTTP_OK,
+                'message' => 'Đơn hàng đã được hủy thành công.',
+            ], Response::HTTP_OK);
+        });
+    }
+    
     private function handlePayment(string $paymentMethod, Order $order)
     {
         $paymentControllers = [
