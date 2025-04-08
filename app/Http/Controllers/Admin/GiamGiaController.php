@@ -6,7 +6,7 @@ use App\Models\Discount;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class KhuyenMaiController extends Controller
+class GiamGiaController extends Controller
 {
     public function index()
     {

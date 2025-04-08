@@ -47,10 +47,11 @@ class DonHangController extends Controller
         return redirect()->route('orders.index')->with('success', 'Đơn hàng đã được tạo thành công.');
     }
 
-    public function show($id)
+   public function show($id)
     {
-        $order = Order::findOrFail($id);
-        return view('admin.orders.view', compact('order'));
+        $order = Order::with('user', 'orderItems.product')->findOrFail($id);
+
+        return view('admin.orders.show', compact('order'));
     }
 
     public function edit($id)

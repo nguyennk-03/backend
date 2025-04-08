@@ -30,73 +30,46 @@ class Order extends Model
         'created_at' => 'datetime',
     ];
 
-    /**
-     * Quan hệ tới User
-     */
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    /**
-     * Quan hệ tới Discount
-     */
     public function discount()
     {
         return $this->belongsTo(Discount::class, 'discount_id', 'id');
     }
 
-    /**
-     * Quan hệ tới OrderItem
-     */
     public function items()
     {
         return $this->hasMany(OrderItem::class, 'order_id', 'id');
     }
 
-    /**
-     * Quan hệ tới Payment
-     */
     public function payment()
     {
         return $this->belongsTo(Payment::class, 'payment_id', 'id');
     }
 
-    /**
-     * Kiểm tra đơn hàng đã thanh toán chưa
-     */
     public function isPaid(): bool
     {
         return $this->payment_status === PaymentStatusEnum::PAID;
     }
 
-    /**
-     * Scope lọc theo trạng thái đơn hàng
-     */
     public function scopeStatus($query, OrderStatusEnum $status)
     {
         return $query->where('status', $status);
     }
 
-    /**
-     * Scope lọc đơn hàng đã thanh toán
-     */
     public function scopePaid($query)
     {
         return $query->where('payment_status', PaymentStatusEnum::PAID);
     }
 
-    /**
-     * Scope lọc đơn hàng theo user
-     */
     public function scopeUserOrders($query, $userId)
     {
         return $query->where('user_id', $userId);
     }
 
-    /**
-     * Cập nhật trạng thái thanh toán
-     */
     public function updatePaymentStatus($status)
     {
         if ($this->isPaid() && $status !== PaymentStatusEnum::PAID) {
@@ -108,9 +81,6 @@ class Order extends Model
         return $this;
     }
 
-    /**
-     * Mutator cho status
-     */
     protected function status(): Attribute
     {
         return Attribute::make(
@@ -118,13 +88,21 @@ class Order extends Model
         );
     }
 
-    /**
-     * Mutator cho payment_status
-     */
     protected function paymentStatus(): Attribute
     {
         return Attribute::make(
             set: fn($value) => strtolower($value),
         );
     }
+    public function getStatusTextAttribute(): string
+    {
+        return $this->status?->label() ?? 'Không xác định';
+    }
+
+    public function getStatusColorAttribute(): string
+    {
+        return $this->status?->badgeClass() ?? 'bg-secondary';
+    }
+
+
 }

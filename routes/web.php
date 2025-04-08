@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\BaiVietController;
+use App\Http\Controllers\Admin\KichThuocController;
+use App\Http\Controllers\Admin\MauSacController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\NguoiDungController;
@@ -7,7 +10,7 @@ use App\Http\Controllers\Admin\SanPhamController;
 use App\Http\Controllers\Admin\DanhMucController;
 use App\Http\Controllers\Admin\ThuongHieuController;
 use App\Http\Controllers\Admin\DonHangController;
-use App\Http\Controllers\Admin\KhuyenMaiController;
+use App\Http\Controllers\Admin\GiamGiaController;
 use App\Http\Controllers\Admin\DanhGiaController;
 use App\Http\Controllers\AdminController;
 use App\Models\User;
@@ -43,9 +46,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('bang-dieu-khien', [AdminController::class, 'index'])->name('admin');
     Route::resource('nguoi-dung', NguoiDungController::class);
     Route::resource('san-pham', SanPhamController::class);
+    Route::resource('mau-sac', MauSacController::class);
+    Route::resource('kich-thuoc', KichThuocController::class);
     Route::resource('danh-muc', DanhMucController::class);
     Route::resource('thuong-hieu', ThuongHieuController::class);
     Route::resource('don-hang', DonHangController::class);
-    Route::resource('khuyen-mai', KhuyenMaiController::class);
+    Route::resource('giam-gia', GiamGiaController::class);
     Route::resource('danh-gia', DanhGiaController::class);
+    Route::resource('bai-viet', BaiVietController::class);
 });

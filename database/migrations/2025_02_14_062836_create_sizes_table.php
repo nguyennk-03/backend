@@ -10,7 +10,9 @@ class CreateSizesTable extends Migration
     {
         Schema::create('sizes', function (Blueprint $table) {
             $table->id();
-            $table->string('size')->unique();
+            $table->string('name')->unique();
+            $table->decimal('cm', 4, 1)->nullable(); 
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

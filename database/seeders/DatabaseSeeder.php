@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             WishlistSeeder::class,
             NotifiSeeder::class,
             NewsSeeder::class,
+            CommentSeeder::class,
         ]);
     }
 }

@@ -10,7 +10,11 @@ class CreateColorsTable extends Migration
     {
         Schema::create('colors', function (Blueprint $table) {
             $table->id();
-            $table->string('color_name')->unique();
+            $table->string('name')->unique();       
+            $table->string('code', 20)->nullable();      
+            $table->string('hex_code', 7);              
+            $table->string('image')->nullable();   
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

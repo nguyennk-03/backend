@@ -1,147 +1,110 @@
 @extends('admin.layout')
-@section('title', 'Chi tiết đơn hàng')
+@section('title', 'Chi Tiết Đơn Hàng')
 @section('content')
 
-    <div class="container-fluid">
-        <!-- Breadcrumb -->
-        <div class="row">
-            <div class="col-12">
-                <div class="page-title-box">
-                    <div class="page-title-right">
-                        <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="#">StepViet</a></li>
-                            <li class="breadcrumb-item"><a href="#">Admin</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('orders') }}">Đơn hàng</a></li>
-                            <li class="breadcrumb-item active">Chi tiết</li>
-                        </ol>
-                    </div>
-                    <h4 class="page-title">Chi tiết đơn hàng #{{ $order->id }}</h4>
-                </div>
+<div class="container-fluid">
+    <!-- Tiêu đề -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-flex justify-content-between align-items-center p-3 rounded shadow-sm">
+                <h4 class="page-title mb-0 fw-bold">
+                    <i class="bi bi-receipt-cutoff"></i> Chi Tiết Đơn Hàng #{{ $order->id }}
+                </h4>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('don-hang.index') }}">Đơn Hàng</a></li>
+                    <li class="breadcrumb-item active">Chi Tiết Đơn Hàng</li>
+                </ol>
             </div>
-        </div>
-
-        <!-- Thông tin đơn hàng -->
-        <div class="card shadow-sm rounded-lg">
-            <div class="card-body">
-                <h4 class="header-title font-weight-bold mb-3">Thông tin đơn hàng</h4>
-                <table class="table table-bordered">
-                    <tr>
-                        <th>Mã đơn hàng:</th>
-                        <td>#{{ $order->id }}</td>
-                    </tr>
-                    <tr>
-                        <th>Khách hàng:</th>
-                        <td>
-                            @if($order->user)
-                                <a href="{{ route('users.show', $order->user->id) }}">{{ $order->user->name }}</a>
-                                ({{ $order->user->email }})
-                            @else
-                                <span class="text-muted">Khách vãng lai</span>
-                            @endif
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Số điện thoại:</th>
-                        <td>{{ optional($order->user)->phone ?? $order->phone }}</td>
-                    </tr>
-                    <tr>
-                        <th>Địa chỉ giao hàng:</th>
-                        <td>{{ optional($order->user)->address ?? $order->address ?? 'Chưa có địa chỉ' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Tổng tiền:</th>
-                        <td><strong class="text-danger">{{ number_format($order->total_price, 0, ',', '.') }} VNĐ</strong>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Trạng thái:</th>
-                        <td>
-                            @php
-                                $statusMap = [
-                                    'completed' => ['Hoàn thành', 'badge-success'],
-                                    'pending' => ['Chờ xử lý', 'badge-warning'],
-                                    'shipped' => ['Đã giao hàng', 'badge-primary'],
-                                    'canceled' => ['Đã hủy', 'badge-danger'],
-                                ];
-                                $status = $statusMap[$order->status] ?? ['Không xác định', 'badge-secondary'];
-                            @endphp
-                            <span class="badge {{ $status[1] }}">{{ $status[0] }}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Ngày đặt hàng:</th>
-                        <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-
-        <!-- Danh sách sản phẩm -->
-        <div class="card shadow-sm rounded-lg mt-3">
-            <div class="card-body">
-                <h4 class="header-title font-weight-bold mb-3">Danh sách sản phẩm</h4>
-                <table class="table table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Hình ảnh</th>
-                            <th>Tên sản phẩm</th>
-                            <th>Số lượng</th>
-                            <th>Giá</th>
-                            <th>Tổng</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if ($order->items->isNotEmpty())
-                            @foreach ($order->items as $item)
-                                <tr>
-                                    <td>
-                                        @if(optional($item->product)->image)
-                                            <img src="{{ asset('storage/' . $item->product->image) }}" alt="Hình ảnh sản phẩm"
-                                                width="60" height="60" class="rounded">
-                                        @else
-                                            <span class="text-muted">Không có ảnh</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($item->product)
-                                            <a href="{{ route('products.show', $item->product->id) }}">
-                                                {{ $item->product->name }}
-                                            </a>
-                                        @else
-                                            <span class="text-muted">Sản phẩm không tồn tại</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $item->quantity }}</td>
-                                    <td>{{ number_format($item->price, 0, ',', '.') }} VNĐ</td>
-                                    <td><strong>{{ number_format($item->quantity * $item->price, 0, ',', '.') }} VNĐ</strong></td>
-                                </tr>
-                            @endforeach
-                        @else
-                            <tr>
-                                <td colspan="5" class="text-center text-muted">Không có sản phẩm nào</td>
-                            </tr>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Thao tác -->
-        <div class="d-flex justify-content-end me-2 mt-3">
-            <a href="{{ route('orders') }}" class="btn btn-secondary">Quay lại</a>
-
-            @if($order->status != 'completed' && $order->status != 'canceled')
-                <div>
-                    <a href="{{ route('orderedit', $order->id) }}" class="btn btn-info">Chỉnh sửa</a>
-                    <form action="{{ route('orderdelete', $order->id) }}" method="POST" class="d-inline-block">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger"
-                            onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')">Xóa</button>
-                    </form>
-                </div>
-            @endif
         </div>
     </div>
+
+    <!-- Thông tin đơn hàng -->
+    <div class="row g-4 mt-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 hover-scale">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-person-circle text-primary"></i> Thông Tin Khách Hàng</h5>
+                    <p><strong>Tên: </strong> {{ $order->user->name }}</p>
+                    <p><strong>Email: </strong> {{ $order->user->email }}</p>
+                    <p><strong>Điện thoại: </strong> {{ $order->user->phone ?? 'Chưa có' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 hover-scale">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-info-circle text-warning"></i> Thông Tin Đơn Hàng</h5>
+                    <p><strong>Mã đơn hàng: </strong> #{{ $order->id }}</p>
+                    <p><strong>Ngày đặt hàng: </strong> {{ $order->created_at->format('d/m/Y H:i') }}</p>
+                    <p><strong>Trạng thái: </strong> 
+                        <span class="badge bg-{{ $order->status }}">
+                            {{ $order->status_text }}
+                        </span>
+                    </p>
+                    <p><strong>Tổng tiền: </strong> {{ number_format($order->total_price) }}₫</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách sản phẩm trong đơn hàng -->
+    <div class="row g-4 mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 hover-scale">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="bi bi-cart-check text-success"></i> Sản Phẩm Trong Đơn Hàng</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Sản phẩm</th>
+                                    <th>Ảnh</th>
+                                    <th>Số lượng</th>
+                                    <th>Giá</th>
+                                    <th>Tổng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($order->orderItems as $item)
+                                    <tr>
+                                        <td>{{ $item->id }}</td>
+                                        <td>{{ $item->product->name }}</td>
+                                        <td>
+                                            <img src="{{ asset('images/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="img-thumbnail" width="60">
+                                        </td>
+                                        <td>{{ $item->quantity }}</td>
+                                        <td>{{ number_format($item->price) }}₫</td>
+                                        <td>{{ number_format($item->quantity * $item->price) }}₫</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-end mt-3">
+                        <a href="{{ route('don-hang.index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Quay Lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS -->
+<style>
+    .hover-scale {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-radius: 12px;
+    }
+
+    .hover-scale:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    }
+</style>
 
 @endsection

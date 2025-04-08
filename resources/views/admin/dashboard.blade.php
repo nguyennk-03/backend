@@ -1,688 +1,412 @@
 @extends('admin.layout')
-@section('title','Dashboard')
+
+@section('title', 'Bảng Điều Khiển')
 
 @section('content')
+<div class="container mt-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div
+                class="page-title-box d-flex justify-content-between align-items-center p-4 rounded shadow-lg bg-gradient-primary text-white">
+                <h4 class="page-title mb-0 fw-bold">
+                    <i class="fas fa-tachometer-alt me-2"></i>Trang Quản Lý
+                </h4>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="#" >StepViet</a></li>
+                    <li class="breadcrumb-item"><a href="#" >Admin</a></li>
+                    <li class="breadcrumb-item active ">Trang Quản Lý</li>
+                </ol>
+            </div>
+        </div>
+    </div>
 
-<div class="content">
+    <!-- Tổng quan thống kê - Dạng hình tròn -->
+    <div class="row mb-5 d-flex flex-row flex-nowrap justify-content-center g-4 text-white">
+        @php
+        $stats = [
+        ['title' => 'Tổng Đơn Hàng', 'value' => $totalOrders, 'icon' => 'fas fa-box', 'color' => 'primary'],
+        ['title' => 'Đơn Hàng Chờ', 'value' => $totalPendingOrders, 'icon' => 'fas fa-clock', 'color' => 'warning'],
+        ['title' => 'Doanh Thu', 'value' => number_format($revenue, 0, ',', '.') . ' VND', 'icon' => 'fas fa-money-bill-wave', 'color' => 'success'],
+        ['title' => 'Số Lượng Sản Phẩm', 'value' => $totalProducts, 'icon' => 'fas fa-cogs', 'color' => 'info'],
+        ];
+        @endphp
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="page-title-box">
-                    <div class="page-title-right">
-                        <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">StepViet</a></li>
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboards</a></li>
-                            <li class="breadcrumb-item active">Dashboard</li>
-                        </ol>
+        @foreach($stats as $stat)
+        <div class="col-md-3 col-sm-6 stat-card-wrapper">
+            <div class="card shadow-lg text-center rounded-circle p-4 stat-card hover-scale border-0">
+                <div class="card-body">
+                    <i class="{{ $stat['icon'] }} fa-3x mb-3 text-{{ $stat['color'] }}"></i>
+                    <h5 class="card-title text-muted">{{ $stat['title'] }}</h5>
+                    <p class="h4 fw-bold text-{{ $stat['color'] }}">{{ $stat['value'] }}</p>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    <!-- Bố cục chính: Biểu đồ bên trái, Đơn hàng mới nhất bên phải -->
+    <div class="row g-4">
+        <!-- Cột trái: Biểu đồ Doanh Thu và Trạng Thái Đơn Hàng -->
+        <div class="col-lg-7">
+            <!-- Biểu đồ Doanh Thu và Số Đơn Hàng -->
+            <div class="card shadow-lg border-0 rounded-lg mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title fw-bold text-primary">
+                            <i class="bi bi-bar-chart me-2"></i>Doanh Thu và Số Đơn Hàng
+                        </h5>
+                        <!-- Bộ lọc thời gian -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button"
+                                id="timeFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Theo Tháng
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="timeFilterDropdown">
+                                <li><a class="dropdown-item" href="#" data-filter="week">Theo Tuần</a></li>
+                                <li><a class="dropdown-item active " href="#" data-filter="month">Theo Tháng</a></li>
+                                <li><a class="dropdown-item" href="#" data-filter="year">Theo Năm</a></li>
+                            </ul>
+                        </div>
                     </div>
-                    <h4 class="page-title">Dashboard</h4>
+                    <canvas id="comboChart" style="max-height: 400px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Biểu đồ Trạng Thái Đơn Hàng -->
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4 fw-bold text-danger">
+                        <i class="bi bi-pie-chart me-2"></i>Trạng Thái Đơn Hàng
+                    </h5>
+                    <canvas id="orderStatusChart" style="max-height: 400px;"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-xl-3">
-                <div class="card-box">
-                    <i class="fa fa-info-circle text-muted float-right" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="More Info"></i>
-                    <h4 class="mt-0 font-16">Wallet Balance</h4>
-                    <h2 class="text-primary my-4 text-center">$<span data-plugin="counterup">31,570</span></h2>
-                    <div class="row mb-4">
-                        <div class="col-6">
-                            <p class="text-muted mb-1">This Month</p>
-                            <h3 class="mt-0 font-20 text-truncate">$120,254 <small class="badge badge-light-success font-13">+15%</small></h3>
-                        </div>
-
-                        <div class="col-6">
-                            <p class="text-muted mb-1">Last Month</p>
-                            <h3 class="mt-0 font-20 text-truncate">$98,741 <small class="badge badge-light-danger font-13">-5%</small></h3>
-                        </div>
-                    </div>
-
-                    <div class="mt-5">
-                        <span data-plugin="peity-line" data-fill="#56c2d6" data-stroke="#4297a6" data-width="100%" data-height="50">3,5,2,9,7,2,5,3,9,6,5,9,7</span>
-                    </div>
-
-                </div> <!-- end card-box-->
-            </div>
-
-            <div class="col-xl-6">
-                <div class="card-box" dir="ltr">
-                    <div class="float-right d-none d-md-inline-block">
-                        <div class="btn-group mb-2">
-                            <button type="button" class="btn btn-xs btn-light active">Today</button>
-                            <button type="button" class="btn btn-xs btn-light">Weekly</button>
-                            <button type="button" class="btn btn-xs btn-light">Monthly</button>
-                        </div>
-                    </div>
-                    <h4 class="header-title mb-1">Transaction History</h4>
-                    <div id="rotate-labels-column" class="apex-charts"></div>
-                </div> <!-- end card-box-->
-            </div> <!-- end col -->
-
-            <div class="col-xl-3">
-                <div class="card-box">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="avatar-sm bg-light rounded">
-                                <i class="fe-shopping-cart avatar-title font-22 text-success"></i>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-right">
-                                <h3 class="text-dark my-1"><span data-plugin="counterup">1576</span></h3>
-                                <p class="text-muted mb-1 text-truncate">January's Sales</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <h6 class="text-uppercase">Target <span class="float-right">49%</span></h6>
-                        <div class="progress progress-sm m-0">
-                            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="49" aria-valuemin="0" aria-valuemax="100" style="width: 49%">
-                                <span class="sr-only">49% Complete</span>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- end card-box-->
-
-                <div class="card-box">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="avatar-sm bg-light rounded">
-                                <i class="fe-aperture avatar-title font-22 text-purple"></i>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-right">
-                                <h3 class="text-dark my-1">$<span data-plugin="counterup">12,145</span></h3>
-                                <p class="text-muted mb-1 text-truncate">Income status</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <h6 class="text-uppercase">Target <span class="float-right">60%</span></h6>
-                        <div class="progress progress-sm m-0">
-                            <div class="progress-bar bg-purple" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%">
-                                <span class="sr-only">60% Complete</span>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- end card-box-->
-            </div>
-        </div>
-        <!-- end row -->
-
-
-        <div class="row">
-            <div class="col-xl-8">
-                <!-- Portlet card -->
-                <div class="card">
-                    <div class="card-body" dir="ltr">
-                        <div class="card-widgets">
-                            <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
-                            <a data-toggle="collapse" href="#cardCollpase1" role="button" aria-expanded="false" aria-controls="cardCollpase1"><i class="mdi mdi-minus"></i></a>
-                            <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
-                        </div>
-                        <h4 class="header-title mb-0">Revenue</h4>
-
-                        <div id="cardCollpase1" class="collapse pt-3 show">
-                            <div class="bg-soft-light">
-                                <div class="row text-center">
-                                    <div class="col-md-4">
-                                        <p class="text-muted mb-0 mt-3">Today's Earning</p>
-                                        <h2 class="font-weight-normal mb-3">
-                                            <small class="mdi mdi-checkbox-blank-circle text-muted align-middle mr-1"></small>
-                                            <span>$751.<sup class="font-13">25</sup></span>
-                                        </h2>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <p class="text-muted mb-0 mt-3">Current Week</p>
-                                        <h2 class="font-weight-normal mb-3">
-                                            <small class="mdi mdi-checkbox-blank-circle text-info align-middle mr-1"></small>
-                                            <span>$2,874.<sup class="font-13">07</sup></span>
-                                        </h2>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <p class="text-muted mb-0 mt-3">Previous Week</p>
-                                        <h2 class="font-weight-normal mb-3">
-                                            <small class="mdi mdi-checkbox-blank-circle text-danger align-middle mr-1"></small>
-                                            <span>$1,258.<sup class="font-13">66</sup></span>
-                                        </h2>
+        <!-- Cột phải: Đơn Hàng Mới Nhất -->
+        <div class="col-lg-5">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-body p-3">
+                    <h5 class="card-title mb-4 fw-bold text-primary">
+                        <i class="bi bi-clock-history me-2"></i>Đơn Hàng Mới Nhất
+                    </h5>
+                    <div class="order-list">
+                        @forelse($latestOrders as $order)
+                        <div class="order-item mb-3 p-3 border border-light rounded shadow-sm hover-scale">
+                            <div class="row g-3 align-items-center">
+                                <!-- Cột trái -->
+                                <div class="col-8">
+                                    <h6 class="mb-1 fw-bold">{{ $order->user->name }}</h6>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-muted fs-13 mt-1">
+                                            <strong>
+                                                <i class="{{ $order->status->iconClass() }} me-1"></i> Trạng thái:
+                                            </strong>
+                                            <span class="badge {{ $order->status->badgeClass() }} fs-12 mb-1">
+                                                {{ $order->status->label() }}
+                                            </span>
+                                        </span>
+                                        <span class="text-muted fs-12">
+                                            <strong>
+                                                <i class="bi bi-upc-scan me-1"></i> Mã đơn hàng:
+                                            </strong>
+                                            #{{ $order->code ?? 'N/A' }}
+                                        </span>
+                                        <span class="text-muted fs-12">
+                                            <strong>
+                                                <i class="bi bi-credit-card me-1"></i> Phương thức thanh toán:
+                                            </strong>
+                                            {{ optional($order->payment)->name ?? 'Chưa xác định' }}
+                                        </span>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="dash-item-overlay d-none d-md-block">
-                                <h5>Today's Earning: $751.25</h5>
-                                <p class="text-muted font-13 mb-3 mt-2">Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget...</p>
-                                <a href="javascript: void(0);" class="btn btn-primary">View Statements
-                                    <i class="mdi mdi-arrow-right ml-2"></i>
-                                </a>
-                            </div>
-                            <div id="apex-line-1" class="apex-charts" style="min-height: 480px !important;"></div>
-                        </div> <!-- collapsed end -->
-                    </div> <!-- end card-body -->
-                </div> <!-- end card-->
-            </div> <!-- end col-->
-
-            <div class="col-xl-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="card-widgets">
-                            <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
-                            <a data-toggle="collapse" href="#cardCollpase2" role="button" aria-expanded="false" aria-controls="cardCollpase2"><i class="mdi mdi-minus"></i></a>
-                            <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
-                        </div>
-                        <h4 class="header-title mb-0">Orders Analytics</h4>
-
-                        <div id="cardCollpase2" class="collapse pt-3 show" dir="ltr">
-                            <div id="radar-multiple-series" class="apex-charts"></div>
-                        </div> <!-- collapsed end -->
-                    </div> <!-- end card-body -->
-                </div> <!-- end card-->
-
-                <div class="card cta-box bg-info text-white">
-                    <div class="card-body">
-                        <div class="media align-items-center">
-                            <div class="media-body">
-                                <div class="avatar-md bg-soft-light rounded-circle text-center mb-2">
-                                    <i class="mdi mdi-store font-22 avatar-title text-white"></i>
+                                <!-- Cột phải: Tổng tiền & nút xem -->
+                                <div class="col-4 text-end">
+                                    <div class="text-primary fw-bold fs-5">
+                                        {{ number_format($order->total_price) }}₫
+                                    </div>
+                                    <a href="{{ route('don-hang.show', $order->id) }}"
+                                        class="btn btn-sm btn-outline-primary mt-2 hover-btn">
+                                        <i class="bi bi-eye"></i> Xem
+                                    </a>
                                 </div>
-                                <h3 class="m-0 font-weight-normal text-white sp-line-1 cta-box-title">Special launcing <b>Discount</b> offer</h3>
-                                <p class="text-white-50 mt-2 sp-line-2">Suspendisse vel quam malesuada, aliquet sem sit amet, fringilla elit. Morbi tempor tincidunt tempor. Etiam id turpis viverra.</p>
-                                <a href="javascript: void(0);" class="text-white font-weight-semibold text-uppercase">Read More <i class="mdi mdi-arrow-right"></i></a>
                             </div>
-                            <img class="ml-3" src="{{ asset('images/update.svg') }}" width="120" alt="Generic placeholder image">
                         </div>
+                        @if(!$loop->last)
+                        <hr class="my-3">
+                        @endif
+                        @empty
+                        <p class="text-muted text-center">Không có đơn hàng nào để hiển thị.</p>
+                        @endforelse
                     </div>
-                    <!-- end card-body -->
-                </div>
-            </div> <!-- end col-->
-        </div>
-        <!-- end row -->
-
-        <div class="row">
-            <div class="col-xl-9">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="card-widgets">
-                            <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
-                            <a data-toggle="collapse" href="#cardCollpase4" role="button" aria-expanded="false" aria-controls="cardCollpase4"><i class="mdi mdi-minus"></i></a>
-                            <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
-                        </div>
-                        <h4 class="header-title mb-0">Revenue by Location</h4>
-
-                        <div id="cardCollpase4" class="collapse pt-3 show">
-                            <div class="row">
-                                <div class="col-md-8 align-self-center">
-                                    <div id="usa-map" style="height: 350px" class="dash-usa-map"></div>
-                                </div> <!-- end col -->
-                                <div class="col-md-4 align-self-center">
-                                    <h5 class="mb-1 mt-0">1,12,540 <small class="text-muted ml-2">www.getbootstrap.com</small></h5>
-                                    <div class="progress-w-percent">
-                                        <span class="progress-value font-weight-bold">72% </span>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar" role="progressbar" style="width: 72%;" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-1 mt-0">51,480 <small class="text-muted ml-2">www.youtube.com</small></h5>
-                                    <div class="progress-w-percent">
-                                        <span class="progress-value font-weight-bold">39% </span>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-success" role="progressbar" style="width: 39%;" aria-valuenow="39" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-1 mt-0">45,760 <small class="text-muted ml-2">www.dribbble.com</small></h5>
-                                    <div class="progress-w-percent">
-                                        <span class="progress-value font-weight-bold">61% </span>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-info" role="progressbar" style="width: 61%;" aria-valuenow="61" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-1 mt-0">98,512 <small class="text-muted ml-2">www.behance.net</small></h5>
-                                    <div class="progress-w-percent">
-                                        <span class="progress-value font-weight-bold">52% </span>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-warning" role="progressbar" style="width: 52%;" aria-valuenow="52" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-1 mt-0">2,154 <small class="text-muted ml-2">www.vimeo.com</small></h5>
-                                    <div class="progress-w-percent mb-0">
-                                        <span class="progress-value font-weight-bold">28% </span>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 28%;" aria-valuenow="28" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-                                </div> <!-- end col -->
-                            </div> <!-- end row-->
-
-                        </div> <!-- collapsed end -->
-                    </div> <!-- end card-body -->
-                </div> <!-- end card-->
-            </div> <!-- end col-->
-            <div class="col-xl-3">
-                <!-- Portlet card -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="card-widgets">
-                            <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
-                            <a data-toggle="collapse" href="#cardCollpase3" role="button" aria-expanded="false" aria-controls="cardCollpase3"><i class="mdi mdi-minus"></i></a>
-                            <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
-                        </div>
-                        <h4 class="header-title mb-0">Recent Activities</h4>
-
-                        <div id="cardCollpase3" class="collapse pt-3 show">
-                            <div class="slimscroll" style="max-height: 350px;">
-                                <div class="timeline-alt">
-                                    <div class="timeline-item">
-                                        <i class="timeline-icon"></i>
-                                        <div class="timeline-item-info">
-                                            <a href="#" class="text-body font-weight-semibold mb-1 d-block">You sold an item</a>
-                                            <small>Paul Burgess just purchased “Upvex - Admin Dashboard”!</small>
-                                            <p>
-                                                <small class="text-muted">5 minutes ago</small>
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="timeline-item">
-                                        <i class="timeline-icon"></i>
-                                        <div class="timeline-item-info">
-                                            <a href="#" class="text-body font-weight-semibold mb-1 d-block">Product on the Bootstrap Market</a>
-                                            <small>Dave Gamache added
-                                                <span class="font-weight-medium">Admin Dashboard</span>
-                                            </small>
-                                            <p>
-                                                <small class="text-muted">30 minutes ago</small>
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="timeline-item">
-                                        <i class="timeline-icon"></i>
-                                        <div class="timeline-item-info">
-                                            <a href="#" class="text-body font-weight-semibold mb-1 d-block">Robert Delaney</a>
-                                            <small>Send you message
-                                                <span class="font-weight-medium">"Are you there?"</span>
-                                            </small>
-                                            <p>
-                                                <small class="text-muted">2 hours ago</small>
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="timeline-item">
-                                        <i class="timeline-icon"></i>
-                                        <div class="timeline-item-info">
-                                            <a href="#" class="text-body font-weight-semibold mb-1 d-block">Audrey Tobey</a>
-                                            <small>Uploaded a photo
-                                                <span class="font-weight-semibold">"Error.jpg"</span> Please change folder structure.
-                                            </small>
-                                            <p>
-                                                <small class="text-muted">14 hours ago</small>
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="timeline-item">
-                                        <i class="timeline-icon"></i>
-                                        <div class="timeline-item-info">
-                                            <a href="#" class="text-body font-weight-semibold mb-1 d-block">You sold an item</a>
-                                            <small>Paul Burgess just purchased “Upvex - Admin Dashboard”!</small>
-                                            <p>
-                                                <small class="text-muted">1 day ago</small>
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <!-- end timeline -->
-                            </div> <!-- end slimscroll -->
-                        </div> <!-- collapsed end -->
-                    </div> <!-- end card-body -->
-                </div> <!-- end card-->
-            </div> <!-- end col-->
-        </div>
-        <!-- end row -->
-
-
-        <div class="row">
-            <div class="col-xl-6">
-                <div class="card-box">
-                    <h4 class="header-title mb-3">Top 5 Users Balances</h4>
-
-                    <div class="table-responsive">
-                        <table class="table table-borderless table-hover table-centered table-nowrap m-0">
-
-                            <thead class="thead-light">
-                                <tr>
-                                    <th colspan="2">Profile</th>
-                                    <th>Currency</th>
-                                    <th>Balance</th>
-                                    <th>Reserved in orders</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="width: 36px;">
-                                        <img src="{{ asset('images/users/user-2.jpg') }}" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm">
-                                    </td>
-
-                                    <td>
-                                        <h5 class="m-0 font-weight-normal">Tomaslau</h5>
-                                        <p class="mb-0 text-muted"><small>Member Since 2017</small></p>
-                                    </td>
-
-                                    <td>
-                                        <i class="mdi mdi-currency-btc text-primary"></i> BTC
-                                    </td>
-
-                                    <td>
-                                        0.00816117 BTC
-                                    </td>
-
-                                    <td>
-                                        0.00097036 BTC
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td style="width: 36px;">
-                                        <img src="{{ asset('images/users/user-3.jpg') }}" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm">
-                                    </td>
-
-                                    <td>
-                                        <h5 class="m-0 font-weight-normal">Erwin E. Brown</h5>
-                                        <p class="mb-0 text-muted"><small>Member Since 2017</small></p>
-                                    </td>
-
-                                    <td>
-                                        <i class="mdi mdi-currency-eth text-primary"></i> ETH
-                                    </td>
-
-                                    <td>
-                                        3.16117008 ETH
-                                    </td>
-
-                                    <td>
-                                        1.70360009 ETH
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 36px;">
-                                        <img src="{{ asset('images/users/user-4.jpg') }}" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm">
-                                    </td>
-
-                                    <td>
-                                        <h5 class="m-0 font-weight-normal">Margeret V. Ligon</h5>
-                                        <p class="mb-0 text-muted"><small>Member Since 2017</small></p>
-                                    </td>
-
-                                    <td>
-                                        <i class="mdi mdi-currency-eur text-primary"></i> EUR
-                                    </td>
-
-                                    <td>
-                                        25.08 EUR
-                                    </td>
-
-                                    <td>
-                                        12.58 EUR
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 36px;">
-                                        <img src="{{ asset('images/users/user-5.jpg') }}" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm">
-                                    </td>
-
-                                    <td>
-                                        <h5 class="m-0 font-weight-normal">Jose D. Delacruz</h5>
-                                        <p class="mb-0 text-muted"><small>Member Since 2017</small></p>
-                                    </td>
-
-                                    <td>
-                                        <i class="mdi mdi-currency-cny text-primary"></i> CNY
-                                    </td>
-
-                                    <td>
-                                        82.00 CNY
-                                    </td>
-
-                                    <td>
-                                        30.83 CNY
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 36px;">
-                                        <img src="{{ asset('images/users/user-6.jpg') }}" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm">
-                                    </td>
-
-                                    <td>
-                                        <h5 class="m-0 font-weight-normal">Luke J. Sain</h5>
-                                        <p class="mb-0 text-muted"><small>Member Since 2017</small></p>
-                                    </td>
-
-                                    <td>
-                                        <i class="mdi mdi-currency-btc text-primary"></i> BTC
-                                    </td>
-
-                                    <td>
-                                        2.00816117 BTC
-                                    </td>
-
-                                    <td>
-                                        1.00097036 BTC
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
-                                    </td>
-                                </tr>
-
-                            </tbody>
-                        </table>
+                    <!-- Nút xem tất cả -->
+                    <div class="text-end mt-4">
+                        <a href="{{ route('don-hang.index') }}" class="btn btn-primary btn-sm hover-btn">
+                            Xem tất cả <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
                     </div>
-                </div>
-            </div> <!-- end col -->
-
-            <div class="col-xl-6">
-                <div class="card-box">
-                    <h4 class="header-title mb-3">Revenue History</h4>
-
-                    <div class="table-responsive">
-                        <table class="table table-borderless table-hover table-centered  table-nowrap m-0">
-
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Marketplaces</th>
-                                    <th>Date</th>
-                                    <th>Payouts</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <h5 class="m-0 font-weight-normal">Themes Market</h5>
-                                    </td>
-
-                                    <td>
-                                        Oct 15, 2018
-                                    </td>
-
-                                    <td>
-                                        $5848.68
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-light-warning">Upcoming</span>
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <h5 class="m-0 font-weight-normal">Freelance</h5>
-                                    </td>
-
-                                    <td>
-                                        Oct 12, 2018
-                                    </td>
-
-                                    <td>
-                                        $1247.25
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-light-success">Paid</span>
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <h5 class="m-0 font-weight-normal">Share Holding</h5>
-                                    </td>
-
-                                    <td>
-                                        Oct 10, 2018
-                                    </td>
-
-                                    <td>
-                                        $815.89
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-light-success">Paid</span>
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <h5 class="m-0 font-weight-normal">Envato's Affiliates</h5>
-                                    </td>
-
-                                    <td>
-                                        Oct 03, 2018
-                                    </td>
-
-                                    <td>
-                                        $248.75
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-light-danger">Overdue</span>
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <h5 class="m-0 font-weight-normal">Marketing Revenue</h5>
-                                    </td>
-
-                                    <td>
-                                        Sep 21, 2018
-                                    </td>
-
-                                    <td>
-                                        $978.21
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-light-warning">Upcoming</span>
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <h5 class="m-0 font-weight-normal">Advertise Revenue</h5>
-                                    </td>
-
-                                    <td>
-                                        Sep 15, 2018
-                                    </td>
-
-                                    <td>
-                                        $358.10
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-light-success">Paid</span>
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                    </td>
-                                </tr>
-
-                            </tbody>
-                        </table>
-                    </div> <!-- end .table-responsive-->
-                </div> <!-- end card-box-->
-            </div> <!-- end col -->
-        </div>
-
-    </div> <!-- container -->
-
-</div>
-
-
-<footer class="footer">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="text-md-right footer-links d-none d-sm-block">
-                    <a href="javascript:void(0);">About Us</a>
-                    <a href="javascript:void(0);">Help</a>
-                    <a href="javascript:void(0);">Contact Us</a>
                 </div>
             </div>
         </div>
     </div>
-</footer>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Dữ liệu cho biểu đồ
+    const weeklyLabels = @json($weeklyLabels);
+    const weeklyValues = @json($weeklyValues);
+    const weeklyOrderData = @json($weeklyOrderData);
+
+    const monthlyLabels = @json($comboLabels);
+    const monthlyRevenueData = @json($comboRevenueData);
+    const monthlyOrderData = @json($comboOrderData);
+
+    const yearlyLabels = @json($yearlyLabels);
+    const yearlyValues = @json($yearlyValues);
+    const yearlyOrderData = @json($yearlyOrderData);
+
+    // Dữ liệu mặc định (theo tháng)
+    let currentLabels = monthlyLabels;
+    let currentRevenueData = monthlyRevenueData;
+    let currentOrderData = monthlyOrderData;
+
+    // Cấu hình dữ liệu cho biểu đồ
+    const comboData = {
+        labels: currentLabels,
+        datasets: [{
+                label: 'Doanh Thu (VND)',
+                data: currentRevenueData,
+                type: 'bar',
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1,
+                yAxisID: 'y1',
+            },
+            {
+                label: 'Số Đơn Hàng',
+                data: currentOrderData,
+                type: 'line',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                fill: true,
+                tension: 0.4,
+                yAxisID: 'y2',
+            }
+        ]
+    };
+
+    const comboConfig = {
+        type: 'bar',
+        data: comboData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Doanh Thu (Cột) và Số Đơn Hàng (Đường)',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 20
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label === 'Doanh Thu (VND)') {
+                                return `${label}: ${context.parsed.y.toLocaleString()} VND`;
+                            }
+                            return `${label}: ${context.parsed.y}`;
+                        },
+                        title: function(tooltipItems) {
+                            const label = tooltipItems[0].label;
+                            if (currentLabels === weeklyLabels) {
+                                const dayIndex = weeklyLabels.indexOf(label);
+                                const startOfLastWeek = new Date();
+                                startOfLastWeek.setDate(startOfLastWeek.getDate() - 7 - startOfLastWeek.getDay() + dayIndex);
+                                const day = startOfLastWeek.getDate().toString().padStart(2, '0');
+                                const month = (startOfLastWeek.getMonth() + 1).toString().padStart(2, '0');
+                                const year = startOfLastWeek.getFullYear();
+                                return `${label} (${day}/${month}/${year})`;
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'category',
+                    title: {
+                        display: true,
+                        text: 'Thời Gian',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            const label = this.getLabelForValue(value);
+                            if (currentLabels === monthlyLabels) {
+                                const [year, month] = label.split('-');
+                                return `Tháng ${parseInt(month)}/${year}`;
+                            }
+                            return label;
+                        }
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Doanh Thu (VND)',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function(value) {
+                            return value.toLocaleString() + ' VND';
+                        }
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                },
+                y2: {
+                    type: 'linear',
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Số Đơn Hàng',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 1
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            }
+        }
+    };
+
+    // Khởi tạo biểu đồ
+    const comboChart = new Chart(document.getElementById('comboChart'), comboConfig);
+
+    // Xử lý sự kiện khi chọn bộ lọc thời gian
+    document.querySelectorAll('.dropdown-item[data-filter]').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const filter = this.getAttribute('data-filter');
+
+            if (filter === 'week') {
+                currentLabels = weeklyLabels;
+                currentRevenueData = weeklyValues;
+                currentOrderData = weeklyOrderData;
+                document.getElementById('timeFilterDropdown').textContent = 'Theo Tuần (Tuần Trước)';
+            } else if (filter === 'month') {
+                currentLabels = monthlyLabels;
+                currentRevenueData = monthlyRevenueData;
+                currentOrderData = monthlyOrderData;
+                document.getElementById('timeFilterDropdown').textContent = 'Theo Tháng';
+            } else if (filter === 'year') {
+                currentLabels = yearlyLabels;
+                currentRevenueData = yearlyValues;
+                currentOrderData = yearlyOrderData;
+                document.getElementById('timeFilterDropdown').textContent = 'Theo Năm';
+            }
+
+            comboChart.data.labels = currentLabels;
+            comboChart.data.datasets[0].data = currentRevenueData;
+            comboChart.data.datasets[1].data = currentOrderData;
+            comboChart.update();
+
+            document.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Biểu đồ Trạng Thái Đơn Hàng
+    const orderStatusChart = new Chart(document.getElementById('orderStatusChart'), {
+        type: 'pie',
+        data: {
+            labels: @json($orderStatusLabels),
+            datasets: [{
+                label: 'Trạng Thái Đơn Hàng',
+                data: @json($orderStatusValues),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Tỷ Lệ Trạng Thái Đơn Hàng',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 20
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
 @endsection

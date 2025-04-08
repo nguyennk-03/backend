@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Ẩn thông báo thành công sau 2 giây
     const successMessage = document.querySelector("#success-message");
     if (successMessage) {
         setTimeout(() => {
@@ -6,12 +7,12 @@ document.addEventListener("DOMContentLoaded", function () {
             successMessage.style.opacity = "0";
             setTimeout(() => {
                 successMessage.style.display = "none";
-                successMessage.style.opacity = "1"; 
+                successMessage.style.opacity = "1";
             }, 500);
         }, 2000);
     }
 
-    // Danh sách các bảng cần khởi tạo DataTable
+    // Danh sách bảng cần khởi tạo DataTable
     const tableIds = [
         "UserTable",
         "CategoryTable",
@@ -20,20 +21,15 @@ document.addEventListener("DOMContentLoaded", function () {
         "OrderTable",
         "ReviewTable",
         "ProductTable",
+        "OrderDetailTable",
+        "ColorTable",
+        "SizeTable",
     ];
 
     if (window.jQuery && $.fn.DataTable) {
         tableIds.forEach((tableId) => {
             const tableElement = document.getElementById(tableId);
-            if (tableElement) {
-                const rows = tableElement.querySelectorAll("tbody tr");
-                if (rows.length === 0) {
-                    console.warn(
-                        `Bảng ${tableId} không có dữ liệu để hiển thị.`
-                    );
-                    return;
-                }
-
+            if (tableElement && tableElement.querySelector("tbody tr")) {
                 $("#" + tableId).DataTable({
                     paging: true,
                     searching: true,
@@ -55,11 +51,35 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     order: [[0, "desc"]], // Sắp xếp theo cột ID giảm dần
                 });
-            } else {
-                console.error(`Không tìm thấy bảng với ID: ${tableId}`);
             }
         });
     } else {
         console.error("jQuery hoặc DataTables chưa được tải.");
+    }
+
+    // Tính tổng giá trị đơn hàng dựa trên sản phẩm và số lượng
+    const productSelect = document.querySelector('select[name="product_id"]');
+    const quantityInput = document.querySelector('input[name="quantity"]');
+    const totalPriceInput = document.getElementById("total_price");
+
+    function calculateTotal() {
+        if (!productSelect || !quantityInput || !totalPriceInput) return;
+
+        const selectedOption =
+            productSelect.options[productSelect.selectedIndex];
+        const price = selectedOption?.getAttribute("data-price")
+            ? parseFloat(selectedOption.getAttribute("data-price"))
+            : 0;
+        const quantity = parseInt(quantityInput.value) || 0;
+        const total = price * quantity;
+
+        totalPriceInput.value =
+            total > 0 ? total.toLocaleString("vi-VN") + " VNĐ" : "0 VNĐ";
+    }
+
+    if (productSelect && quantityInput && totalPriceInput) {
+        productSelect.addEventListener("change", calculateTotal);
+        quantityInput.addEventListener("input", calculateTotal);
+        calculateTotal(); // Tính toán lần đầu khi trang tải
     }
 });
