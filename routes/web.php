@@ -13,7 +13,6 @@ use App\Http\Controllers\Admin\DonHangController;
 use App\Http\Controllers\Admin\GiamGiaController;
 use App\Http\Controllers\Admin\DanhGiaController;
 use App\Http\Controllers\AdminController;
-use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 // Trang chu

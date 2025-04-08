@@ -90,10 +90,10 @@
                                 sách sản phẩm</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('color')  }}" class="nav-link"><i class="la la-palette"></i> Quản lý theo màu</a>
+                            <a href="{{route('mau-sac.index')  }}" class="nav-link"><i class="la la-palette"></i> Quản lý theo màu</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('size')  }}" class="nav-link"><i class="la la-arrows-alt"></i> Quản lý theo size</a>
+                            <a href="{{route('kich-thuoc.index')  }}" class="nav-link"><i class="la la-arrows-alt"></i> Quản lý theo size</a>
                         </li>
                     </ul>
                 </li>
