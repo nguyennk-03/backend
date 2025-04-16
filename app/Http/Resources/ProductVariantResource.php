@@ -17,24 +17,18 @@ class ProductVariantResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'product_id' => $this->product_id,
-            'size_id' => $this->size_id,
-            'color_id' => $this->color_id,
+            'product' => new ProductResource($this->whenLoaded('product')),
+            'size' => new SizeResource($this->whenLoaded('size')),
+            'color' => new ColorResource($this->whenLoaded('color')),
             'price' => $this->price,
             'discount_percent' => $this->discount_percent,
             'discounted_price' => $this->discounted_price,
             'stock_quantity' => $this->stock_quantity,
             'sold' => $this->sold,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-
-            'product' => new ProductResource($this->whenLoaded('product')),
-            'size' => new SizeResource($this->whenLoaded('size')),
-            'color' => new ColorResource($this->whenLoaded('color')),
-
-            // 👉 Thêm images
             'images' => ImageResource::collection($this->whenLoaded('images')),
             'main_image' => new ImageResource($this->whenLoaded('mainImage')),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }
