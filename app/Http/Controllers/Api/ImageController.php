@@ -10,11 +10,13 @@ class ImageController extends Controller
 {
     public function index()
     {
-        return response()->json(Image::with('product')->get());
+        // Sử dụng với 'productVariant' thay vì 'product'
+        return response()->json(Image::with('productVariant')->get());
     }
 
     public function show($id)
     {
+        // Sử dụng với 'productVariant' thay vì 'product'
         $image = Image::with('productVariant.product')->find($id);
         return $image
             ? response()->json($image)
