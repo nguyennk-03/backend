@@ -2,33 +2,23 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 use App\Models\Brand;
+use Illuminate\Database\Seeder;
 
 class BrandSeeder extends Seeder
 {
     public function run()
     {
         $brands = [
-            ['id' => 1, 'name' => 'Adidas', 'slug' => 'adidas', 'logo' => 'images/brands/adidas.png'],
-            ['id' => 2, 'name' => 'Asics', 'slug' => 'asics', 'logo' => 'images/brands/asics.png'],
-            ['id' => 3, 'name' => 'Bata', 'slug' => 'bata', 'logo' => 'images/brands/bata.png'],
-            ['id' => 4, 'name' => 'Nike', 'slug' => 'nike', 'logo' => 'images/brands/nike.png'],
-            ['id' => 5, 'name' => 'Puma', 'slug' => 'puma', 'logo' => 'images/brands/puma.png'],
+            ['name' => 'Adidas', 'logo' => 'images/brands/adidas.png', 'status' => 1],
+            ['name' => 'Asics', 'logo' => 'images/brands/asics.png', 'status' => 1],
+            ['name' => 'Bata', 'logo' => 'images/brands/bata.png', 'status' => 1],
+            ['name' => 'Nike', 'logo' => 'images/brands/nike.png', 'status' => 1],
+            ['name' => 'Puma', 'logo' => 'images/brands/puma.png', 'status' => 1],
         ];
 
         foreach ($brands as $brand) {
-            Brand::updateOrCreate(
-                ['id' => $brand['id']],  
-                [
-                    'name' => $brand['name'],
-                    'slug' => Str::slug($brand['name']),
-                    'logo' => $brand['logo'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
+            Brand::create($brand);
         }
     }
 }

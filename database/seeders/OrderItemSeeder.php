@@ -26,7 +26,7 @@ class OrderItemSeeder extends Seeder
                     'order_id' => $order->id,
                     'variant_id' => $variant->id,
                     'quantity' => rand(1, 5),
-                    'price' => $variant->product->price, 
+                    'price' => $variant->price, 
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

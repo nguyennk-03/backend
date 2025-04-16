@@ -2,24 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductDiscount extends Model {
-    use HasFactory;
-
-    protected $table = 'product_discounts';
-
+class ProductDiscount extends Model
+{
     protected $fillable = ['product_id', 'discount_id'];
 
-    public $timestamps = false;
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
-    public function product() {
+    // Quan hệ: Liên kết thuộc về một sản phẩm
+    public function product()
+    {
         return $this->belongsTo(Product::class);
     }
 
-    public function discount() {
+    // Quan hệ: Liên kết thuộc về một mã giảm giá
+    public function discount()
+    {
         return $this->belongsTo(Discount::class);
     }
 }
-

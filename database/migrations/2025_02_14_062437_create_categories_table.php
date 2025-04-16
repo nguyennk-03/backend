@@ -10,10 +10,9 @@ class CreateCategoriesTable extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('image')->nullable();
-            $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('set null');
+            $table->string('name')->unique()->comment('Tên danh mục');
+            $table->string('image')->nullable()->comment('Hình ảnh danh mục');
+            $table->tinyInteger('status')->default(1)->comment('0: Ẩn, 1: Hiển thị');
             $table->timestamps();
         });
     }

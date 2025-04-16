@@ -22,7 +22,7 @@
                     <!-- Form thêm màu -->
                     <div class="mb-4 p-4 border rounded">
                         <h5 class="mb-3">Thêm Màu</h5>
-                        <form action="{{ route('mau-sac.store') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('mau-sac.store') }}" method="POST">
                             @csrf
                             <div class="row g-3">
                                 <div class="col-md-4">
@@ -33,8 +33,8 @@
                                     <label for="hex_code" class="form-label">Chọn mã màu</label>
                                     <input type="color" class="form-control form-control-color" id="hex_code" name="hex_code" value="{{ old('hex_code', '#000000') }}">
                                 </div>
-                                <div class="col-md-4">
-                                    <button type="submit" class="btn btn-primary mt-2">Thêm màu</button>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary">Thêm màu</button>
                                 </div>
                             </div>
                         </form>
@@ -50,20 +50,31 @@
                                         <th width="5%">STT</th>
                                         <th>Tên màu</th>
                                         <th width="10%">Mã màu</th>
+                                        <th>Trạng thái</th>
                                         <th width="15%">Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($colors as $index => $color)
+                                    @forelse($colors as $index => $color)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
                                         <td>{{ $color->name }}</td>
                                         <td class="text-center">
                                             @if($color->hex_code)
-                                                <div class="color-box" style="background-color: {{ $color->hex_code }};" title="{{ $color->hex_code }}"></div>
+                                                <div class="color-box" style="background-color: {{ $color->hex_code }}; width: 30px; height: 30px; border-radius: 4px; border: 1px solid #ccc;" title="{{ $color->hex_code }}"></div>
                                             @else
                                                 <span class="text-secondary">❌</span>
                                             @endif
+                                        </td>
+                                        <td>
+                                            <form action="{{ route('mau-sac.update', $color->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PUT')
+                                                <select name="is_active" onchange="this.form.submit()" class="form-select form-select-sm custom-status-select">
+                                                    <option value="1" {{ $color->is_active ? 'selected' : '' }}>Hiển thị</option>
+                                                    <option value="0" {{ !$color->is_active ? 'selected' : '' }}>Ẩn</option>
+                                                </select>
+                                            </form>
                                         </td>
                                         <td>
                                             <form action="{{ route('mau-sac.destroy', $color->id) }}" method="POST" class="d-inline">
@@ -73,37 +84,18 @@
                                             </form>
                                         </td>
                                     </tr>
-                                    @endforeach
-                                    @if($colors->isEmpty())
-                                        <tr>
-                                            <td colspan="4" class="text-center text-muted">Chưa có màu nào được thêm</td>
-                                        </tr>
-                                    @endif
+                                    @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Chưa có màu nào được thêm</td>
+                                    </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
-                    </div><!-- end bảng -->
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    const fileInput = document.getElementById('image');
-    const clearButton = document.getElementById('clearFile');
-    const fileNameDisplay = document.getElementById('fileName');
-
-    clearButton.addEventListener('click', function () {
-        fileInput.value = '';
-        fileNameDisplay.textContent = 'Không có tệp nào được chọn';
-    });
-
-    fileInput.addEventListener('change', function () {
-        const fileName = this.files[0] ? this.files[0].name : 'Không có tệp nào được chọn';
-        fileNameDisplay.textContent = fileName;
-    });
-</script>
-@endpush

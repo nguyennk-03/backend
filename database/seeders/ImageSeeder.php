@@ -14,7 +14,7 @@ class ImageSeeder extends Seeder
         $imageIndex = 1;
 
         foreach ($variants as $variant) {
-// Tạo đường dẫn ảnh theo thứ tự
+            // Tạo đường dẫn ảnh theo thứ tự
             $imagePath = "images/products/{$variant->product->brand->name}-{$imageIndex}.png";
 
             if (!file_exists(public_path($imagePath))) {
@@ -23,7 +23,8 @@ class ImageSeeder extends Seeder
 
             Image::create([
                 'variant_id' => $variant->id,
-                'image' => $imagePath,
+                'path' => $imagePath, // Changed from 'image' to 'path' to match schema
+                'is_main' => false, // Added default value for is_main
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

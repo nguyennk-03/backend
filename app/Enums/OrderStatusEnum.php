@@ -2,14 +2,14 @@
 
 namespace App\Enums;
 
-enum OrderStatusEnum: string
+enum OrderStatusEnum: int
 {
-    case PENDING = 'pending';
-    case PROCESSING = 'processing';
-    case SHIPPED = 'shipped';
-    case COMPLETED = 'completed';
-    case CANCELED = 'canceled';
-    case RETURNED = 'returned'; 
+    case PENDING = 0;
+    case PROCESSING = 1;
+    case SHIPPED = 2;
+    case COMPLETED = 3;
+    case CANCELED = 4;
+    case RETURNED = 5;
 
     public function label(): string
     {
@@ -19,8 +19,7 @@ enum OrderStatusEnum: string
             self::COMPLETED => 'Đã thanh toán',
             self::SHIPPED => 'Đã giao',
             self::CANCELED => 'Đã hủy',
-            self::RETURNED => 'Đã trả hàng', 
-            default => 'Không xác định',
+            self::RETURNED => 'Đã trả hàng',
         };
     }
 
@@ -32,11 +31,11 @@ enum OrderStatusEnum: string
             self::SHIPPED => 'bg-primary',
             self::CANCELED => 'bg-danger',
             self::PROCESSING => 'bg-secondary',
-            self::RETURNED => 'bg-info', 
-            default => 'bg-dark',
+            self::RETURNED => 'bg-info',
         };
     }
-     public function iconClass(): string
+
+    public function iconClass(): string
     {
         return match($this) {
             self::PENDING => 'bi bi-hourglass-split',
@@ -45,7 +44,18 @@ enum OrderStatusEnum: string
             self::COMPLETED => 'bi bi-check-circle',
             self::CANCELED => 'bi bi-x-circle',
             self::RETURNED => 'bi bi-arrow-counterclockwise',
-            default => 'bi bi-question-circle',
         };
+    }
+
+    public static function options(): array
+    {
+        return [
+            self::PENDING->value => self::PENDING->label(),
+            self::PROCESSING->value => self::PROCESSING->label(),
+            self::SHIPPED->value => self::SHIPPED->label(),
+            self::COMPLETED->value => self::COMPLETED->label(),
+            self::CANCELED->value => self::CANCELED->label(),
+            self::RETURNED->value => self::RETURNED->label(),
+        ];
     }
 }

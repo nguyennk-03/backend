@@ -5,43 +5,31 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Color;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class MauSacController extends Controller
 {
-    /**
-     * Hiển thị danh sách màu sắc
-     */
     public function index()
     {
         $colors = Color::all();
         return view('admin.products.color', compact('colors'));
     }
 
-    /**
-     * Hiển thị form thêm màu sắc
-     */
     public function create()
     {
         return view('admin.colors.create');
     }
 
-    /**
-     * Lưu màu sắc mới vào database
-     */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:colors,name',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'code' => 'nullable|string|max:50|unique:colors,code',
+            'hex_code' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'is_active' => 'nullable|boolean',
         ]);
 
-        $data = $request->only('name');
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('colors', 'public');
-            $data['image'] = $imagePath;
-        }
+        $data = $request->only(['name', 'code', 'hex_code']);
+        $data['is_active'] = $request->boolean('is_active', true); // mặc định true
 
         Color::create($data);
 
@@ -49,58 +37,28 @@ class MauSacController extends Controller
             ->with('success', 'Thêm màu sắc thành công!');
     }
 
-    /**
-     * Hiển thị thông tin chi tiết màu sắc
-     */
     public function show(Color $color)
     {
         return view('admin.colors.show', compact('color'));
     }
 
-    /**
-     * Hiển thị form chỉnh sửa màu sắc
-     */
     public function edit(Color $color)
     {
         return view('admin.colors.edit', compact('color'));
     }
 
-    /**
-     * Cập nhật màu sắc trong database
-     */
-    public function update(Request $request, Color $color)
+    public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:colors,name,' . $color->id,
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $color = Color::findOrFail($id);
+        $color->is_active = $request->input('is_active') == 1;
+        $color->save();
 
-        $data = $request->only('name');
-
-        if ($request->hasFile('image')) {
-            // Xóa ảnh cũ nếu có
-            if ($color->image) {
-                Storage::disk('public')->delete($color->image);
-            }
-
-            $imagePath = $request->file('image')->store('colors', 'public');
-            $data['image'] = $imagePath;
-        }
-
-        $color->update($data);
-
-        return redirect()->route('mau-sac.index')
-            ->with('success', 'Cập nhật màu sắc thành công!');
+        return back()->with('success', 'Cập nhật trạng thái thành công.');
     }
 
-    /**
-     * Xóa màu sắc
-     */
-    public function destroy(Color $color)
+    public function destroy($id)
     {
-        if ($color->image) {
-            Storage::disk('public')->delete($color->image);
-        }
+        $color = Color::findOrFail($id); 
 
         $color->delete();
 

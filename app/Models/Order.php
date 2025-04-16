@@ -2,107 +2,47 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Enums\OrderStatusEnum;
-use App\Enums\PaymentStatusEnum;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Order extends Model
 {
-    use HasFactory;
-
-    protected $table = 'orders';
-
     protected $fillable = [
-        'user_id',
-        'discount_id',
-        'payment_id',
-        'status',
-        'total_price',
-        'payment_status',
+        'code', 'user_id', 'discount_id', 'payment_id', 'status',
+        'payment_status', 'total_price', 'total_after_discount',
+        'tracking_code', 'recipient_name', 'recipient_phone',
+        'shipping_address', 'note'
     ];
 
     protected $casts = [
+        'status' => 'integer',
+        'payment_status' => 'integer',
         'total_price' => 'decimal:2',
-        'status' => OrderStatusEnum::class,
-        'payment_status' => PaymentStatusEnum::class,
+        'total_after_discount' => 'decimal:2',
         'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
+    // Quan hệ: Đơn hàng thuộc về một người dùng
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class);
     }
 
+    // Quan hệ: Đơn hàng sử dụng một mã giảm giá
     public function discount()
     {
-        return $this->belongsTo(Discount::class, 'discount_id', 'id');
+        return $this->belongsTo(Discount::class)->withDefault();
     }
 
-    public function items()
-    {
-        return $this->hasMany(OrderItem::class, 'order_id', 'id');
-    }
-
+    // Quan hệ: Đơn hàng sử dụng một phương thức thanh toán
     public function payment()
     {
-        return $this->belongsTo(Payment::class, 'payment_id', 'id');
+        return $this->belongsTo(Payment::class)->withDefault();
     }
 
-    public function isPaid(): bool
+    // Quan hệ: Đơn hàng có nhiều chi tiết đơn hàng
+    public function orderItems()
     {
-        return $this->payment_status === PaymentStatusEnum::PAID;
+        return $this->hasMany(OrderItem::class);
     }
-
-    public function scopeStatus($query, OrderStatusEnum $status)
-    {
-        return $query->where('status', $status);
-    }
-
-    public function scopePaid($query)
-    {
-        return $query->where('payment_status', PaymentStatusEnum::PAID);
-    }
-
-    public function scopeUserOrders($query, $userId)
-    {
-        return $query->where('user_id', $userId);
-    }
-
-    public function updatePaymentStatus($status)
-    {
-        if ($this->isPaid() && $status !== PaymentStatusEnum::PAID) {
-            return response()->json(['message' => 'Không thể thay đổi trạng thái của thanh toán đã hoàn thành.'], 400);
-        }
-
-        $this->update(['payment_status' => $status]);
-
-        return $this;
-    }
-
-    protected function status(): Attribute
-    {
-        return Attribute::make(
-            set: fn($value) => strtolower($value),
-        );
-    }
-
-    protected function paymentStatus(): Attribute
-    {
-        return Attribute::make(
-            set: fn($value) => strtolower($value),
-        );
-    }
-    public function getStatusTextAttribute(): string
-    {
-        return $this->status?->label() ?? 'Không xác định';
-    }
-
-    public function getStatusColorAttribute(): string
-    {
-        return $this->status?->badgeClass() ?? 'bg-secondary';
-    }
-
-
 }

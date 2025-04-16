@@ -10,9 +10,9 @@ class CreateBrandsTable extends Migration
     {
         Schema::create('brands', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('logo')->nullable();
+            $table->string('name')->unique()->comment('Tên thương hiệu');
+            $table->string('logo')->nullable()->comment('Logo thương hiệu');
+            $table->tinyInteger('status')->default(1)->comment('0: Ẩn, 1: Hiển thị');
             $table->timestamps();
         });
     }

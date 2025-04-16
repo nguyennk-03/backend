@@ -2,22 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Review extends Model {
-    use HasFactory;
+class Review extends Model
+{
+    protected $fillable = ['user_id', 'product_id', 'rating', 'comment', 'is_hidden'];
 
-    protected $table = 'reviews';
+    protected $casts = [
+        'rating' => 'integer',
+        'is_hidden' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
-    protected $fillable = ['user_id', 'product_id', 'rating', 'comment'];
-
-    public function user() {
+    // Quan hệ: Đánh giá thuộc về một người dùng
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function product() {
-        return $this->belongsTo(Product::class,'product_id');
+    // Quan hệ: Đánh giá thuộc về một sản phẩm
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 }
-

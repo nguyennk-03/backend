@@ -12,10 +12,11 @@ return new class extends Migration {
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->tinyInteger('rating')->unsigned()->comment('Từ 1 đến 5 sao');
-            $table->text('comment')->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->comment('Người dùng');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade')->comment('Sản phẩm');
+            $table->tinyInteger('rating')->unsigned()->comment('Đánh giá từ 1 đến 5 sao');
+            $table->text('comment')->nullable()->comment('Bình luận');
+            $table->tinyInteger('is_hidden')->default(0)->comment('0: Ẩn, 1: Hiển thị');
             $table->timestamps();
         });
     }

@@ -176,9 +176,21 @@
                             <td>{{ $order->user ? $order->user->name : 'Khách vãng lai' }}</td>
                             <td class="text-end">{{ number_format($order->total_price, 0, ',', '.') }} VNĐ</td>
                             <td class="text-center">
-                                <span class="badge {{ $order->status->badgeClass() }}">
-                                    {{ $order->status->label() }}
-                                </span>
+                                <form action="{{ route('don-hang.update', $order->id) }}" method="POST" class="d-inline-block">
+                                    @csrf
+                                    @method('PUT')
+                                    <select name="status" onchange="this.form.submit()" class="form-select form-select-sm">
+                                        @foreach(\App\Enums\OrderStatusEnum::cases() as $status)
+                                        <option
+                                            value="{{ $order->status->value }}"
+                                            class="bg-light text-dark"
+                                            data-class="{{ $status->badgeClass() }}"
+                                            {{ $order->status->value === $status ? 'selected' : '' }}>
+                                            {{ $status->label() }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </form>
                             </td>
                             <td class="text-center">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                             <td class="text-center">
@@ -186,135 +198,12 @@
                                     <button type="button" class="btn btn-warning btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#showModal{{ $order->id }}">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button type="button" class="btn btn-info btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ $order->id }}">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <form action="{{ route('don-hang.destroy', $order->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm shadow-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>
 
                         <!-- Show Order Modal -->
-                        <div class="modal fade" id="showModal{{ $order->id }}" tabindex="-1" aria-labelledby="showModalLabel{{ $order->id }}" aria-hidden="true">
-                            <div class="modal-dialog modal-xl">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="showModalLabel{{ $order->id }}">Chi tiết đơn hàng #{{ $order->id }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row mb-4">
-                                            <div class="col-md-6">
-                                                <h6><strong>Thông tin khách hàng</strong></h6>
-                                                <p>Tên: {{ $order->user ? $order->user->name : 'Khách vãng lai' }}</p>
-                                                <p>Email: {{ $order->user ? $order->user->email : 'N/A' }}</p>
-                                                <p>Điện thoại: {{ $order->phone ?? 'N/A' }}</p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <h6><strong>Thông tin đơn hàng</strong></h6>
-                                                <p>Mã đơn: #{{ $order->id }}</p>
-                                                <p>Trạng thái:
-                                                    <span class="badge {{ $order->status->badgeClass() }}">
-                                                        {{ $order->status->label() }}
-                                                    </span>
-                                                </p>
-                                                <p>Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</p>
-                                            </div>
-                                            <div class="col-md-12 mt-3">
-                                                <h6><strong>Địa chỉ giao hàng</strong></h6>
-                                                <p>{{ $order->address }}</p>
-                                            </div>
-                                        </div>
 
-                                        <h6 class="mb-3"><strong>Danh sách sản phẩm</strong></h6>
-                                        <div class="table-responsive">
-
-                                        </div>
-
-                                        @if($order->note)
-                                        <div class="mt-3">
-                                            <h6><strong>Ghi chú</strong></h6>
-                                            <p>{{ $order->note }}</p>
-                                        </div>
-                                        @endif
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Edit Order Modal -->
-                        <div class="modal fade" id="editModal{{ $order->id }}" tabindex="-1" aria-labelledby="editModalLabel{{ $order->id }}" aria-hidden="true">
-                            <div class="modal-dialog modal-xl">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editModalLabel{{ $order->id }}">Chỉnh sửa đơn hàng #{{ $order->id }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form action="{{ route('don-hang.update', $order->id) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <div class="row g-4">
-                                                <div class="col-md-6">
-                                                    <label class="form-label fw-semibold">Khách hàng <span class="text-danger">*</span></label>
-                                                    <select name="user_id" class="form-select border-0 shadow-sm" required>
-                                                        <option value="">-- Chọn khách hàng --</option>
-                                                        @foreach ($users as $user)
-                                                        <option value="{{ $user->id }}" {{ $order->user_id == $user->id ? 'selected' : '' }}>
-                                                            {{ $user->name }} ({{ $user->email }})
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
-                                                    <input type="text" name="phone" class="form-control border-0 shadow-sm"
-                                                        value="{{ $order->phone }}" placeholder="Nhập số điện thoại" required>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <label class="form-label fw-semibold">Địa chỉ giao hàng <span class="text-danger">*</span></label>
-                                                    <textarea name="address" class="form-control border-0 shadow-sm" rows="2"
-                                                        placeholder="Nhập địa chỉ giao hàng" required>{{ $order->address }}</textarea>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label fw-semibold">Trạng thái <span class="text-danger">*</span></label>
-                                                    <select name="status" class="form-select border-0 shadow-sm" required>
-                                                        @foreach (App\Enums\OrderStatusEnum::cases() as $status)
-                                                        <option value="{{ $status->value }}" {{ $order->status->value == $status->value ? 'selected' : '' }}>
-                                                            {{ $status->label() }}
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label fw-semibold">Tổng tiền (VNĐ)</label>
-                                                    <input type="text" class="form-control border-0 shadow-sm"
-                                                        value="{{ number_format($order->total_price, 0, ',', '.') }}" readonly>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <label class="form-label fw-semibold">Ghi chú</label>
-                                                    <textarea name="note" class="form-control border-0 shadow-sm" rows="3"
-                                                        placeholder="Nhập ghi chú (nếu có)">{{ $order->note }}</textarea>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer border-0 pt-4">
-                                                <button type="button" class="btn btn-secondary btn-sm fw-semibold" data-bs-dismiss="modal">Hủy</button>
-                                                <button type="submit" class="btn btn-primary btn-sm fw-semibold">Cập nhật</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         @empty
                         <tr>
                             <td colspan="6" class="text-center text-muted py-4">Không có đơn hàng nào để hiển thị.</td>
@@ -322,33 +211,55 @@
                         @endforelse
                     </tbody>
                 </table>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Sản phẩm</th>
-                            <th class="text-end">Đơn giá</th>
-                            <th class="text-center">Số lượng</th>
-                            <th class="text-end">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($orders as $item)
-                        <tr>
-                            <td>{{ $item->product->name ?? 'Sản phẩm đã xóa' }}</td>
-                            <td class="text-end">{{ number_format($item->price, 0, ',', '.') }} VNĐ</td>
-                            <td class="text-center">{{ $item->quantity }}</td>
-                            <td class="text-end">{{ number_format($item->price * $item->quantity, 0, ',', '.') }} VNĐ</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="3" class="text-end">Tổng cộng:</th>
-                            <th class="text-end">{{ number_format($item->total_price, 0, ',', '.') }} VNĐ</th>
-                        </tr>
-                    </tfoot>
-                </table>
-                <div class="card shadow-sm rounded-lg">
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="showModal{{ $order->id }}" tabindex="-1" aria-labelledby="showModalLabel{{ $order->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="showModalLabel{{ $order->id }}">Chi tiết đơn hàng #{{ $order->id }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6><strong>Thông tin khách hàng</strong></h6>
+                            <p>Tên: {{ $order->user ? $order->user->name : 'Khách vãng lai' }}</p>
+                            <p>Email: {{ $order->user ? $order->user->email : 'N/A' }}</p>
+                            <p>Điện thoại: {{ $order->phone ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><strong>Thông tin đơn hàng</strong></h6>
+                            <p>Mã đơn: #{{ $order->id }}</p>
+                            <p>Trạng thái:
+                                <span class="badge {{ $order->status->badgeClass() }}">
+                                    {{ $order->status->label() }}
+                                </span>
+                            </p>
+                            <p>Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</p>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <h6><strong>Địa chỉ giao hàng</strong></h6>
+                            <p>{{ $order->user->address }}</p>
+                        </div>
+                    </div>
+
+                    <h6 class="mb-3"><strong>Danh sách sản phẩm</strong></h6>
+                    {{ $order->products }}
+                    <div class="table-responsive">
+
+                    </div>
+
+                    @if($order->note)
+                    <div class="mt-3">
+                        <h6><strong>Ghi chú</strong></h6>
+                        <p>{{ $order->note }}</p>
+                    </div>
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>

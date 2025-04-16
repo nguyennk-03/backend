@@ -2,27 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Wishlist extends Model
 {
-    use HasFactory;
+    protected $fillable = ['user_id', 'product_id'];
 
-    protected $table = 'wishlists'; 
-
-    protected $fillable = [
-        'user_id',
-        'product_id',
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
-    // Liên kết với bảng Users
+    // Quan hệ: Danh sách yêu thích thuộc về một người dùng
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Liên kết với bảng Products
+    // Quan hệ: Danh sách yêu thích chứa một sản phẩm
     public function product()
     {
         return $this->belongsTo(Product::class);

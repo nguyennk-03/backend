@@ -13,18 +13,17 @@ return new class extends Migration
     {
         Schema::create('news', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('slug')->unique();
-            $table->text('content');
-            $table->string('image')->nullable();
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->foreignId('brand_id')->nullable()->constrained('brands')->onDelete('set null');
-            $table->string('author');
-            $table->integer('views')->default(0);
-            $table->enum('status', ['draft', 'published'])->default('draft');
+            $table->string('title')->comment('Tiêu đề bài viết');
+            $table->string('slug')->unique()->comment('Slug bài viết');
+            $table->text('content')->comment('Nội dung bài viết');
+            $table->string('image')->nullable()->comment('Hình ảnh bài viết');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade')->comment('Danh mục bài viết');
+            $table->foreignId('brand_id')->nullable()->constrained('brands')->onDelete('set null')->comment('Thương hiệu liên quan');
+            $table->string('author')->comment('Tác giả');
+            $table->tinyInteger('status')->default(1)->comment('0: Ẩn, 1: Hiển thị');
+            $table->integer('views')->default(0)->comment('Lượt xem');
             $table->timestamps();
         });
-
     }
 
     /**

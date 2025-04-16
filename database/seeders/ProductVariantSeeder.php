@@ -2,46 +2,34 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\ProductVariant;
-use App\Models\Product;
-use App\Models\Size;
-use App\Models\Color;
 use Faker\Factory as Faker;
+use Illuminate\Database\Seeder;
 
 class ProductVariantSeeder extends Seeder
 {
     public function run()
     {
         $faker = Faker::create();
-        $productIds = Product::pluck('id')->toArray();
-        $sizeIds = Size::pluck('id')->toArray();
-        $colorIds = Color::pluck('id')->toArray();
 
-        // Đảm bảo mỗi sản phẩm có ít nhất một biến thể
-        foreach ($productIds as $productId) {
-            ProductVariant::create([
-                'product_id' => $productId,
-                'size_id' => $faker->randomElement($sizeIds),
-                'color_id' => $faker->randomElement($colorIds),
-                'stock' => $faker->numberBetween(10, 100),
-                'sold' => $faker->numberBetween(0, 50),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+        // Tạo 2 biến thể cho mỗi sản phẩm (49 sản phẩm x 2 = 98 biến thể)
+        foreach (range(1, 49) as $productId) {
+            foreach (range(1, 2) as $variant) {
+                $price = $faker->randomFloat(2, 500000, 3000000);
+                $discount_percent = $faker->numberBetween(0, 30);
+                $discounted_price = $discount_percent ? $price * (1 - $discount_percent / 100) : null;
 
-        // Thêm các biến thể ngẫu nhiên
-        for ($i = 1; $i <= 50; $i++) {
-            ProductVariant::create([
-                'product_id' => $faker->randomElement($productIds),
-                'size_id' => $faker->randomElement($sizeIds),
-                'color_id' => $faker->randomElement($colorIds),
-                'stock' => $faker->numberBetween(10, 100),
-                'sold' => $faker->numberBetween(0, 50),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+                ProductVariant::create([
+                    'product_id' => $productId,
+                    'size_id' => $faker->numberBetween(1, 12),
+                    'color_id' => $faker->numberBetween(1, 10),
+                    'price' => $price,
+                    'discount_percent' => $discount_percent,
+                    'discounted_price' => $discounted_price,
+                    'stock_quantity' => $faker->numberBetween(5, 50),
+                    'sold' => $faker->numberBetween(0, 20),
+                ]);
+            }
         }
     }
 }

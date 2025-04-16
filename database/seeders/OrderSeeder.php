@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use App\Enums\OrderStatusEnum;
@@ -22,15 +21,18 @@ class OrderSeeder extends Seeder
         $paymentIds = Payment::pluck('id')->toArray();
 
         foreach ($userIds as $userId) {
-            // Mỗi user có thể có từ 1-3 đơn hàng
+            // Mỗi user có thể có từ 1-10 đơn hàng
             $orderCount = rand(1, 10);
 
             for ($i = 0; $i < $orderCount; $i++) {
-                $totalPrice = rand(5000000, 10000000);
-                $status = $faker->randomElement(array_column(OrderStatusEnum::cases(), 'value'));
-                $paymentStatus = $faker->randomElement(array_column(PaymentStatusEnum::cases(), 'value'));
+                $totalPrice = $faker->randomFloat(2, 500000, 10000000); // VD: 500,000 - 10,000,000
                 $discountId = $faker->optional(0.5)->randomElement($discountIds);
                 $paymentId = $faker->optional(0.8)->randomElement($paymentIds);
+                $status = $faker->randomElement(array_column(OrderStatusEnum::cases(), 'value'));
+                $paymentStatus = $faker->randomElement(array_column(PaymentStatusEnum::cases(), 'value'));
+
+                $discountAmount = $discountId ? $totalPrice * (rand(5, 20) / 100) : 0;
+                $finalPrice = $totalPrice - $discountAmount;
 
                 Order::create([
                     'code' => 'STEPVIET' . strtoupper($faker->bothify('#####')),
@@ -40,8 +42,14 @@ class OrderSeeder extends Seeder
                     'payment_status' => $paymentStatus,
                     'status' => $status,
                     'total_price' => $totalPrice,
+                    'total_after_discount' => $discountId ? $finalPrice : null,
+                    'recipient_name' => $faker->name,
+                    'recipient_phone' => $faker->phoneNumber,
+                    'shipping_address' => $faker->address,
+                    'note' => $faker->optional()->sentence(),
+                    'tracking_code' => $faker->optional()->regexify('[A-Z]{2}[0-9]{8}VN'),
                     'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
-                    'updated_at' => $faker->dateTimeBetween('-1 year', 'now'),
+                    'updated_at' => now(),
                 ]);
             }
         }

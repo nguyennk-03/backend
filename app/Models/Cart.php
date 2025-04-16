@@ -2,29 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
-    use HasFactory;
+    protected $fillable = ['user_id', 'variant_id', 'quantity', 'total_price'];
 
-    protected $table = 'carts';
+    protected $casts = [
+        'quantity' => 'integer',
+        'total_price' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
-    protected $fillable = ['user_id', 'product_variant_id', 'quantity','total_price'];
-
+    // Quan hệ: Giỏ hàng thuộc về một người dùng
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function productVariant()
+    // Quan hệ: Giỏ hàng chứa một biến thể sản phẩm
+    public function variant()
     {
-        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
-    }
-    public function product()
-    {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(ProductVariant::class);
     }
 }
-

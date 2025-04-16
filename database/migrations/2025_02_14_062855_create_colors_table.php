@@ -10,11 +10,10 @@ class CreateColorsTable extends Migration
     {
         Schema::create('colors', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();       
-            $table->string('code', 20)->nullable();      
-            $table->string('hex_code', 7);              
-            $table->string('image')->nullable();   
-            $table->boolean('is_active')->default(true);
+            $table->string('name')->unique()->comment('Tên màu');
+            $table->string('code', 20)->nullable()->comment('Mã màu (nếu có)');
+            $table->string('hex_code', 7)->comment('Mã hex, ví dụ: #FF0000');
+            $table->tinyInteger('status')->default(1)->comment('0: Ẩn, 1: Hiển thị');
             $table->timestamps();
         });
     }

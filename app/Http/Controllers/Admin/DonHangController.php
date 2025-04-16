@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Validation\Rules\Enum;
+use App\Enums\OrderStatusEnum;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Product;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class DonHangController extends Controller
 {
@@ -47,7 +50,7 @@ class DonHangController extends Controller
         return redirect()->route('orders.index')->with('success', 'Đơn hàng đã được tạo thành công.');
     }
 
-   public function show($id)
+    public function show($id)
     {
         $order = Order::with('user', 'orderItems.product')->findOrFail($id);
 
@@ -62,8 +65,15 @@ class DonHangController extends Controller
 
     public function update(Request $request, $id)
     {
-        Order::findOrFail($id)->update($request->all());
-        return redirect()->route('orders')->with('success', 'Cập nhật đơn hàng thành công');
+        $request->validate([
+            'status' => ['required', Rule::in(array_column(OrderStatusEnum::cases(), 'value'))],
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->status = OrderStatusEnum::from($request->input('status')); // Chuyển string thành Enum
+        $order->save();
+
+        return back()->with('success', 'Cập nhật trạng thái thành công!');
     }
 
     public function destroy($id)

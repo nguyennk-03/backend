@@ -10,9 +10,9 @@ class CreateSizesTable extends Migration
     {
         Schema::create('sizes', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->decimal('cm', 4, 1)->nullable(); 
-            $table->boolean('is_active')->default(true);
+            $table->string('name')->unique()->comment('Tên kích thước');
+            $table->decimal('cm', 6, 1)->nullable()->comment('Kích thước tính bằng cm');
+            $table->tinyInteger('status')->default(1)->comment('0: Ẩn, 1: Hiển thị');
             $table->timestamps();
         });
     }

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('product_discounts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->foreignId('discount_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade')->comment('Sản phẩm');
+            $table->foreignId('discount_id')->constrained('discounts')->onDelete('cascade')->comment('Mã giảm giá');
             $table->timestamps();
         });
     }

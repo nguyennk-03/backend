@@ -12,14 +12,13 @@ class ImageResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
-    {
-        return [
-            'id' => $this->id,
-            'product_id' => $this->product_id,
-            'image_url' => $this->image_url,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
-        ];
-    }
+    public function toArray($request)
+{
+    return [
+        'id' => $this->id,
+        'variant_id' => $this->variant_id,
+        'path' => asset('images/products/' . $this->path),
+        'is_main' => $this->is_main,
+    ];
+}
 }

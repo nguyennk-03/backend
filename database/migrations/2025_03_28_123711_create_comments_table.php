@@ -13,14 +13,12 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('user_id'); 
-            $table->text('message'); 
-            $table->boolean('is_staff')->default(false); 
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade')->comment('Người dùng');
+            $table->foreignId('product_id')->nullable()->constrained('products')->onDelete('cascade')->comment('Sản phẩm');
+            $table->text('message')->comment('Nội dung bình luận');
+            $table->boolean('is_staff')->default(false)->comment('Bình luận từ nhân viên?');
+            $table->tinyInteger('is_hidden')->default(0)->comment('0: Ẩn, 1: Hiển thị');
             $table->timestamps();
-
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

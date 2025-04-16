@@ -31,6 +31,7 @@ class NewsSeeder extends Seeder
                 chỉ hiệu suất, Adidas còn kết hợp thiết kế hiện đại, phù hợp cả khi tập luyện lẫn đi chơi.',
                 'category_id' => 1,
                 'brand_id' => 1,
+                'status' => 1,
                 'image' => 'images/news/adidas_ultraboost.jpg'
             ],
             [
@@ -40,6 +41,7 @@ class NewsSeeder extends Seeder
                 kiếm một đôi giày hiệu suất cao, đây chính là lựa chọn hàng đầu.',
                 'category_id' => 2,
                 'brand_id' => 4,
+                'status' => 1,
                 'image' => 'images/news/nike_vaporfly.jpg'
             ],
             [
@@ -47,8 +49,9 @@ class NewsSeeder extends Seeder
                 'content' => 'Lấy cảm hứng từ thiết kế thập niên 80, Puma Future Rider mang đến sự trẻ trung và linh hoạt. Với đế Rider
                 Foam nhẹ nhàng và lớp lót thoáng khí, đôi giày không chỉ tạo sự thoải mái mà còn giúp tăng cường hiệu suất vận động. Một
                 lựa chọn tuyệt vời cho các tín đồ sneaker.',
-                'category_id' => 3,
+                'category_id' => 1,
                 'brand_id' => 5,
+                'status' => 1,
                 'image' => 'images/news/puma_futurerider.jpg'
             ],
             [
@@ -56,16 +59,18 @@ class NewsSeeder extends Seeder
                 'content' => 'Dành cho những ai yêu thích tốc độ, Asics Novablast được trang bị đệm FF Blast giúp tăng độ nảy và giảm áp
                 lực lên bàn chân. Kiểu dáng thể thao cùng trọng lượng nhẹ làm cho Novablast trở thành đôi giày lý tưởng cho cả việc chạy
                 bộ và tập luyện hàng ngày.',
-                'category_id' => 4,
+                'category_id' => 2,
                 'brand_id' => 2,
+                'status' => 1,
                 'image' => 'images/news/asics_novablast.jpg'
             ],
             [
                 'title' => 'Bata Power – Biểu tượng bền bỉ vượt thời gian',
                 'content' => 'Bata Power là một trong những dòng giày có độ bền cao nhất trên thị trường. Với phần đế cao su chắc chắn
                 và lớp da tổng hợp chống nước, đôi giày này thích hợp cho các hoạt động thể thao và sử dụng hàng ngày.',
-                'category_id' => 5,
+                'category_id' => 1,
                 'brand_id' => 3,
+                'status' => 1,
                 'image' => 'images/news/bata_power.jpg'
             ],
             [
@@ -73,15 +78,17 @@ class NewsSeeder extends Seeder
                 'content' => 'Từ những năm 1980, Air Jordan luôn là biểu tượng của văn hóa sneaker. Với thiết kế mang đậm phong cách thể
                 thao, kết hợp cùng công nghệ đệm Air độc quyền, Nike Air Jordan không chỉ là một đôi giày, mà còn là một tuyên ngôn thời
                 trang.',
-                'category_id' => 6,
+                'category_id' => 2,
                 'brand_id' => 4,
+                'status' => 1,
                 'image' => 'images/news/nike_airjordan.jpg'
             ],
             [
                 'title' => 'Puma Cali – Đôi giày "hot trend" trong làng thời trang',
                 'content' => 'Puma Cali không chỉ đơn giản là một đôi giày thể thao mà còn là item thời trang không thể thiếu của những
                 tín đồ street style. Với thiết kế đơn giản nhưng đầy tinh tế, phần đế dày giúp tạo chiều cao và điểm nhấn nổi bật.',
-                'category_id' => 7,
+                'category_id' => 1,
+                'status' => 1,
                 'brand_id' => 5,
                 'image' => 'images/news/puma_cali.jpg'
             ],
@@ -90,8 +97,9 @@ class NewsSeeder extends Seeder
                 'content' => 'Được ra mắt vào năm 1969, Adidas Superstar vẫn luôn là biểu tượng vượt thời gian. Thiết kế cổ điển với mũi
                 vỏ sò huyền thoại và chất liệu da cao cấp khiến đôi giày này trở thành must-have trong tủ đồ của bất kỳ ai yêu thích
                 sneaker.',
-                'category_id' => 8,
+                'category_id' => 2,
                 'brand_id' => 1,
+                'status' => 1,
                 'image' => 'images/news/adidas_superstar.jpg'
             ],
             [
@@ -100,6 +108,7 @@ class NewsSeeder extends Seeder
                 bảo vệ chân khỏi tác động mạnh, mang lại cảm giác thoải mái ngay cả khi chạy đường dài.',
                 'category_id' => 1,
                 'brand_id' => 2,
+                'status' => 1,
                 'image' => 'images/news/asics_gelkayano.jpg'
             ],
             [
@@ -108,7 +117,8 @@ class NewsSeeder extends Seeder
                 động linh hoạt mà còn đảm bảo độ bám tốt nhờ thiết kế đế chống trượt.',
                 'category_id' => 2,
                 'brand_id' => 4,
-                'image' => 'images/news/nike_airmax_kids.jpg'
+                'image' => 'images/news/nike_airmax_kids.jpg',
+                'status' => 1,
             ],
         ];
 
@@ -124,7 +134,6 @@ class NewsSeeder extends Seeder
                     'brand_id' => $news['brand_id'],
                     'author' => $user->name,
                     'views' => rand(500, 5000),
-                    'status' => 'published',
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ProductVariant;
+use App\Http\Resources\ProductVariantResource;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -12,7 +13,7 @@ class ProductVariantController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ProductVariant::with(['product', 'size', 'color']);
+        $query = ProductVariant::with(['product', 'size', 'color', 'images', 'mainImage']);
 
         if ($request->has('product_id')) {
             $query->where('product_id', $request->product_id);
@@ -27,16 +28,19 @@ class ProductVariantController extends Controller
         }
 
         if ($request->has('stock')) {
-            $query->where('stock', '>=', $request->stock);
+            $query->where('stock_quantity', '>=', $request->stock);
         }
 
         if ($request->has(['start_date', 'end_date'])) {
-            $startDate = Carbon::parse($request->start_date)->startOfDay();
-            $endDate = Carbon::parse($request->end_date)->endOfDay();
-            $query->whereBetween('created_at', [$startDate, $endDate]);
+            $query->whereBetween('created_at', [
+                Carbon::parse($request->start_date)->startOfDay(),
+                Carbon::parse($request->end_date)->endOfDay(),
+            ]);
         }
 
-        return response()->json($query->orderBy('created_at', 'desc')->get());
+        $variants = $query->orderBy('created_at', 'desc')->get();
+
+        return ProductVariantResource::collection($variants);
     }
 
     public function show($id)

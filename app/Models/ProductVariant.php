@@ -2,38 +2,71 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductVariant extends Model {
-    use HasFactory;
+class ProductVariant extends Model
+{
+    protected $fillable = [
+        'product_id',
+        'size_id',
+        'color_id',
+        'style_id',
+        'price',
+        'discount_percent',
+        'discounted_price',
+        'stock_quantity',
+        'sold'
+    ];
 
-    protected $table = 'product_variants';
+    protected $casts = [
+        'price' => 'decimal:2',
+        'discount_percent' => 'integer',
+        'discounted_price' => 'decimal:2',
+        'stock_quantity' => 'integer',
+        'sold' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
-    protected $fillable = ['product_id', 'size_id', 'color_id', 'stock', 'sold'];
-
-    public function size() {
-        return $this->belongsTo(Size::class);
-    }
-
-    public function color() {
-        return $this->belongsTo(Color::class);
-    }
+    // Quan hệ: Biến thể thuộc về một sản phẩm
     public function product()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(Product::class);
     }
 
-    public function images() {
-        return $this->hasMany(Image::class,'variant_id');
-    }
-    public function items()
+    // Quan hệ: Biến thể thuộc về một kích thước
+    public function size()
     {
-        return $this->hasMany(OrderItem::class, 'variant_id');
+        return $this->belongsTo(Size::class)->withDefault();
     }
-    
+
+    // Quan hệ: Biến thể thuộc về một màu sắc
+    public function color()
+    {
+        return $this->belongsTo(Color::class)->withDefault();
+    }
+
+
+    // Quan hệ: Biến thể có nhiều hình ảnh
+    public function images()
+    {
+        return $this->hasMany(Image::class, 'variant_id');
+    }
+
+    public function mainImage()
+    {
+        return $this->hasOne(Image::class, 'variant_id')->where('is_main', true);
+    }
+
+    // Quan hệ: Biến thể trong giỏ hàng
     public function carts()
     {
-        return $this->hasMany(Cart::class, 'variant_id');
+        return $this->hasMany(Cart::class);
+    }
+
+    // Quan hệ: Biến thể trong chi tiết đơn hàng
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }

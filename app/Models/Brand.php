@@ -2,27 +2,27 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Brand extends Model
 {
-    use HasFactory;
+    protected $fillable = ['name', 'logo', 'status'];
 
-    protected $table = 'brands';
+    protected $casts = [
+        'status' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
-    protected $fillable = ['name', 'slug', 'logo'];
-
+    // Quan hệ: Một thương hiệu có nhiều sản phẩm
     public function products()
     {
         return $this->hasMany(Product::class);
     }
 
-    public function scopeFindBySlug($query, $slug)
+    // Quan hệ: Một thương hiệu có nhiều bài viết
+    public function news()
     {
-        return $query->where('slug', $slug)->first();
+        return $this->hasMany(News::class);
     }
-    
 }
-
-    

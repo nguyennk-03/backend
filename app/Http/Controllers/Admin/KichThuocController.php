@@ -8,60 +8,62 @@ use Illuminate\Http\Request;
 
 class KichThuocController extends Controller
 {
-    // Danh sách size
+    /**
+     * Hiển thị danh sách size
+     */
     public function index()
     {
-        $sizes = Size::orderBy('name')->get();
+        $sizes = Size::all();
         return view('admin.products.size', compact('sizes'));
     }
 
-    // Hiển thị form thêm size
-    public function create()
-    {
-        return view('sizes.create');
-    }
-
-    // Lưu size mới
+    /**
+     * Lưu size mới vào database
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:sizes,name|max:10',
-            'cm' => 'required|numeric|min:10|max:35',
+            'name' => 'required|numeric|unique:sizes,name|between:30,50',
+            'cm'   => 'nullable|numeric|between:18,35',
         ]);
 
-        Size::create($request->only(['name', 'cm']));
+        Size::create([
+            'name' => $request->name,
+            'cm'   => $request->cm,
+        ]);
 
-        return redirect()->route('admin.products.size')->with('success', 'Đã thêm size thành công.');
+        return redirect()->route('kich-thuoc.index')->with('success', 'Đã thêm size thành công.');
     }
 
-    // Hiển thị form sửa size
+    /**
+     * Hiển thị form chỉnh sửa size (chưa dùng nếu không có blade edit riêng)
+     */
     public function edit($id)
     {
         $size = Size::findOrFail($id);
-        return view('sizes.edit', compact('size'));
+        return view('admin.products.size-edit', compact('size')); // nếu dùng modal hoặc không có thì có thể bỏ
     }
 
-    // Cập nhật size
+    /**
+     * Cập nhật size trong database
+     */
     public function update(Request $request, $id)
     {
         $size = Size::findOrFail($id);
+        $size->is_active = $request->input('is_active') == 1;
+        $size->save();
 
-        $request->validate([
-            'name' => 'required|max:10|unique:sizes,name,' . $id,
-            'cm' => 'required|numeric|min:10|max:35',
-        ]);
-
-        $size->update($request->only(['name', 'cm']));
-
-        return redirect()->route('admin.products.size')->with('success', 'Cập nhật size thành công.');
+        return back()->with('success', 'Cập nhật trạng thái thành công.');
     }
 
-    // Xoá size
+    /**
+     * Xóa size
+     */
     public function destroy($id)
     {
         $size = Size::findOrFail($id);
         $size->delete();
 
-        return redirect()->route('admin.products.size')->with('success', 'Đã xoá size.');
+        return redirect()->route('kich-thuoc.index')->with('success', 'Đã xoá size thành công.');
     }
 }

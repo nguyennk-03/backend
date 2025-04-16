@@ -2,33 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Size extends Model
 {
-    use HasFactory;
-    protected $table = 'sizes';
-    
-    protected $fillable = ['size'];
+    protected $fillable = ['name', 'cm', 'status'];
 
     protected $casts = [
+        'cm' => 'decimal:1',
+        'status' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-    public function products()
-    {
-        return $this->belongsToMany(Product::class, 'product_variants')
-                    ->withPivot('color_id', 'quantity', 'price', 'image')
-                    ->withTimestamps();
-    }
-    public function colors()
-    {
-        return $this->belongsToMany(Color::class, 'product_variants')
-                    ->withPivot('product_id', 'quantity', 'price', 'image')
-                    ->withTimestamps();
-    }
-    public function productVariants()
+
+    // Quan hệ: Kích thước có nhiều biến thể sản phẩm
+    public function variants()
     {
         return $this->hasMany(ProductVariant::class);
     }

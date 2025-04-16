@@ -2,82 +2,61 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Support\Facades\File;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable, HasFactory;
-
-    const ROLE_ADMIN = 'admin';
-    const ROLE_USER = 'user';
-
-    protected $table = 'users';
+    use Notifiable;
 
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'phone',
-        'address',
-        'avatar',
-        'role',
+        'name', 'email', 'password', 'is_locked', 'status',
+        'phone', 'avatar', 'address', 'role'
     ];
 
-    protected $hidden = ['password', 'remember_token',];
+    protected $hidden = ['password', 'remember_token'];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'is_locked' => 'boolean',
+        'status' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
-    public function isAdmin()
+    // Quan hệ: Người dùng có nhiều giỏ hàng
+    public function carts()
     {
-        return $this->role === self::ROLE_ADMIN;
+        return $this->hasMany(Cart::class);
     }
 
-    public function isUser()
-    {
-        return $this->role === self::ROLE_USER;
-    }
-
+    // Quan hệ: Người dùng có nhiều đơn hàng
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
 
+    // Quan hệ: Người dùng có nhiều đánh giá
     public function reviews()
     {
         return $this->hasMany(Review::class);
     }
 
-
-    public function cart()
+    // Quan hệ: Người dùng có nhiều bình luận
+    public function comments()
     {
-        return $this->hasMany(Cart::class);
+        return $this->hasMany(Comment::class);
     }
 
-    public static function getRandomImage()
+    // Quan hệ: Người dùng có nhiều thông báo
+    public function notifications()
     {
-        $directory = public_path('images/users');
+        return $this->hasMany(Notification::class);
+    }
 
-        if (!File::exists($directory)) {
-            return 'images/users/user-1.jpg';
-        }
-
-        $files = array_diff(scandir($directory), array('..', '.'));
-
-        $images = array_filter($files, function ($file) {
-            return preg_match('/\.(jpg|jpeg|png|gif)$/i', $file);
-        });
-
-        if (!empty($images)) {
-            return 'images/users/' . $images[array_rand($images)];
-        }
-
-        return 'images/users/user-1.jpg';
+    // Quan hệ: Người dùng có nhiều danh sách yêu thích
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
     }
 }

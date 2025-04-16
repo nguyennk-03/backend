@@ -2,22 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    use HasFactory;
+    protected $fillable = ['name'];
 
-    protected $table = 'payments'; 
-
-    protected $fillable = [
-        'name',
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
-    public function order()
+    // Quan hệ: Phương thức thanh toán có nhiều đơn hàng
+    public function orders()
     {
-        return $this->hasMany(Order::class, 'payment_id');
+        return $this->hasMany(Order::class);
     }
-
 }
