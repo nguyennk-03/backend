@@ -3,33 +3,41 @@
 namespace Database\Seeders;
 
 use App\Models\ProductVariant;
-use Faker\Factory as Faker;
+use App\Models\Product;
+use App\Models\Size;
+use App\Models\Color;
 use Illuminate\Database\Seeder;
 
 class ProductVariantSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        $faker = Faker::create();
+        $sizes = Size::all();
+        $colors = Color::all();
+        $products = Product::all();
 
-        // Tạo 2 biến thể cho mỗi sản phẩm (49 sản phẩm x 2 = 98 biến thể)
-        foreach (range(1, 49) as $productId) {
-            foreach (range(1, 2) as $variant) {
-                $price = $faker->randomFloat(2, 500000, 3000000);
-                $discount_percent = $faker->numberBetween(0, 30);
-                $discounted_price = $discount_percent ? $price * (1 - $discount_percent / 100) : null;
+        foreach ($products as $product) {
+            $size = $sizes->random();
+            $color = $colors->random();
 
-                ProductVariant::create([
-                    'product_id' => $productId,
-                    'size_id' => $faker->numberBetween(1, 12),
-                    'color_id' => $faker->numberBetween(1, 10),
-                    'price' => $price,
-                    'discount_percent' => $discount_percent,
-                    'discounted_price' => $discounted_price,
-                    'stock_quantity' => $faker->numberBetween(5, 50),
-                    'sold' => $faker->numberBetween(0, 20),
-                ]);
-            }
+            $price = rand(1200000, 3000000);
+            $discountOptions = [0, 10, 15, 20];
+            $discountPercent = $discountOptions[array_rand($discountOptions)];
+            $discountedPrice = round($price * (1 - $discountPercent / 100), -3);
+
+            $stock_quantity = rand(20, 100);
+            $sold = rand(0, $stock_quantity / 2);
+
+            ProductVariant::create([
+                'product_id'        => $product->id,
+                'size_id'           => $size->id,
+                'color_id'          => $color->id,
+                'price'             => $price,
+                'discount_percent'  => $discountPercent,
+                'discounted_price'  => $discountedPrice,
+                'stock_quantity'    => $stock_quantity,
+                'sold'              => $sold,
+            ]);
         }
     }
 }
