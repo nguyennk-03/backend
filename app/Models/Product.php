@@ -36,7 +36,7 @@ class Product extends Model
     // Quan hệ: Sản phẩm có nhiều biến thể
     public function variants()
     {
-        return $this->hasMany(ProductVariant::class,'variant_id');
+        return $this->hasMany(ProductVariant::class,'product_id');
     }
 
     // Quan hệ: Sản phẩm có nhiều đánh giá

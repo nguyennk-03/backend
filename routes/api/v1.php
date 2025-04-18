@@ -19,7 +19,6 @@ use App\Http\Controllers\Api\MomoController;
 use App\Http\Controllers\Api\VNPayController;
 use App\Http\Controllers\Api\ZaloPayController;
 use App\Http\Controllers\Api\NotifiController;
-use App\Http\Controllers\Api\ProductDiscountController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\CommentController;
 use Illuminate\Http\Request;
@@ -40,8 +39,6 @@ Route::prefix('v1')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum')->name('logout');
-    Route::get('google/redirect', [AuthController::class, 'redirectToGoogleApi']);
-    Route::get('google/callback', [AuthController::class, 'handleGoogleCallbackApi']);
     Route::post('password/email', [AuthController::class, 'sendResetLinkApi']);
     Route::post('password/reset', [AuthController::class, 'resetPasswordApi']);
 
@@ -60,7 +57,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('order-items', OrderItemController::class)->only(['index', 'show']);
         Route::apiResource('wishlists', WishlistController::class)->only(['index', 'store', 'show', 'destroy']);
         Route::apiResource('discounts', DiscountController::class)->only(['index', 'show']);
-        Route::apiResource('product-discounts', ProductDiscountController::class)->only(['index', 'show']);
         Route::apiResource('notifis', NotifiController::class);
         Route::apiResource('reviews', ReviewController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::apiResource('comments', CommentController::class);

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -17,24 +16,21 @@ class SanPhamController extends Controller
         $query = Product::query()->with([
             'category',
             'brand',
-            'variant' => function ($q) {
-                $q->with('images'); // Load images cho mỗi variant
+            'variants' => function ($q) {
+                $q->with('images');
             }
         ]);
 
-        // Lọc theo danh mục
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-        // Lọc theo thương hiệu
         if ($request->filled('brand_id')) {
             $query->where('brand_id', $request->brand_id);
         }
 
-        // Lọc theo khoảng giá
         if ($request->filled('min_price') || $request->filled('max_price')) {
-            $query->whereHas('variant', function ($q) use ($request) {
+            $query->whereHas('variants', function ($q) use ($request) {
                 if ($request->filled('min_price')) {
                     $q->where('price', '>=', $request->min_price);
                 }
@@ -44,20 +40,19 @@ class SanPhamController extends Controller
             });
         }
 
-        // Sắp xếp
         if ($request->filled('sort_by')) {
             switch ($request->sort_by) {
                 case 'price_asc':
-                    $query->leftJoin('product_variant', 'products.id', '=', 'product_variant.product_id')
-                        ->select('products.*')
-                        ->orderByRaw('MIN(product_variant.price) ASC')
-                        ->groupBy('products.id');
+                    $query->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')
+                          ->select('products.*')
+                          ->orderByRaw('MIN(product_variants.price) ASC')
+                          ->groupBy('products.id');
                     break;
                 case 'price_desc':
-                    $query->leftJoin('product_variant', 'products.id', '=', 'product_variant.product_id')
-                        ->select('products.*')
-                        ->orderByRaw('MAX(product_variant.price) DESC')
-                        ->groupBy('products.id');
+                    $query->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')
+                          ->select('products.*')
+                          ->orderByRaw('MAX(product_variants.price) DESC')
+                          ->groupBy('products.id');
                     break;
                 case 'newest':
                     $query->orderBy('created_at', 'desc');
@@ -68,7 +63,6 @@ class SanPhamController extends Controller
             }
         }
 
-        // Lấy tất cả sản phẩm (không phân trang)
         $products = $query->get();
         $categories = Category::where('status', 1)->get();
         $brands = Brand::where('status', 1)->get();
@@ -85,34 +79,34 @@ class SanPhamController extends Controller
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
-            'variant.0.price' => 'required|numeric|min:0',
-            'variant.0.stock_quantity' => 'required|integer|min:0',
-            'variant.0.size_id' => 'nullable|exists:sizes,id',
-            'variant.0.color_id' => 'nullable|exists:colors,id',
+            'variants.0.price' => 'required|numeric|min:0',
+            'variants.0.stock_quantity' => 'required|integer|min:0',
+            'variants.0.size_id' => 'nullable|exists:sizes,id',
+            'variants.0.color_id' => 'nullable|exists:colors,id',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $product = Product::create([
             'name' => $validated['name'],
-            'description' => $validated['description'],
-            'category_id' => $validated['category_id'],
-            'brand_id' => $validated['brand_id'],
-            'stock_quantity' => $validated['variant'][0]['stock_quantity'],
+            'description' => $validated['description'] ?? null,
+            'category_id' => $validated['category_id'] ?? null,
+            'brand_id' => $validated['brand_id'] ?? null,
+            'stock_quantity' => $validated['variants'][0]['stock_quantity'],
         ]);
 
-        $variant = $product->variant()->create([
-            'price' => $validated['variant'][0]['price'],
-            'stock_quantity' => $validated['variant'][0]['stock_quantity'],
-            'size_id' => $validated['variant'][0]['size_id'],
-            'color_id' => $validated['variant'][0]['color_id'],
+        $variant = $product->variants()->create([
+            'price' => $validated['variants'][0]['price'],
+            'stock_quantity' => $validated['variants'][0]['stock_quantity'],
+            'size_id' => $validated['variants'][0]['size_id'] ?? null,
+            'color_id' => $validated['variants'][0]['color_id'] ?? null,
         ]);
 
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
+            foreach ($request->file('images') as $index => $image) {
                 $path = $image->store('images', 'public');
                 $variant->images()->create([
                     'path' => $path,
-                    'is_main' => true, // Giả định ảnh đầu tiên là ảnh chính
+                    'is_main' => $index === 0,
                 ]);
             }
         }
@@ -127,38 +121,38 @@ class SanPhamController extends Controller
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
-            'variant.0.price' => 'required|numeric|min:0',
-            'variant.0.stock_quantity' => 'required|integer|min:0',
-            'variant.0.size_id' => 'nullable|exists:sizes,id',
-            'variant.0.color_id' => 'nullable|exists:colors,id',
+            'variants.0.price' => 'required|numeric|min:0',
+            'variants.0.stock_quantity' => 'required|integer|min:0',
+            'variants.0.size_id' => 'nullable|exists:sizes,id',
+            'variants.0.color_id' => 'nullable|exists:colors,id',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $product->update([
             'name' => $validated['name'],
-            'description' => $validated['description'],
-            'category_id' => $validated['category_id'],
-            'brand_id' => $validated['brand_id'],
-            'stock_quantity' => $validated['variant'][0]['stock_quantity'],
+            'description' => $validated['description'] ?? null,
+            'category_id' => $validated['category_id'] ?? null,
+            'brand_id' => $validated['brand_id'] ?? null,
+            'stock_quantity' => $validated['variants'][0]['stock_quantity'],
         ]);
 
-        $variant = $product->variant()->first();
+        $variant = $product->variants()->first();
         if ($variant) {
             $variant->update([
-                'price' => $validated['variant'][0]['price'],
-                'stock_quantity' => $validated['variant'][0]['stock_quantity'],
-                'size_id' => $validated['variant'][0]['size_id'],
-                'color_id' => $validated['variant'][0]['color_id'],
+                'price' => $validated['variants'][0]['price'],
+                'stock_quantity' => $validated['variants'][0]['stock_quantity'],
+                'size_id' => $validated['variants'][0]['size_id'] ?? null,
+                'color_id' => $validated['variants'][0]['color_id'] ?? null,
             ]);
         }
 
         if ($request->hasFile('images')) {
-            $variant->images()->delete(); // Xóa ảnh cũ
-            foreach ($request->file('images') as $image) {
+            $variant->images()->delete();
+            foreach ($request->file('images') as $index => $image) {
                 $path = $image->store('images', 'public');
                 $variant->images()->create([
                     'path' => $path,
-                    'is_main' => true,
+                    'is_main' => $index === 0,
                 ]);
             }
         }
