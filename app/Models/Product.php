@@ -36,7 +36,7 @@ class Product extends Model
     // Quan hệ: Sản phẩm có nhiều biến thể
     public function variants()
     {
-        return $this->hasMany(ProductVariant::class);
+        return $this->hasMany(ProductVariant::class,'variant_id');
     }
 
     // Quan hệ: Sản phẩm có nhiều đánh giá
@@ -54,12 +54,27 @@ class Product extends Model
     // Quan hệ: Sản phẩm có nhiều mã giảm giá
     public function discounts()
     {
-        return $this->belongsToMany(Discount::class, 'product_discounts');
+        return $this->belongsToMany(Discount::class, 'discounts');
     }
 
     // Quan hệ: Sản phẩm trong danh sách yêu thích
     public function wishlists()
     {
         return $this->hasMany(Wishlist::class);
+    }
+    public function getImageAttribute()
+    {
+        $mainImage = $this->variants()
+            ->whereHas('images', fn($query) => $query->where('is_main', true))
+            ->with(['images' => fn($query) => $query->where('is_main', true)])
+            ->first();
+
+        return $mainImage?->images->first()?->path ?? null;
+    }
+
+    // Accessor cho tổng tồn kho
+    public function getTotalStockAttribute()
+    {
+        return $this->variants->sum('stock_quantity');
     }
 }

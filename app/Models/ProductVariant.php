@@ -27,10 +27,6 @@ class ProductVariant extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-public function variant()
-{
-    return $this->belongsTo(ProductVariant::class, 'variant_id');
-}
     // Quan hệ: Biến thể thuộc về một sản phẩm
     public function product()
     {

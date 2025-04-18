@@ -2,20 +2,31 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatusEnum;
+use App\Enums\PaymentStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
     protected $fillable = [
-        'code', 'user_id', 'discount_id', 'payment_id', 'status',
-        'payment_status', 'total_price', 'total_after_discount',
-        'tracking_code', 'recipient_name', 'recipient_phone',
-        'shipping_address', 'note'
+        'code',
+        'user_id',
+        'discount_id',
+        'payment_id',
+        'status',
+        'payment_status',
+        'total_price',
+        'total_after_discount',
+        'tracking_code',
+        'recipient_name',
+        'recipient_phone',
+        'shipping_address',
+        'note'
     ];
 
     protected $casts = [
-        'status' => 'integer',
-        'payment_status' => 'integer',
+        'status' => OrderStatusEnum::class,
+        'payment_status' => PaymentStatusEnum::class,
         'total_price' => 'decimal:2',
         'total_after_discount' => 'decimal:2',
         'created_at' => 'datetime',

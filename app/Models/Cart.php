@@ -22,7 +22,7 @@ class Cart extends Model
     }
 
     // Quan hệ: Giỏ hàng chứa một biến thể sản phẩm
-    public function variant()
+    public function variants()
     {
         return $this->belongsTo(ProductVariant::class);
     }

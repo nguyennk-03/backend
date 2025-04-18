@@ -3,190 +3,172 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Brand, Category, Color, Product, ProductVariant, Size};
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Color;
+use App\Models\Product;
+use App\Models\Size;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class SanPhamController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = Category::orderBy('id', 'asc')->get();
-        $brands = Brand::orderBy('id', 'asc')->get();
-        $query = Product::with('variants');
+        $query = Product::query()->with([
+            'category',
+            'brand',
+            'variant' => function ($q) {
+                $q->with('images'); // Load images cho mỗi variant
+            }
+        ]);
 
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('description', 'like', '%' . $request->search . '%');
-        }
-
-        if ($request->filled('brand_id')) {
-            $query->where('brand_id', $request->brand_id);
-        }
-
+        // Lọc theo danh mục
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-        // Xử lý khoảng giá
-        if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
-        }
-        if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+        // Lọc theo thương hiệu
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->brand_id);
         }
 
+        // Lọc theo khoảng giá
+        if ($request->filled('min_price') || $request->filled('max_price')) {
+            $query->whereHas('variant', function ($q) use ($request) {
+                if ($request->filled('min_price')) {
+                    $q->where('price', '>=', $request->min_price);
+                }
+                if ($request->filled('max_price')) {
+                    $q->where('price', '<=', $request->max_price);
+                }
+            });
+        }
+
+        // Sắp xếp
         if ($request->filled('sort_by')) {
             switch ($request->sort_by) {
-                case 'created_at_desc':
+                case 'price_asc':
+                    $query->leftJoin('product_variant', 'products.id', '=', 'product_variant.product_id')
+                        ->select('products.*')
+                        ->orderByRaw('MIN(product_variant.price) ASC')
+                        ->groupBy('products.id');
+                    break;
+                case 'price_desc':
+                    $query->leftJoin('product_variant', 'products.id', '=', 'product_variant.product_id')
+                        ->select('products.*')
+                        ->orderByRaw('MAX(product_variant.price) DESC')
+                        ->groupBy('products.id');
+                    break;
                 case 'newest':
                     $query->orderBy('created_at', 'desc');
                     break;
-                case 'created_at_asc':
                 case 'oldest':
                     $query->orderBy('created_at', 'asc');
-                    break;
-                case 'name_asc':
-                    $query->orderBy('name', 'asc');
-                    break;
-                case 'name_desc':
-                    $query->orderBy('name', 'desc');
-                    break;
-                case 'price_asc':
-                    $query->orderBy('price', 'asc');
-                    break;
-                case 'price_desc':
-                    $query->orderBy('price', 'desc');
                     break;
             }
         }
 
-        $products = $query->get()->map(function ($product) {
-            $product->img_display_url = $product->image ? asset($product->image) : null;
-            $product->total_stock = $product->variants->sum('stock'); // Tính tổng stock từ variants
-            return $product;
-        });
+        // Lấy tất cả sản phẩm (không phân trang)
+        $products = $query->get();
+        $categories = Category::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->get();
+        $sizes = Size::where('status', 1)->get();
+        $colors = Color::where('status', 1)->get();
 
-        return view('admin.products.index', compact('categories', 'brands', 'products'));
-    }
-
-    public function show($id)
-    {
-        try {
-            $product = Product::with('category', 'brand', 'variants')->findOrFail($id);
-            return response()->json(['success' => true, 'product' => $product]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Không tìm thấy sản phẩm']);
-        }
+        return view('admin.products.index', compact('products', 'categories', 'brands', 'sizes', 'colors'));
     }
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'brand_id' => 'nullable|integer|exists:brands,id',
-            'category_id' => 'nullable|integer|exists:categories,id',
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'variant.*.stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',    
+            'category_id' => 'nullable|exists:categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
+            'variant.0.price' => 'required|numeric|min:0',
+            'variant.0.stock_quantity' => 'required|integer|min:0',
+            'variant.0.size_id' => 'nullable|exists:sizes,id',
+            'variant.0.color_id' => 'nullable|exists:colors,id',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        try {
-            if ($request->hasFile('image')) {
-                $file = $request->file('image');
+        $product = Product::create([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'category_id' => $validated['category_id'],
+            'brand_id' => $validated['brand_id'],
+            'stock_quantity' => $validated['variant'][0]['stock_quantity'],
+        ]);
 
-                if (!$file->isValid()) {
-                    throw new \Exception('File ảnh không hợp lệ: ' . $file->getErrorMessage());
-                }
+        $variant = $product->variant()->create([
+            'price' => $validated['variant'][0]['price'],
+            'stock_quantity' => $validated['variant'][0]['stock_quantity'],
+            'size_id' => $validated['variant'][0]['size_id'],
+            'color_id' => $validated['variant'][0]['color_id'],
+        ]);
 
-                $publicPath = public_path('images/products/store');
-                if (!file_exists($publicPath)) {
-                    mkdir($publicPath, 0755, true);
-                }
-
-                $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move($publicPath, $fileName);
-                $validatedData['image'] = 'images/products/store/' . $fileName;
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('images', 'public');
+                $variant->images()->create([
+                    'path' => $path,
+                    'is_main' => true, // Giả định ảnh đầu tiên là ảnh chính
+                ]);
             }
+        }
 
-            $product = Product::create($validatedData);
-            $product->variants()->create([
-                'size_id' => Size::value('id') ?? 1,
-                'color_id' => Color::value('id') ?? 1,
-                'stock' => $request->input('stock', 0),
-                'sold' => 0,
+        return redirect()->route('products.index')->with('success', 'Thêm sản phẩm thành công!');
+    }
+
+    public function update(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
+            'variant.0.price' => 'required|numeric|min:0',
+            'variant.0.stock_quantity' => 'required|integer|min:0',
+            'variant.0.size_id' => 'nullable|exists:sizes,id',
+            'variant.0.color_id' => 'nullable|exists:colors,id',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $product->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'category_id' => $validated['category_id'],
+            'brand_id' => $validated['brand_id'],
+            'stock_quantity' => $validated['variant'][0]['stock_quantity'],
+        ]);
+
+        $variant = $product->variant()->first();
+        if ($variant) {
+            $variant->update([
+                'price' => $validated['variant'][0]['price'],
+                'stock_quantity' => $validated['variant'][0]['stock_quantity'],
+                'size_id' => $validated['variant'][0]['size_id'],
+                'color_id' => $validated['variant'][0]['color_id'],
             ]);
-
-            return redirect()->route('san-pham.index')->with('success', 'Thêm sản phẩm thành công');
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Có lỗi xảy ra: ' . $e->getMessage()])->withInput();
         }
+
+        if ($request->hasFile('images')) {
+            $variant->images()->delete(); // Xóa ảnh cũ
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('images', 'public');
+                $variant->images()->create([
+                    'path' => $path,
+                    'is_main' => true,
+                ]);
+            }
+        }
+
+        return redirect()->route('products.index')->with('success', 'Cập nhật sản phẩm thành công!');
     }
 
-    public function update(Request $request, $id)
+    public function destroy(Product $product)
     {
-        $validatedData = $request->validate([
-            'brand_id' => 'nullable|integer|exists:brands,id',
-            'category_id' => 'nullable|integer|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'description' => 'nullable|string',
-            'variant.*.stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        try {
-            $product = Product::findOrFail($id);
-
-            if ($request->hasFile('image')) {
-                $file = $request->file('image');
-
-                if (!$file->isValid()) {
-                    throw new \Exception('File ảnh không hợp lệ: ' . $file->getErrorMessage());
-                }
-
-                $publicPath = public_path('images/products/update');
-                if (!file_exists($publicPath)) {
-                    mkdir($publicPath, 0755, true);
-                }
-
-                $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move($publicPath, $fileName);
-                $validatedData['image'] = 'images/products/update/' . $fileName;
-            }
-
-            $product->update($validatedData);
-
-            $product->variants()->updateOrCreate(
-                ['product_id' => $product->id],
-                [
-                    'size_id' => Size::first()->id ?? 1,
-                    'color_id' => Color::first()->id ?? 1,
-                    'stock' => $request->input('stock', 0),
-                    'sold' => $product->variants()->value('sold') ?? 0,
-                ]
-            );
-
-            return redirect()->route('san-pham.index')->with('success', 'Cập nhật sản phẩm thành công');
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Có lỗi xảy ra: ' . $e->getMessage()])->withInput();
-        }
-    }
-    public function destroy($id)
-    {
-        try {
-            $product = Product::findOrFail($id);
-
-            if ($product->image && file_exists(public_path($product->image))) {
-                unlink(public_path($product->image));
-            }
-
-            $product->delete();
-
-            return redirect()->route('san-pham.index')->with('success', 'Xóa sản phẩm thành công');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Có lỗi xảy ra khi xóa sản phẩm: ' . $e->getMessage());
-        }
+        $product->delete();
+        return redirect()->route('products.index')->with('success', 'Xóa sản phẩm thành công!');
     }
 }

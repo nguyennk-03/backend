@@ -15,7 +15,7 @@ class Image extends Model
     ];
 
     // Quan hệ: Hình ảnh thuộc về một biến thể sản phẩm
-    public function variant()
+    public function variants()
     {
         return $this->belongsTo(ProductVariant::class);
     }

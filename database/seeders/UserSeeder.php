@@ -12,6 +12,8 @@ class UserSeeder extends Seeder
     public function run()
     {
         $users = [
+            ['name' => 'Nguyễn Văn A', 'email' => 'user1@gmail.com  ', 'password' => 'user1234@','role' => 'user'],
+            ['name' => 'Nguyễn Văn B', 'email' => 'admin1@gmail.com', 'password' => 'admin1234@','role' => 'admin'],
             ['name' => 'Ngô Khánh Nguyên', 'email' => 'nguyennkps27609@fpt.edu.vn', 'password' => 'nguyennkps27609@fpt.edu.vn',],
             ['name' => 'Nguyễn Hữu Kiệt', 'email' => 'kietnhps27657@fpt.edu.vn', 'password' => 'kietnhps27657@fpt.edu.vn',],
             ['name' => 'Nguyễn Tuấn Anh', 'email' => 'anhntps35235@fpt.edu.vn', 'password' => 'anhntps35235@fpt.edu.vn',],
