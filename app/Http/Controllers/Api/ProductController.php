@@ -13,34 +13,40 @@ class ProductController extends Controller
     {
         $query = Product::query();
 
-        if ($request->has('name')) {
+        if ($request->filled('name')) {
             $query->where('name', 'like', '%' . $request->name . '%');
         }
 
-        if ($request->has('category_id')) {
+        if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-        if ($request->has('brand_id')) {
+        if ($request->filled('brand_id')) {
             $query->where('brand_id', $request->brand_id);
         }
 
-        if ($request->has(['start_date', 'end_date'])) {
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('sale')) {
+            $query->where('sale', $request->sale);
+        }
+
+        if ($request->filled('hot')) {
+            $query->where('hot', $request->hot);
+        }
+
+        if ($request->filled(['start_date', 'end_date'])) {
             $startDate = Carbon::parse($request->start_date)->startOfDay();
             $endDate = Carbon::parse($request->end_date)->endOfDay();
             $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
-        if ($request->has('sort')) {
-            $sort = $request->sort === 'price_asc' ? 'asc' : 'desc';
-            $query->orderBy('price', $sort);
-        } else {
-            $query->orderBy('created_at', 'desc');
-        }
+        // Mặc định sắp xếp theo ngày tạo mới nhất
+        $query->orderBy('created_at', 'desc');
 
-        $products = $query->get();
-
-        return response()->json($products);
+        return response()->json($query->get());
     }
 
     public function show($id)
@@ -53,12 +59,14 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
-            'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'required|exists:brands,id',
+            'sale' => 'nullable|in:0,1',
+            'hot' => 'nullable|in:0,1,2,3',
+            'status' => 'nullable|in:0,1',
+            'stock_quantity' => 'required|integer|min:0',
+            'sold' => 'nullable|integer|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
         ]);
 
         $product = Product::create($validated);
@@ -68,14 +76,17 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
-            'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'required|exists:brands,id',
+            'sale' => 'nullable|in:0,1',
+            'hot' => 'nullable|in:0,1,2,3',
+            'status' => 'nullable|in:0,1',
+            'stock_quantity' => 'required|integer|min:0',
+            'sold' => 'nullable|integer|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
         ]);
 
         $product->update($validated);

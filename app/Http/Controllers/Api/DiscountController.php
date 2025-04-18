@@ -12,14 +12,12 @@ class DiscountController extends Controller
     {
         $query = Discount::query();
 
-        // Lọc theo mã giảm giá (nếu có)
         if ($request->has('code')) {
             $query->where('code', $request->code);
         }
 
         return response()->json($query->get());
     }
-
 
     public function applyDiscount(Request $request)
     {
@@ -30,31 +28,34 @@ class DiscountController extends Controller
 
         $discount = Discount::where('code', $validated['code'])->first();
 
-        // Kiểm tra hiệu lực mã giảm giá
-        if (now() < $discount->start_date || now() > $discount->end_date) {
+        if (!$discount->is_active) {
             return response()->json(['error' => 'Mã giảm giá không còn hiệu lực'], 400);
         }
 
-        // Kiểm tra số lần sử dụng
-        if ($discount->max_uses !== null && $discount->max_uses <= 0) {
+        if (now()->lt($discount->start_date) || now()->gt($discount->end_date)) {
+            return response()->json(['error' => 'Mã giảm giá đã hết hạn'], 400);
+        }
+
+        if ($discount->usage_limit !== null && $discount->used_count >= $discount->usage_limit) {
             return response()->json(['error' => 'Mã giảm giá đã hết lượt sử dụng'], 400);
         }
 
-        // Tính giảm giá
-        $discountAmount = ($discount->discount_type === 'percentage')
+        if ($validated['total_price'] < $discount->min_order_amount) {
+            return response()->json(['error' => 'Không đạt mức tối thiểu để áp dụng mã giảm giá'], 400);
+        }
+
+        $discountAmount = $discount->discount_type === 0 // 0: percentage
             ? ($discount->value / 100) * $validated['total_price']
             : $discount->value;
 
         $newTotalPrice = max(0, $validated['total_price'] - $discountAmount);
 
-        // Giảm số lượt sử dụng
-        if ($discount->max_uses !== null) {
-            $discount->decrement('max_uses');
-        }
+        // Tăng lượt đã sử dụng
+        $discount->increment('used_count');
 
         return response()->json([
-            'discount_amount' => $discountAmount,
-            'new_total_price' => $newTotalPrice,
+            'discount_amount' => round($discountAmount, 2),
+            'new_total_price' => round($newTotalPrice, 2),
             'discount_code' => $discount->code,
         ]);
     }
@@ -62,13 +63,18 @@ class DiscountController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'name' => 'required|string|max:255',
             'code' => 'required|string|unique:discounts,code',
-            'discount_type' => 'required|in:fixed,percentage',
+            'discount_type' => 'required|in:0,1', // 0: percentage, 1: fixed
             'value' => 'required|numeric|min:0',
+            'min_order_amount' => 'nullable|numeric|min:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'max_uses' => 'nullable|integer|min:1',
+            'usage_limit' => 'nullable|integer|min:1',
+            'is_active' => 'boolean',
         ]);
+
+        $validated['used_count'] = 0;
 
         return response()->json(Discount::create($validated), 201);
     }
@@ -78,15 +84,19 @@ class DiscountController extends Controller
         $discount = Discount::findOrFail($id);
 
         $validated = $request->validate([
+            'name' => 'required|string|max:255',
             'code' => 'required|string|unique:discounts,code,' . $id,
-            'discount_type' => 'required|in:fixed,percentage',
+            'discount_type' => 'required|in:0,1',
             'value' => 'required|numeric|min:0',
+            'min_order_amount' => 'nullable|numeric|min:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'max_uses' => 'nullable|integer|min:1',
+            'usage_limit' => 'nullable|integer|min:1',
+            'is_active' => 'boolean',
         ]);
 
         $discount->update($validated);
+
         return response()->json($discount);
     }
 
@@ -94,9 +104,8 @@ class DiscountController extends Controller
     {
         $discount = Discount::findOrFail($id);
 
-        // Kiểm tra nếu mã đã được sử dụng trong đơn hàng
-        if ($discount->orders()->exists()) {
-            return response()->json(['error' => 'Không thể xóa mã giảm giá vì đã được sử dụng'], 400);
+        if ($discount->used_count > 0) {
+            return response()->json(['error' => 'Không thể xóa mã đã được sử dụng'], 400);
         }
 
         $discount->delete();
