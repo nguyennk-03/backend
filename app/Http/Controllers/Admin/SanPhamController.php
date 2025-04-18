@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -44,15 +45,15 @@ class SanPhamController extends Controller
             switch ($request->sort_by) {
                 case 'price_asc':
                     $query->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')
-                          ->select('products.*')
-                          ->orderByRaw('MIN(product_variants.price) ASC')
-                          ->groupBy('products.id');
+                        ->select('products.*')
+                        ->orderByRaw('MIN(product_variants.price) ASC')
+                        ->groupBy('products.id');
                     break;
                 case 'price_desc':
                     $query->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')
-                          ->select('products.*')
-                          ->orderByRaw('MAX(product_variants.price) DESC')
-                          ->groupBy('products.id');
+                        ->select('products.*')
+                        ->orderByRaw('MAX(product_variants.price) DESC')
+                        ->groupBy('products.id');
                     break;
                 case 'newest':
                     $query->orderBy('created_at', 'desc');
@@ -79,6 +80,9 @@ class SanPhamController extends Controller
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
+            'sale' => 'nullable|boolean',
+            'hot' => 'nullable|integer|in:0,1,2,3',
+            'status' => 'nullable|boolean',
             'variants.0.price' => 'required|numeric|min:0',
             'variants.0.stock_quantity' => 'required|integer|min:0',
             'variants.0.size_id' => 'nullable|exists:sizes,id',
@@ -91,7 +95,11 @@ class SanPhamController extends Controller
             'description' => $validated['description'] ?? null,
             'category_id' => $validated['category_id'] ?? null,
             'brand_id' => $validated['brand_id'] ?? null,
+            'sale' => $validated['sale'] ?? 0,
+            'hot' => $validated['hot'] ?? 0,
+            'status' => $validated['status'] ?? 1,
             'stock_quantity' => $validated['variants'][0]['stock_quantity'],
+            'sold' => 0,
         ]);
 
         $variant = $product->variants()->create([
@@ -121,6 +129,9 @@ class SanPhamController extends Controller
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
+            'sale' => 'nullable|boolean',
+            'hot' => 'nullable|integer|in:0,1,2,3',
+            'status' => 'nullable|boolean',
             'variants.0.price' => 'required|numeric|min:0',
             'variants.0.stock_quantity' => 'required|integer|min:0',
             'variants.0.size_id' => 'nullable|exists:sizes,id',
@@ -133,6 +144,9 @@ class SanPhamController extends Controller
             'description' => $validated['description'] ?? null,
             'category_id' => $validated['category_id'] ?? null,
             'brand_id' => $validated['brand_id'] ?? null,
+            'sale' => $validated['sale'] ?? 0,
+            'hot' => $validated['hot'] ?? 0,
+            'status' => $validated['status'] ?? 1,
             'stock_quantity' => $validated['variants'][0]['stock_quantity'],
         ]);
 
@@ -144,16 +158,16 @@ class SanPhamController extends Controller
                 'size_id' => $validated['variants'][0]['size_id'] ?? null,
                 'color_id' => $validated['variants'][0]['color_id'] ?? null,
             ]);
-        }
 
-        if ($request->hasFile('images')) {
-            $variant->images()->delete();
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('images', 'public');
-                $variant->images()->create([
-                    'path' => $path,
-                    'is_main' => $index === 0,
-                ]);
+            if ($request->hasFile('images')) {
+                $variant->images()->delete();
+                foreach ($request->file('images') as $index => $image) {
+                    $path = $image->store('images', 'public');
+                    $variant->images()->create([
+                        'path' => $path,
+                        'is_main' => $index === 0,
+                    ]);
+                }
             }
         }
 
