@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\OrderStatusEnum;
+use App\Enums\PaymentStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\{Order, OrderItem, Payment, ProductVariant, Cart};
 use Illuminate\Http\Request;
@@ -13,16 +15,27 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::with([
-                'items:id,order_id,variant_id,quantity,price',
-                'items.variant:id,product_id,stock,sold',
-                'payment:id,name',
-                'discount:id,code,value,discount_type',
-            ])
+            'items:id,order_id,variant_id,quantity,price',
+            'items.variant:id,product_id,stock_quantity,sold',
+            'payment:id,name',
+            'discount:id,code,value,discount_type',
+        ])
             ->where('user_id', Auth::id())
             ->select([
-                'id', 'code', 'user_id', 'discount_id', 'payment_id', 'status', 'payment_status',
-                'total_price', 'total_after_discount', 'tracking_code',
-                'recipient_name', 'recipient_phone', 'shipping_address', 'note'
+                'id',
+                'code',
+                'user_id',
+                'discount_id',
+                'payment_id',
+                'status',
+                'payment_status',
+                'total_price',
+                'total_after_discount',
+                'tracking_code',
+                'recipient_name',
+                'recipient_phone',
+                'shipping_address',
+                'note'
             ])
             ->latest()
             ->get();
@@ -33,17 +46,28 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::with([
-                'items:id,order_id,variant_id,quantity,price',
-                'items.variant:id,product_id,stock,sold',
-                'items.variant.product:id,name',
-                'payment:id,name',
-                'discount:id,code,value,discount_type',
-            ])
+            'items:id,order_id,variant_id,quantity,price',
+            'items.variant:id,product_id,stock_quantity,sold',
+            'items.variant.product:id,name',
+            'payment:id,name',
+            'discount:id,code,value,discount_type',
+        ])
             ->where('user_id', Auth::id())
             ->select([
-                'id', 'code', 'user_id', 'discount_id', 'payment_id', 'status', 'payment_status',
-                'total_price', 'total_after_discount', 'tracking_code',
-                'recipient_name', 'recipient_phone', 'shipping_address', 'note'
+                'id',
+                'code',
+                'user_id',
+                'discount_id',
+                'payment_id',
+                'status',
+                'payment_status',
+                'total_price',
+                'total_after_discount',
+                'tracking_code',
+                'recipient_name',
+                'recipient_phone',
+                'shipping_address',
+                'note'
             ])
             ->findOrFail($id);
 
@@ -97,8 +121,8 @@ class OrderController extends Controller
 
                 foreach ($validated['products'] as $product) {
                     $variant = $variants->get($product['variant_id']);
-                    if (!$variant || $variant->stock < $product['quantity']) {
-                        throw new \Exception("Sản phẩm ID {$product['variant_id']} không đủ hàng (còn: " . ($variant->stock ?? 0) . ").");
+                    if (!$variant || $variant->stock_quantity < $product['quantity']) {
+                        throw new \Exception("Sản phẩm ID {$product['variant_id']} không đủ hàng (còn: " . ($variant->stock_quantity ?? 0) . ").");
                     }
                 }
 
@@ -110,8 +134,12 @@ class OrderController extends Controller
                     'email' => $validated['email'],
                     'payment_id' => $validated['payment_id'],
                     'total_price' => $validated['total_price'],
-                    'status' => 'pending',
-                    'payment_status' => 'unpaid',
+                    'status' => OrderStatusEnum::PENDING,
+                    'payment_status' => PaymentStatusEnum::PENDING,
+                    'code' => 'StepViet' . time() . $user->id,
+                    'note' => $validated['note'] ?? null,
+                    'tracking_code' => null,
+                    'discount_id' => $validated['discount_id'] ?? null,
                 ]);
 
                 $orderItems = collect($validated['products'])->map(function ($product) use ($order) {
@@ -129,7 +157,7 @@ class OrderController extends Controller
 
                 foreach ($validated['products'] as $product) {
                     $variant = $variants->get($product['variant_id']);
-                    $variant->decrement('stock', $product['quantity']);
+                    $variant->decrement('stock_quantity', $product['quantity']);
                     $variant->increment('sold', $product['quantity']);
                 }
 
@@ -138,7 +166,6 @@ class OrderController extends Controller
                 Log::info('Tạo đơn hàng thành công', ['order_id' => $order->id]);
 
                 return $this->handlePayment($order->payment->name, $order);
-
             } catch (\Throwable $e) {
                 Log::error("Lỗi tạo đơn hàng: {$e->getMessage()}", [
                     'user_id' => $user->id,
@@ -172,7 +199,7 @@ class OrderController extends Controller
         return DB::transaction(function () use ($order) {
             foreach ($order->items as $item) {
                 ProductVariant::where('id', $item->variant_id)->update([
-                    'stock' => DB::raw("stock + {$item->quantity}"),
+                    'stock_quantity' => DB::raw("stock_quantity + {$item->quantity}"),
                     'sold' => DB::raw("sold - {$item->quantity}"),
                 ]);
             }

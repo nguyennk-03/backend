@@ -61,8 +61,14 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item text-danger" href="{{ route('dang-xuat') }}"><i
-                                    class="fas fa-sign-out-alt me-2"></i> Đăng Xuất</a></li>
+                        <li>
+                            <form action="{{ route('dang-xuat') }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn đăng xuất?');">
+                                @csrf
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Đăng Xuất
+                                </button>
+                            </form>
+                        </li>
                     </ul>
                 </li>
             </ul>

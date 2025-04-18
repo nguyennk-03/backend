@@ -24,9 +24,6 @@ Route::get('dang-ky', [AuthController::class, 'formRegister'])->name('dang-ky');
 Route::post('dang-ky', [AuthController::class, 'handleRegister']);
 Route::get('user/bang-dieu-khien', [AuthController::class, 'index'])->name('user.dashboard');
 
-Route::get('google/redirect', [AuthController::class, 'redirectToGoogleWeb']);
-Route::get('google/callback', [AuthController::class, 'handleGoogleCallbackWeb']);
-
 Route::get('quen-mat-khau', [AuthController::class, 'showForgotPasswordForm'])->name('quen-mat-khau');
 Route::post('quen-mat-khau', [AuthController::class, 'sendResetLink']);
 

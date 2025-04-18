@@ -11,7 +11,7 @@ class OrderItemController extends Controller
 {
     public function index()
     {
-        $orderItems = OrderItem::with('productVariant')->get();
+        $orderItems = OrderItem::with('variant')->get();
         return response()->json($orderItems);
     }
 

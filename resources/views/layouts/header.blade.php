@@ -45,23 +45,16 @@
 
                 <li>
                     @if (Auth::check())
-                            <button class="nav-action-btn"
-                                onclick="event.preventDefault(); document.getElementById('dang-xuat-form').submit();">
-                                <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
-                                <span class="nav-action-text">{{ Auth::user()->name }} (Đăng xuất)</span>
-                            </button>
-                        <form id="dang-xuat-form" action="{{ route('dang-xuat') }}" method="POST" style="display: none;">
-                            @csrf
-                        </form>
-
-                        <button class="btn btn-danger" onclick="event.preventDefault(); document.getElementById('dang-xuat-form').submit();">
-                            Đăng xuất
+                    <form action="{{ route('dang-xuat') }}" method="POST" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn đăng xuất?');">
+                        @csrf
+                        <button type="submit" class="btn btn-danger icon-only" title="Đăng xuất">
+                            <ion-icon name="log-out-outline" aria-hidden="true"></ion-icon>
                         </button>
+                    </form>
                     @else
-                        <button class="nav-action-btn" onclick="window.location.href='/dang-nhap'">
-                            <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
-                            <span class="nav-action-text">Đăng nhập / Đăng ký</span>
-                        </button>
+                    <a href="{{ route('login') }}" class="btn btn-outline-primary icon-only" title="Đăng nhập / Đăng ký">
+                        <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
+                    </a>
                     @endif
                 </li>
 

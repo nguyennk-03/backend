@@ -994,3 +994,20 @@ a.footer-link:is(:hover, :focus) { color: var(--bittersweet); }
     gap: 50px;
   }
 }
+.btn.icon-only:is(:hover, :focus)::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: hsla(0, 0%, 100%, 0.7);
+  border-radius: 50%;
+  top: 8px;
+  left: 8px;
+  opacity: 0;
+  animation: sparkle 0.5s ease-out;
+}
+@keyframes sparkle {
+  0% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.5); }
+}

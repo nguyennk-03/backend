@@ -22,8 +22,8 @@ class OrderItem extends Model
     }
 
     // Quan hệ: Chi tiết đơn hàng chứa một biến thể sản phẩm
-    public function variants()
+    public function variant()
     {
-        return $this->belongsTo(ProductVariant::class);
+        return $this->belongsTo(ProductVariant::class, 'variant_id');
     }
 }

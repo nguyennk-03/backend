@@ -21,7 +21,9 @@ use App\Http\Controllers\Api\ZaloPayController;
 use App\Http\Controllers\Api\NotifiController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -48,7 +50,7 @@ Route::prefix('v1')->group(function () {
         Route::post('orders/payment', [OrderController::class, 'processPayment']);
         Route::apiResource('orders', OrderController::class)->only(['index', 'show']);
         Route::get('momo/success', [MoMoController::class, 'MoMoSuccess']); 
-        Route::post('momo/notify', [MoMoController::class, 'MoMoNotify']); 
+    Route::post('momo/notify', [MoMoController::class, 'MoMoNotify']); 
         Route::post('momo/cancel', [MoMoController::class, 'MoMoCancel']);
         Route::get('zalopay/success', [ZaloPayController::class, 'ZaloPaySuccess']);
         Route::post('zalopay/cancel', [ZaloPayController::class, 'ZaloPayCancel']);
@@ -57,7 +59,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('order-items', OrderItemController::class)->only(['index', 'show']);
         Route::apiResource('wishlists', WishlistController::class)->only(['index', 'store', 'show', 'destroy']);
         Route::apiResource('discounts', DiscountController::class)->only(['index', 'show']);
-        Route::apiResource('notifis', NotifiController::class);
+        Route::apiResource('notifis', NotificationController::class);
         Route::apiResource('reviews', ReviewController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::apiResource('comments', CommentController::class);
 

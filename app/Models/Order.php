@@ -52,7 +52,7 @@ class Order extends Model
     }
 
     // Quan hệ: Đơn hàng có nhiều chi tiết đơn hàng
-    public function orderItems()
+    public function items()
     {
         return $this->hasMany(OrderItem::class);
     }
