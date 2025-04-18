@@ -45,18 +45,18 @@
 
                 <li>
                     @if (Auth::check())
-                    <form action="{{ route('dang-xuat') }}" method="POST" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn đăng xuất?');">
+                    <button class="btn btn-danger icon-only" onclick="event.preventDefault(); document.getElementById('dang-xuat-form').submit();" title="Đăng xuất">
+                        <ion-icon name="log-out-outline" aria-hidden="true"></ion-icon>
+                    </button>
+                    <form id="dang-xuat-form" action="{{ route('dang-xuat') }}" method="POST" style="display: none;">
                         @csrf
-                        <button type="submit" class="btn btn-danger icon-only" title="Đăng xuất">
-                            <ion-icon name="log-out-outline" aria-hidden="true"></ion-icon>
-                        </button>
                     </form>
                     @else
-                    <a href="{{ route('login') }}" class="btn btn-outline-primary icon-only" title="Đăng nhập / Đăng ký">
+                    <a href="{{ route('dang-nhap') }}" class="btn btn-outline-primary icon-only" title="Đăng nhập / Đăng ký">
                         <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
                     </a>
                     @endif
-                </li>
+                </li> 
 
                 <li>
                     <button class="nav-action-btn">

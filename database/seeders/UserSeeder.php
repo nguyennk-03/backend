@@ -12,14 +12,14 @@ class UserSeeder extends Seeder
     public function run()
     {
         $users = [
-            ['name' => 'Nguyễn Văn A', 'email' => 'user1@gmail.com  ', 'password' => 'user1234@','role' => 'user'],
-            ['name' => 'Nguyễn Văn B', 'email' => 'admin1@gmail.com', 'password' => 'admin1234@','role' => 'admin'],
-            ['name' => 'Ngô Khánh Nguyên', 'email' => 'nguyennkps27609@fpt.edu.vn', 'password' => 'nguyennkps27609@fpt.edu.vn',],
-            ['name' => 'Nguyễn Hữu Kiệt', 'email' => 'kietnhps27657@fpt.edu.vn', 'password' => 'kietnhps27657@fpt.edu.vn',],
-            ['name' => 'Nguyễn Tuấn Anh', 'email' => 'anhntps35235@fpt.edu.vn', 'password' => 'anhntps35235@fpt.edu.vn',],
-            ['name' => 'Trần Văn Nhân', 'email' => 'nhantvps33579@fpt.edu.vn', 'password' => 'nhantvps33579@fpt.edu.vn',],
-            ['name' => 'Văn Đức Anh', 'email' => 'anhvdps34505@fpt.edu.vn', 'password' => 'anhvdps34505@fpt.edu.vn',],
-            ['name' => 'Lê Nguyễn Hoàng Khiêm', 'email' => 'khiemlnhps33864@fpt.edu.vn', 'password' => 'khiemlnhps33864@fpt.edu.vn',],
+            ['name' => 'Nguyễn Văn A', 'email' => 'user@gmail.com', 'password' => 'user@gmail.com','role' => 'user'],
+            ['name' => 'Trần Văn B', 'email' => 'admin@gmail.com', 'password' => 'admin@gmail.com','role' => 'admin'],
+            ['name' => 'Ngô Khánh Nguyên', 'email' => 'nguyennkps27609@fpt.edu.vn', 'password' => 'nguyennkps27609@fpt.edu.vn', 'role' => 'admin'],
+            ['name' => 'Nguyễn Hữu Kiệt', 'email' => 'kietnhps27657@fpt.edu.vn', 'password' => 'kietnhps27657@fpt.edu.vn', 'role' => 'admin'],
+            ['name' => 'Nguyễn Tuấn Anh', 'email' => 'anhntps35235@fpt.edu.vn', 'password' => 'anhntps35235@fpt.edu.vn', 'role' => 'admin'],
+            ['name' => 'Trần Văn Nhân', 'email' => 'nhantvps33579@fpt.edu.vn', 'password' => 'nhantvps33579@fpt.edu.vn', 'role' => 'admin'],
+            ['name' => 'Văn Đức Anh', 'email' => 'anhvdps34505@fpt.edu.vn', 'password' => 'anhvdps34505@fpt.edu.vn', 'role' => 'admin'],
+            ['name' => 'Lê Nguyễn Hoàng Khiêm', 'email' => 'khiemlnhps33864@fpt.edu.vn', 'password' => 'khiemlnhps33864@fpt.edu.vn', 'role' => 'admin'],
         ];
 
         foreach ($users as $index => $user) {
@@ -31,7 +31,8 @@ class UserSeeder extends Seeder
                 'phone' => '09876543' . $index,
                 'avatar' => 'images/users/user-' . ($index + 1) . '.jpg',
                 'address' => 'FPT University, Vietnam',
-                'role' => 'admin',
+                'role' => $user['role'] ?? 'user',
+                'status' => 0,
                 'remember_token' => Str::random(10),
             ]);
         }

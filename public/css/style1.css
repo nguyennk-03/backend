@@ -994,20 +994,16 @@ a.footer-link:is(:hover, :focus) { color: var(--bittersweet); }
     gap: 50px;
   }
 }
-.btn.icon-only:is(:hover, :focus)::after {
-  content: '';
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: hsla(0, 0%, 100%, 0.7);
-  border-radius: 50%;
-  top: 8px;
-  left: 8px;
-  opacity: 0;
-  animation: sparkle 0.5s ease-out;
+.btn.btn-danger.icon-only {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px; /* Smaller padding for icon-only */
+    width: 40px; /* Fixed width for a square button */
+    height: 40px; /* Fixed height */
+    border-radius: 8px; /* Match image's rounded corners */
 }
-@keyframes sparkle {
-  0% { opacity: 0; transform: scale(0); }
-  50% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.5); }
+
+.btn.btn-danger.icon-only ion-icon {
+    font-size: 20px; /* Adjust icon size */
 }
