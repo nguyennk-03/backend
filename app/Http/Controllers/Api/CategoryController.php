@@ -10,11 +10,7 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Category::with('children');
-
-        if ($request->filled('parent_id')) {
-            $query->where('parent_id', $request->parent_id);
-        }
+        $query = Category::all();
 
         if ($request->filled('name')) {
             $query->where('name', 'LIKE', '%' . $request->name . '%');
