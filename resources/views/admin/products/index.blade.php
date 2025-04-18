@@ -256,7 +256,7 @@
                                 @endif
                             </td>
                             <td>{{ $item->name }}</td>
-                            <td class="text-end">{{ number_format($item->variants->price ?? 0, 0, ',', '.') }} VNĐ</td>
+                            <td class="text-end">{{ number_format($item->variants->max('price') ?? 0, 0, ',', '.') }} VNĐ</td>
                             <td class="text-center">{{ $item->total_stock }}</td>
                             <td>{{ optional($item->category)->name ?? 'Chưa có danh mục' }}</td>
                             <td>{{ optional($item->brand)->name ?? 'Chưa có thương hiệu' }}</td>

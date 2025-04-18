@@ -238,8 +238,8 @@ class AuthController extends Controller
     public function getRedirectUrl(User $user)
     {
         if ($user->role === 'admin') {
-            return route('admin.dashboard');
+            return route('admin.bang-dieu-khien');
         }
-        return route('user.dashboard');
+        return route('user.bang-dieu-khien');
     }
 }
