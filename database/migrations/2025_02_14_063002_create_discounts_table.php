@@ -12,7 +12,7 @@ class CreateDiscountsTable extends Migration
             $table->id();
             $table->string('name')->comment('Tên mã giảm giá');
             $table->string('code')->unique()->comment('Mã giảm giá');
-            $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage')->comment('Loại giảm giá');
+            $table->tinyInteger('discount_type')->default(0)->comment('0: percentage, 1: fixed');
             $table->decimal('value', 10, 2)->comment('Giá trị giảm');
             $table->decimal('min_order_amount', 10, 2)->default(0)->comment('Giá trị đơn hàng tối thiểu');
             $table->dateTime('start_date')->nullable()->comment('Ngày bắt đầu');

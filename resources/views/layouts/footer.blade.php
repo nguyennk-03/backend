@@ -6,7 +6,7 @@
             <div class="footer-brand">
 
                 <a href="#" class="logo">
-                    <img src="{{asset('images/logo-sm.png') }}" width="150" height="150" alt="Footcap logo">
+                    <img src="{{asset('images/logo-sm.png') }}" width="60" height="60" alt="Footcap logo">
                 </a>
 
                 <ul class="social-list">

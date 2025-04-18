@@ -10,14 +10,14 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Category::with('children');
-
-        if ($request->filled('parent_id')) {
-            $query->where('parent_id', $request->parent_id);
-        }
+        $query = Category::query();
 
         if ($request->filled('name')) {
             $query->where('name', 'LIKE', '%' . $request->name . '%');
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         }
 
         if ($request->filled('sort_by') && in_array($request->sort_by, ['name', 'created_at'])) {
@@ -25,22 +25,21 @@ class CategoryController extends Controller
             $query->orderBy($request->sort_by, $sortOrder);
         }
 
-        return response()->json($query->get()); 
+        return response()->json($query->get());
     }
-
 
     public function show($id)
     {
-        $category = Category::with('children')->findOrFail($id);
+        $category = Category::findOrFail($id);
         return response()->json($category);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
-            'parent_id' => 'nullable|exists:categories,id',
+            'name' => 'required|string|max:255|unique:categories,name',
+            'image' => 'nullable|string',
+            'status' => 'nullable|in:0,1',
         ]);
 
         $category = Category::create($validated);
@@ -50,10 +49,11 @@ class CategoryController extends Controller
     public function update(Request $request, $id)
     {
         $category = Category::findOrFail($id);
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
-            'parent_id' => 'nullable|exists:categories,id',
+            'name' => 'required|string|max:255|unique:categories,name,' . $id,
+            'image' => 'nullable|string',
+            'status' => 'nullable|in:0,1',
         ]);
 
         $category->update($validated);

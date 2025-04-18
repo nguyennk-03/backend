@@ -16,7 +16,7 @@ class HomeController extends Controller
         $brands = Brand::all();
 
         // Fetch top-level categories (Men, Women, Kids)
-        $categories = Category::whereNull('parent_id')->get();
+        $categories = Category::whereNull('name')->get();
 
         // Fetch bestsellers (example: products with high order count or manually flagged)
         $bestsellers = Product::with(['variants.images', 'brand'])

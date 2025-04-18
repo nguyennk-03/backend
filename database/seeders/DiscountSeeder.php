@@ -16,20 +16,23 @@ class DiscountSeeder extends Seeder
         $faker = Faker::create();
 
         for ($i = 1; $i <= 20; $i++) {
-            $discountType = $faker->randomElement(['fixed', 'percentage']);
+            // Ánh xạ discount_type
+            $discountTypeLabel = $faker->randomElement(['fixed', 'percentage']);
+            $discountType = $discountTypeLabel === 'fixed' ? 1 : 0;
+
             Discount::create([
-                'name' => $faker->sentence(3), // Added: Tên mã giảm giá
-                'code' => strtoupper($faker->unique()->bothify('DISCOUNT##??')), // Đảm bảo code là duy nhất
+                'name' => $faker->sentence(3),
+                'code' => strtoupper($faker->unique()->bothify('DISCOUNT##??')),
                 'discount_type' => $discountType,
-                'value' => $discountType == 'fixed'
+                'value' => $discountType === 1
                     ? $faker->numberBetween(10000, 100000)
                     : $faker->randomFloat(2, 5, 40),
-                'min_order_amount' => $faker->numberBetween(50000, 500000), // Added: Giá trị đơn hàng tối thiểu
+                'min_order_amount' => $faker->numberBetween(50000, 500000),
                 'start_date' => $faker->dateTimeBetween('-1 month', 'now'),
                 'end_date' => $faker->dateTimeBetween('now', '+3 month'),
-                'is_active' => $faker->boolean(80), // Added: 80% cơ hội là true
-                'usage_limit' => $faker->optional(0.7)->numberBetween(10, 100), // Added: 70% có giới hạn sử dụng
-                'used_count' => $faker->numberBetween(0, 10), // Added: Số lần đã sử dụng
+                'is_active' => $faker->boolean(80),
+                'usage_limit' => $faker->optional(0.7)->numberBetween(10, 100),
+                'used_count' => $faker->numberBetween(0, 10),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
