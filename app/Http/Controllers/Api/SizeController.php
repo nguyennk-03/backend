@@ -14,10 +14,10 @@ class SizeController extends Controller
         $query = Size::query();
 
         if ($request->has('size')) {
-            $query->where('size', 'like', '%' . $request->size . '%');
+            $query->where('name', 'like', '%' . $request->size . '%');
         }
 
-        return response()->json($query->orderBy('size')->get());
+        return response()->json($query->orderBy('name')->get());
     }
 
     public function store(Request $request)
