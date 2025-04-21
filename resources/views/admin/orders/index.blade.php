@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex justify-content-between align-items-center p-3 rounded shadow-sm">
-                <h4 class="page-title mb-0 fw-bold"><i class="fas fa-shopping-cart me-2"></i> Quản lý Đơn hàng</h4>
+                <h4 class="page-title mb-0 fw-bold"><i class="la la-shopping-cart me-2"></i> Quản Lý Đơn Hàng</h4>
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="#">StepViet</a></li>
                     <li class="breadcrumb-item"><a href="#">Admin</a></li>

@@ -10,7 +10,7 @@ class GiamGiaController extends Controller
 {
     public function index()
     {
-        $discounts = Discount::all(     );
+        $discounts = Discount::all();
         return view('admin.discounts.index', compact('discounts'));
     }
 

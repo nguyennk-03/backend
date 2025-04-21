@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex justify-content-between align-items-center p-3 rounded shadow-sm">
-                <h4 class="page-title mb-0 fw-bold"><i class="fas fa-users me-2"></i> Người Dùng</h4>
+                <h4 class="page-title mb-0 fw-bold"><i class="fas fa-users me-2"></i>Quản Lý Người Dùng</h4>
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="#">StepViet</a></li>
                     <li class="breadcrumb-item"><a href="#">Admin</a></li>
@@ -65,20 +65,17 @@
                             <button type="submit" class="btn btn-primary btn-sm fw-semibold shadow-sm">
                                 <i class="fas fa-search me-1"></i> Tìm kiếm
                             </button>
-                            <a href="{{ route('nguoi-dung.index') }}"
-                                class="btn btn-warning btn-sm fw-semibold shadow-sm">
+                            <a href="{{ route('san-pham.index') }}" class="btn btn-warning btn-sm fw-semibold shadow-sm">
                                 <i class="fas fa-sync me-1"></i> Làm mới
                             </a>
+                            <button type="button" class="btn btn-success btn-sm fw-semibold shadow-sm" data-bs-toggle="modal"
+                                data-bs-target="#addUserModal">
+                                <i class="fas fa-plus me-1"></i> Thêm người dùng
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 d-flex align-items-end justify-content-end">
-            <button type="button" class="btn btn-success btn-sm fw-semibold shadow-sm" data-bs-toggle="modal"
-                data-bs-target="#addUserModal">
-                <i class="fas fa-plus me-1"></i> Thêm người dùng
-            </button>
         </div>
     </div>
 

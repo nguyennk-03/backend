@@ -15,7 +15,7 @@ class DiscountSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 10; $i++) {
             // Ánh xạ discount_type
             $discountTypeLabel = $faker->randomElement(['fixed', 'percentage']);
             $discountType = $discountTypeLabel === 'fixed' ? 1 : 0;

@@ -17,23 +17,18 @@ class DonHangController extends Controller
     {
         $query = Order::query();
 
-        if ($request->filled('search')) {
-            $query->where('id', 'like', '%' . $request->search . '%')
-                ->orWhereHas('user', function ($q) use ($request) {
-                    $q->where('name', 'like', '%' . $request->search . '%');
-                });
-        }
-
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         $orders = $query->with('user')->get();
+
         $users = User::all();
         $products = Product::all();
 
         return view('admin.orders.index', compact('orders', 'users', 'products'));
     }
+
 
     public function store(Request $request)
     {

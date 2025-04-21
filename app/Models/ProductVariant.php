@@ -68,4 +68,12 @@ class ProductVariant extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+    protected static function booted()
+    {
+        static::saving(function ($variant) {
+            if ($variant->isDirty('price') || $variant->isDirty('discount_percent')) {
+                $variant->discounted_price = $variant->price * (1 - $variant->discount_percent / 100);
+            }
+        });
+    }
 }

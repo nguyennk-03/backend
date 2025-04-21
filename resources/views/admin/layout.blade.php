@@ -23,9 +23,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/line-awesome@1.3.0/dist/line-awesome/css/line-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/line-awesome@1.3.0/dist/line-awesome/css/line-awesome.min.css">
 </head>
 
 <body>
@@ -99,7 +97,7 @@
                             <a href="{{route('mau-sac.index')  }}" class="nav-link"><i class="la la-palette"></i> Quản lý theo màu</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('kich-thuoc.index')  }}" class="nav-link"><i class="la la-arrows-alt"></i> Quản lý theo size</a>
+                            <a href="{{route('kich-thuoc.index')  }}" class="nav-link"><i class="la la-ruler"></i> Quản lý theo size</a>
                         </li>
                     </ul>
                 </li>
@@ -109,8 +107,13 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('danh-gia.index') }}">
+                    <a href="{{ route('binh-luan.index') }}">
                         <i class="la la-comments"></i> <span>Quản lý bình luận</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('danh-gia.index') }}">
+                        <i class="la la-award"></i> <span>Quản lý đánh giá</span>
                     </a>
                 </li>
                 <li>
@@ -121,6 +124,11 @@
                 <li>
                     <a href="{{ route('danh-muc.index') }}">
                         <i class="la la-tags"></i> <span>Quản lý danh mục</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('thuong-hieu.index') }}">
+                        <i class="la la-bookmark"></i> <span>Quản lý thương hiệu</span>
                     </a>
                 </li>
                 <li>

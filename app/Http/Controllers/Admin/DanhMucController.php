@@ -11,39 +11,13 @@ use Illuminate\Support\Str;
 
 class DanhMucController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = Category::query();
+        $categories = Category::all();
 
-        if ($request->has('parent_id') && $request->parent_id != '') {
-            $query->where('parent_id', $request->parent_id);
-        }
-
-        if ($request->has('sort_by')) {
-            switch ($request->sort_by) {
-                case 'name_asc':
-                    $query->orderBy('name', 'asc');
-                    break;
-                case 'name_desc':
-                    $query->orderBy('name', 'desc');
-                    break;
-                case 'newest':
-                    $query->orderBy('created_at', 'desc');
-                    break;
-                case 'oldest':
-                    $query->orderBy('created_at', 'asc');
-                    break;
-                default:
-                    $query->orderBy('id', 'asc');
-                    break;
-            }
-        } else {
-            $query->orderBy('id', 'asc');
-        }
-
-        $categories = $query->get();
         return view('admin.categories.index', compact('categories'));
     }
+
 
     public function show($slug)
     {

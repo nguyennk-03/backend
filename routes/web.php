@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BaiVietController;
+use App\Http\Controllers\Admin\BinhLuanController;
 use App\Http\Controllers\Admin\KichThuocController;
 use App\Http\Controllers\Admin\MauSacController;
 use App\Http\Controllers\AuthWebController;
@@ -47,5 +48,6 @@ Route::prefix('admin')->middleware(['auth', 'user'])->group(function () {
     Route::resource('don-hang', DonHangController::class);
     Route::resource('giam-gia', GiamGiaController::class);
     Route::resource('danh-gia', DanhGiaController::class);
+    Route::resource('binh-luan', BinhLuanController::class);
     Route::resource('bai-viet', BaiVietController::class);
 });
