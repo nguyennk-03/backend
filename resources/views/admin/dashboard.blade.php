@@ -10,11 +10,11 @@
             <div
                 class="page-title-box d-flex justify-content-between align-items-center p-4 rounded shadow-lg bg-gradient-primary text-white">
                 <h4 class="page-title mb-0 fw-bold">
-                    <i class="fas fa-tachometer-alt me-2"></i>Trang Quản Lý
+                    <i class="la la-dashboard me-2"></i>Trang Quản Lý
                 </h4>
                 <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="#" >StepViet</a></li>
-                    <li class="breadcrumb-item"><a href="#" >Admin</a></li>
+                    <li class="breadcrumb-item"><a href="#">StepViet</a></li>
+                    <li class="breadcrumb-item"><a href="#">Admin</a></li>
                     <li class="breadcrumb-item active ">Trang Quản Lý</li>
                 </ol>
             </div>

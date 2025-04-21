@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex align-items-center justify-content-between">
-                <h4 class="page-title">Quản Lý Giảm Giá</h4>
+                <h4 class="page-title"><i class="la la-percent"></i>Quản Lý Giảm Giá</h4>
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="#">StepViet</a></li>
                     <li class="breadcrumb-item"><a href="#">Admin</a></li>

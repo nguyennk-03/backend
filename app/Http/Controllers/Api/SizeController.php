@@ -17,7 +17,7 @@ class SizeController extends Controller
             $query->where('size', 'like', '%' . $request->size . '%');
         }
 
-        return response()->json($query->orderBy('size')->paginate(10));
+        return response()->json($query->orderBy('size')->get());
     }
 
     public function store(Request $request)

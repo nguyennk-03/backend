@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex justify-content-between align-items-center p-3 rounded shadow-sm">
-                <h4 class="page-title mb-0 fw-bold"><i class="fas fa-box-open me-2"></i>Quản Lý Sản Phẩm</h4>
+                <h4 class="page-title mb-0 fw-bold"><i class="la la-box-open me-2"></i>Quản Lý Sản Phẩm</h4>
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="#">StepViet</a></li>
                     <li class="breadcrumb-item"><a href="#">Admin</a></li>
@@ -473,7 +473,6 @@
 
 @section('scripts')
 <script>
-    // Xem trước ảnh khi chọn file
     document.querySelectorAll('input[type="file"][data-preview]').forEach(input => {
         input.addEventListener('change', function() {
             const previewId = this.getAttribute('data-preview');

@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex justify-content-between align-items-center p-3 rounded shadow-sm">
-                <h4 class="page-title mb-0 fw-bold"><i class="fas fa-box-open me-2"></i> Quản lý Màu Sắc</h4>
+                <h4 class="page-title mb-0 fw-bold"><i class="la la-palette me-2"></i> Quản lý Màu Sắc</h4>
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="#">StepViet</a></li>
                     <li class="breadcrumb-item"><a href="#">Admin</a></li>
@@ -61,9 +61,9 @@
                                         <td>{{ $color->name }}</td>
                                         <td class="text-center">
                                             @if($color->hex_code)
-                                                <div class="color-box" style="background-color: {{ $color->hex_code }}; width: 30px; height: 30px; border-radius: 4px; border: 1px solid #ccc;" title="{{ $color->hex_code }}"></div>
+                                            <div class="color-box" style="background-color: {{ $color->hex_code }}; width: 30px; height: 30px; border-radius: 4px; border: 1px solid #ccc;" title="{{ $color->hex_code }}"></div>
                                             @else
-                                                <span class="text-secondary">❌</span>
+                                            <span class="text-secondary">❌</span>
                                             @endif
                                         </td>
                                         <td>

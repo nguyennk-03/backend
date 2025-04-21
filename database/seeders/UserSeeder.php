@@ -18,8 +18,6 @@ class UserSeeder extends Seeder
             ['name' => 'Nguyễn Hữu Kiệt', 'email' => 'kietnhps27657@fpt.edu.vn', 'password' => 'kietnhps27657@fpt.edu.vn', 'role' => 'admin'],
             ['name' => 'Nguyễn Tuấn Anh', 'email' => 'anhntps35235@fpt.edu.vn', 'password' => 'anhntps35235@fpt.edu.vn', 'role' => 'admin'],
             ['name' => 'Trần Văn Nhân', 'email' => 'nhantvps33579@fpt.edu.vn', 'password' => 'nhantvps33579@fpt.edu.vn', 'role' => 'admin'],
-            ['name' => 'Văn Đức Anh', 'email' => 'anhvdps34505@fpt.edu.vn', 'password' => 'anhvdps34505@fpt.edu.vn', 'role' => 'admin'],
-            ['name' => 'Lê Nguyễn Hoàng Khiêm', 'email' => 'khiemlnhps33864@fpt.edu.vn', 'password' => 'khiemlnhps33864@fpt.edu.vn', 'role' => 'admin'],
         ];
 
         foreach ($users as $index => $user) {
