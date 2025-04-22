@@ -11,10 +11,26 @@ use Illuminate\Support\Str;
 
 class DanhMucController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::all();
-
+        $query = Category::query();
+        if ($request->sort_by) {
+            switch ($request->sort_by) {
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('name', 'desc');
+                    break;
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'oldest':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+            }
+        }
+        $categories = $query->get();
         return view('admin.categories.index', compact('categories'));
     }
 

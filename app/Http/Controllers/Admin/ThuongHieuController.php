@@ -13,11 +13,31 @@ class ThuongHieuController extends Controller
 {
     public function index(Request $request)
     {
-        $brands = Brand::all();
+        $query = Brand::query();
+        if ($request->search) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
 
+        if ($request->sort_by) {
+            switch ($request->sort_by) {
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('name', 'desc');
+                    break;
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'oldest':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+            }
+        }
+
+        $brands = $query->get(); 
         return view('admin.brands.index', compact('brands'));
     }
-
 
     public function store(Request $request)
     {

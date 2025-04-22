@@ -25,53 +25,40 @@
 
     <!-- Bộ lọc và nút hành động -->
     <div class="row mb-4">
-        <div class="col-md-8">
+        <div class="col-12">
             <div class="card shadow-sm rounded-lg">
                 <div class="card-body p-4">
                     <form action="{{ route('nguoi-dung.index') }}" method="GET">
                         <div class="row g-3 align-items-end">
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold"><i class="fas fa-user-tag me-1"></i> Vai
-                                    trò</label>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold"><i class="fas fa-user-tag me-1"></i> Vai trò</label>
                                 <select name="role" class="form-select form-select-sm border-0 shadow-sm">
                                     <option value="">-- Tất cả --</option>
-                                    <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin
-                                    </option>
-                                    <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>Người dùng
-                                    </option>
+                                    <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                    <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>Người dùng</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold"><i class="fas fa-map-marker-alt me-1"></i> Địa
-                                    chỉ</label>
-                                <input type="text" name="address"
-                                    class="form-control form-control-sm border-0 shadow-sm" placeholder="Nhập địa chỉ"
-                                    value="{{ request('address') }}">
-                            </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold"><i class="fas fa-sort me-1"></i> Sắp xếp</label>
                                 <select name="sort_by" class="form-select form-select-sm border-0 shadow-sm">
                                     <option value="">-- Mặc định --</option>
                                     <option value="created_at_desc" {{ request('sort_by') == 'created_at_desc' ? 'selected' : '' }}>Mới nhất</option>
                                     <option value="created_at_asc" {{ request('sort_by') == 'created_at_asc' ? 'selected' : '' }}>Cũ nhất</option>
-                                    <option value="name_asc" {{ request('sort_by') == 'name_asc' ? 'selected' : '' }}>Tên
-                                        A-Z</option>
-                                    <option value="name_desc" {{ request('sort_by') == 'name_desc' ? 'selected' : '' }}>
-                                        Tên Z-A</option>
+                                    <option value="name_asc" {{ request('sort_by') == 'name_asc' ? 'selected' : '' }}>Tên A-Z</option>
+                                    <option value="name_desc" {{ request('sort_by') == 'name_desc' ? 'selected' : '' }}>Tên Z-A</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="mt-3 d-flex gap-3">
-                            <button type="submit" class="btn btn-primary btn-sm fw-semibold shadow-sm">
-                                <i class="fas fa-search me-1"></i> Tìm kiếm
-                            </button>
-                            <a href="{{ route('san-pham.index') }}" class="btn btn-warning btn-sm fw-semibold shadow-sm">
-                                <i class="fas fa-sync me-1"></i> Làm mới
-                            </a>
-                            <button type="button" class="btn btn-success btn-sm fw-semibold shadow-sm" data-bs-toggle="modal"
-                                data-bs-target="#addUserModal">
-                                <i class="fas fa-plus me-1"></i> Thêm người dùng
-                            </button>
+                            <div class="col-md-4 d-flex gap-2 align-items-end">
+                                <button type="submit" class="btn btn-primary btn-sm fw-semibold shadow-sm">
+                                    <i class="fas fa-search me-1"></i> Tìm kiếm
+                                </button>
+                                <a href="{{ route('nguoi-dung.index') }}" class="btn btn-warning btn-sm fw-semibold shadow-sm">
+                                    <i class="fas fa-sync me-1"></i> Làm mới
+                                </a>
+                                <button type="button" class="btn btn-success btn-sm fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                    <i class="fas fa-plus me-1"></i> Thêm
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>

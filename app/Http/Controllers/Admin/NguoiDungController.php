@@ -10,25 +10,30 @@ use Illuminate\Support\Facades\Hash;
 
 class NguoiDungController extends Controller
 {
+    // app/Http/Controllers/Admin/UserController.php
     public function index(Request $request)
     {
         $query = User::query();
-
-        // Lọc theo role nếu có
-        if ($request->filled('role')) {
+        if ($request->role) {
             $query->where('role', $request->role);
         }
-
-        // Lấy tất cả người dùng theo role (nếu có lọc)
-        $users = $query->get();
-
-        // Thêm đường dẫn hiển thị avatar nếu có
-        $users = $users->map(function ($user) {
-            $user->avatar_display_url = $user->avatar ? Storage::url('avatars/' . $user->avatar) : null;
-            return $user;
-        });
-
-        // Trả về view với danh sách người dùng
+        if ($request->sort_by) {
+            switch ($request->sort_by) {
+                case 'created_at_desc':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'created_at_asc':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('name', 'desc');
+                    break;
+            }
+        }
+        $users = $query->paginate(10);
         return view('admin.users.index', compact('users'));
     }
 

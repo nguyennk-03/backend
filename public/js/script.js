@@ -24,6 +24,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "OrderDetailTable",
         "ColorTable",
         "SizeTable",
+        "CommentTable",
+        "NewsTable",
     ];
 
     if (window.jQuery && $.fn.DataTable) {

@@ -19,39 +19,25 @@
     <!-- Tìm kiếm & Lọc giảm giá -->
     <div class="card shadow-sm rounded-lg mb-3">
         <div class="card-body">
-            <form action="{{ route('khuyen-mai.index') }}" method="GET">
+            <form action="{{ route('giam-gia.index') }}" method="GET">
                 <div class="row g-3 align-items-end">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Tìm kiếm</label>
-                        <input type="text" name="search" class="form-control" placeholder="Nhập tên mã giảm giá"
-                            value="{{ request('search') }}">
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">Loại giảm giá</label>
-                        <select name="type" class="form-select">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold"><i class="fas fa-tags me-1"></i> Loại giảm giá</label>
+                        <select name="type" class="form-select form-select-sm border-0 shadow-sm">
                             <option value="">-- Tất cả --</option>
-                            <option value="percentage" {{ request('type') == 'percentage' ? 'selected' : '' }}>Giảm theo %
-                            </option>
-                            <option value="fixed" {{ request('type') == 'fixed' ? 'selected' : '' }}>Giảm giá tiền
-                            </option>
+                            <option value="percentage" {{ request('type') == 'percentage' ? 'selected' : '' }}>Giảm theo %</option>
+                            <option value="fixed" {{ request('type') == 'fixed' ? 'selected' : '' }}>Giảm giá tiền</option>
                         </select>
                     </div>
-
-                    <div class="col-md-3 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search"></i> Tìm kiếm
+                    <div class="col-md-6 d-flex gap-2 align-items-end justify-content-end">
+                        <button type="submit" class="btn btn-primary btn-sm fw-semibold shadow-sm">
+                            <i class="fas fa-search me-1"></i> Tìm kiếm
                         </button>
-                        <a href="{{ route('khuyen-mai.index') }}" class="btn btn-warning btn-sm fw-semibold shadow-sm">
-                            <i class="fas fa-sync"></i> Làm mới
+                        <a href="{{ route('giam-gia.index') }}" class="btn btn-warning btn-sm fw-semibold shadow-sm">
+                            <i class="fas fa-sync me-1"></i> Làm mới
                         </a>
-                    </div>
-
-                    <!-- Nút Thêm Mã Giảm Giá -->
-                    <div class="col-md-2 text-end">
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
-                            data-bs-target="#addDiscountModal">
-                            <i class="fas fa-plus"></i> Thêm giảm giá
+                        <button type="button" class="btn btn-success btn-sm fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#addDiscountModal">
+                            <i class="fas fa-plus me-1"></i> Thêm
                         </button>
                     </div>
                 </div>
@@ -92,10 +78,10 @@
                         <td class="text-center">{{ date('d/m/Y', strtotime($discount->end_date)) }}</td>
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-2">
-                                <a href="{{ route('khuyen-mai.edit', $discount->id) }}" class="btn btn-info btn-sm">
+                                <a href="{{ route('giam-gia.edit', $discount->id) }}" class="btn btn-info btn-sm">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('khuyen-mai.destroy', $discount->id) }}" method="POST"
+                                <form action="{{ route('giam-gia.destroy', $discount->id) }}" method="POST"
                                     class="d-inline-block">
                                     @csrf
                                     @method('DELETE')
@@ -126,7 +112,7 @@
                 <h5 class="modal-title" id="addDiscountModalLabel">Thêm Mã Giảm Giá</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('khuyen-mai.store') }}" method="POST">
+            <form action="{{ route('giam-gia.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
