@@ -13,7 +13,7 @@ class ProductVariantController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ProductVariant::with(['product', 'images', 'mainImage']);
+        $query = ProductVariant::with(['product']);
 
         if ($request->filled('product_id')) {
             $query->where('product_id', $request->product_id);

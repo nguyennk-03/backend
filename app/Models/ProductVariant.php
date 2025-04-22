@@ -35,18 +35,6 @@ class ProductVariant extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // Quan hệ: Biến thể có nhiều hình ảnh
-    public function images()
-    {
-        return $this->hasMany(Image::class, 'variant_id');
-    }
-
-    // Quan hệ: Hình ảnh chính của biến thể
-    public function mainImage()
-    {
-        return $this->hasOne(Image::class, 'variant_id')->where('is_main', true);
-    }
-
     // Quan hệ: Biến thể trong giỏ hàng
     public function carts()
     {
@@ -54,7 +42,7 @@ class ProductVariant extends Model
     }
 
     // Quan hệ: Biến thể trong chi tiết đơn hàng
-    public function orderItems()
+    public function items()
     {
         return $this->hasMany(OrderItem::class);
     }
