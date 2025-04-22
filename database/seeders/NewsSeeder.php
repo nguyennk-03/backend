@@ -123,17 +123,19 @@ class NewsSeeder extends Seeder
         ];
 
         foreach ($newsData as $news) {
+            $slug = Str::slug($news['title']);
+
             News::updateOrCreate(
-                ['slug' => Str::slug($news['title'])],
+                ['slug' => $slug],
                 [
                     'title' => $news['title'],
-                    'slug' => Str::slug($news['title']),
+                    'slug' => $slug,
                     'content' => $news['content'],
                     'image' => $news['image'],
                     'category_id' => $news['category_id'],
                     'brand_id' => $news['brand_id'],
                     'author' => $user->name,
-                    'views' => rand(500, 5000),
+                    'views' => rand(500, 5000), 
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]

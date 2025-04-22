@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained('products')->onDelete('cascade')->comment('Sản phẩm');
             $table->text('message')->comment('Nội dung bình luận');
             $table->boolean('is_staff')->default(false)->comment('Bình luận từ nhân viên?');
+            $table->foreignId('parent_id')->nullable()->constrained('comments')->onDelete('cascade')->comment('Bình luận cha');
             $table->tinyInteger('is_hidden')->default(0)->comment('0: Ẩn, 1: Hiển thị');
             $table->timestamps();
         });
