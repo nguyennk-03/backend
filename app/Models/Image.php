@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Image extends Model
 {
-    protected $fillable = ['variant_id', 'path', 'is_main'];
+    protected $fillable = ['variant_id','product_id', 'path', 'is_main'];
 
     protected $casts = [
         'is_main' => 'boolean',
@@ -18,5 +18,10 @@ class Image extends Model
     public function variants()
     {
         return $this->belongsTo(ProductVariant::class);
+    }
+    // Quan hệ: Hình ảnh thuộc về một sản phẩm
+    public function products()
+    {
+        return $this->belongsTo(Product::class);
     }
 }

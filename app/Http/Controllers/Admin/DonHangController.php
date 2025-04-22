@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Validation\Rules\Enum;
 use App\Enums\OrderStatusEnum;
+use App\Enums\PaymentStatusEnum;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Product;
@@ -47,9 +48,9 @@ class DonHangController extends Controller
 
     public function show($id)
     {
-        $order = Order::with('user', 'orderItems.product')->findOrFail($id);
+        $order = Order::with('user', 'items.variant')->findOrFail($id);
 
-        return view('admin.orders.show', compact('order'));
+        return view('admin.orders.view', compact('order'));
     }
 
     public function edit($id)
@@ -65,7 +66,7 @@ class DonHangController extends Controller
         ]);
 
         $order = Order::findOrFail($id);
-        $order->status = OrderStatusEnum::from($request->input('status')); // Chuyển string thành Enum
+        $order->status = OrderStatusEnum::from($request->input('status'));
         $order->save();
 
         return back()->with('success', 'Cập nhật trạng thái thành công!');

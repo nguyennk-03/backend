@@ -11,6 +11,7 @@ class CreateImagesTable extends Migration
         Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('variant_id')->constrained('product_variants')->onDelete('cascade')->comment('ID biến thể sản phẩm');
+            $table->foreignId('produtc_id')->constrained('products')->onDelete('cascade')->comment('ID sản phẩm');
             $table->string('path')->unique()->comment('Đường dẫn ảnh (local hoặc URL)');
             $table->boolean('is_main')->default(false)->comment('Là ảnh chính?');
             $table->timestamps();

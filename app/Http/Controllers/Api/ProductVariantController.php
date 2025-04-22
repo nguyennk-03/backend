@@ -13,18 +13,10 @@ class ProductVariantController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ProductVariant::with(['product', 'size', 'color', 'images', 'mainImage']);
+        $query = ProductVariant::with(['product', 'images', 'mainImage']);
 
         if ($request->filled('product_id')) {
             $query->where('product_id', $request->product_id);
-        }
-
-        if ($request->filled('size_id')) {
-            $query->where('size_id', $request->size_id);
-        }
-
-        if ($request->filled('color_id')) {
-            $query->where('color_id', $request->color_id);
         }
 
         if ($request->filled('stock')) {
@@ -40,12 +32,12 @@ class ProductVariantController extends Controller
 
         $variants = $query->orderBy('created_at', 'desc')->get();
 
-        return ProductVariantResource::collection($variants);
+        return response()->json($query->get());
     }
 
     public function show($id)
     {
-        $variant = ProductVariant::with(['product', 'size', 'color', 'images', 'mainImage'])->findOrFail($id);
+        $variant = ProductVariant::with(['product', 'images', 'mainImage'])->findOrFail($id);
         return new ProductVariantResource($variant);
     }
 

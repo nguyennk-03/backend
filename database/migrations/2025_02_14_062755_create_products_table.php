@@ -11,6 +11,8 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name')->comment('Tên sản phẩm');
+            $table->decimal('price', 10, 2)->comment('Giá gốc');
+            $table->string('image')->nullable()->comment('Hình ảnh sản phẩm'); 
             $table->text('description')->nullable()->comment('Mô tả sản phẩm');
             $table->tinyInteger('sale')->default(0)->comment('0: Không giảm giá, 1: Đang giảm giá');
             $table->tinyInteger('hot')->default(0)->comment('0: Thường, 1: Mới, 2: Nổi bật, 3: Bán chạy');

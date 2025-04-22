@@ -2,24 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductVariant extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'product_id',
-        'size_id',
-        'color_id',
-        'style_id',
-        'price',
+        'image',
+        'size',
+        'color',
         'discount_percent',
         'discounted_price',
         'stock_quantity',
-        'sold'
+        'sold',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
         'discount_percent' => 'integer',
         'discounted_price' => 'decimal:2',
         'stock_quantity' => 'integer',
@@ -27,24 +28,12 @@ class ProductVariant extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
     // Quan hệ: Biến thể thuộc về một sản phẩm
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
-
-    // Quan hệ: Biến thể thuộc về một kích thước
-    public function size()
-    {
-        return $this->belongsTo(Size::class)->withDefault();
-    }
-
-    // Quan hệ: Biến thể thuộc về một màu sắc
-    public function color()
-    {
-        return $this->belongsTo(Color::class)->withDefault();
-    }
-
 
     // Quan hệ: Biến thể có nhiều hình ảnh
     public function images()
@@ -52,6 +41,7 @@ class ProductVariant extends Model
         return $this->hasMany(Image::class, 'variant_id');
     }
 
+    // Quan hệ: Hình ảnh chính của biến thể
     public function mainImage()
     {
         return $this->hasOne(Image::class, 'variant_id')->where('is_main', true);
@@ -68,11 +58,14 @@ class ProductVariant extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
     protected static function booted()
     {
         static::saving(function ($variant) {
-            if ($variant->isDirty('price') || $variant->isDirty('discount_percent')) {
-                $variant->discounted_price = $variant->price * (1 - $variant->discount_percent / 100);
+            if ($variant->isDirty('discount_percent')) {
+                // Fetch the price from the related product
+                $price = $variant->product->price;
+                $variant->discounted_price = $price * (1 - $variant->discount_percent / 100);
             }
         });
     }

@@ -56,4 +56,17 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+    public function getStatusEnumAttribute()
+    {
+        return $this->status instanceof OrderStatusEnum
+            ? $this->status
+            : OrderStatusEnum::tryFrom($this->status);
+    }
+
+    public function getPaymentStatusEnumAttribute()
+    {
+        return $this->payment_status instanceof PaymentStatusEnum
+            ? $this->payment_status
+            : PaymentStatusEnum::tryFrom($this->payment_status);
+    }
 }

@@ -2,16 +2,29 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'name', 'description', 'sale', 'hot', 'status',
-        'stock_quantity', 'sold', 'category_id', 'brand_id'
+        'name',
+        'price',
+        'image',
+        'description',
+        'sale',
+        'hot',
+        'status',
+        'stock_quantity',
+        'sold',
+        'category_id',
+        'brand_id',
     ];
 
     protected $casts = [
+        'price' => 'decimal:2',
         'sale' => 'boolean',
         'hot' => 'integer',
         'status' => 'boolean',
@@ -20,6 +33,10 @@ class Product extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    protected $appends = ['total_stock'];
+
+    protected $with = ['category', 'brand'];
 
     // Quan hệ: Sản phẩm thuộc về một danh mục
     public function category()
@@ -36,7 +53,13 @@ class Product extends Model
     // Quan hệ: Sản phẩm có nhiều biến thể
     public function variants()
     {
-        return $this->hasMany(ProductVariant::class,'product_id');
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    // Quan hệ: Sản phẩm có nhiều hình ảnh (qua biến thể)
+    public function images()
+    {
+        return $this->hasManyThrough(Image::class, ProductVariant::class, 'product_id', 'variant_id');
     }
 
     // Quan hệ: Sản phẩm có nhiều đánh giá
@@ -62,19 +85,10 @@ class Product extends Model
     {
         return $this->hasMany(Wishlist::class);
     }
-    public function getImageAttribute()
-    {
-        $mainImage = $this->variants()
-            ->whereHas('images', fn($query) => $query->where('is_main', true))
-            ->with(['images' => fn($query) => $query->where('is_main', true)])
-            ->first();
-
-        return $mainImage?->images->first()?->path ?? null;
-    }
 
     // Accessor cho tổng tồn kho
     public function getTotalStockAttribute()
     {
-        return $this->variants->sum('stock_quantity');
+        return $this->variants()->sum('stock_quantity');
     }
 }

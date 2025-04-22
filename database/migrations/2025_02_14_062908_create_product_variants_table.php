@@ -11,9 +11,9 @@ class CreateProductVariantsTable extends Migration
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade')->comment('Sản phẩm');
-            $table->foreignId('size_id')->nullable()->constrained('sizes')->onDelete('set null')->comment('Kích thước');
-            $table->foreignId('color_id')->nullable()->constrained('colors')->onDelete('set null')->comment('Màu sắc');
-            $table->decimal('price', 10, 2)->comment('Giá gốc');
+            $table->string('image')->nullable()->comment('Hình ảnh biến thể');
+            $table->string('size')->nullable()->comment('Kích thước');
+            $table->string('color')->nullable()->comment('Màu sắc');
             $table->unsignedTinyInteger('discount_percent')->default(0)->comment('Phần trăm giảm giá (0-100%)');
             $table->decimal('discounted_price', 10, 2)->nullable()->comment('Giá sau giảm');
             $table->integer('stock_quantity')->default(0)->comment('Tổng tồn kho');
