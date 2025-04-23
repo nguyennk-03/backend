@@ -3,148 +3,151 @@
 @section('title', 'Bảng Điều Khiển')
 
 @section('content')
-<div class="container mt-5">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div
-                class="page-title-box d-flex justify-content-between align-items-center p-4 rounded shadow-lg bg-gradient-primary text-white">
-                <h4 class="page-title mb-0 fw-bold">
-                    <i class="la la-dashboard me-2"></i>Trang Quản Lý
-                </h4>
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="#">StepViet</a></li>
-                    <li class="breadcrumb-item"><a href="#">Admin</a></li>
-                    <li class="breadcrumb-item active ">Trang Quản Lý</li>
-                </ol>
-            </div>
-        </div>
-    </div>
+<div class="container-fluid">
 
-    <!-- Tổng quan thống kê - Dạng hình tròn -->
-    <div class="row mb-5 d-flex flex-row flex-nowrap justify-content-center g-4 text-white">
-        @php
-        $stats = [
-        ['title' => 'Tổng Đơn Hàng', 'value' => $totalOrders, 'icon' => 'fas fa-box', 'color' => 'primary'],
-        ['title' => 'Đơn Hàng Chờ', 'value' => $totalPendingOrders, 'icon' => 'fas fa-clock', 'color' => 'warning'],
-        ['title' => 'Doanh Thu', 'value' => number_format($revenue, 0, ',', '.') . ' VND', 'icon' => 'fas fa-money-bill-wave', 'color' => 'success'],
-        ['title' => 'Số Lượng Sản Phẩm', 'value' => $totalProducts, 'icon' => 'fas fa-cogs', 'color' => 'info'],
-        ];
-        @endphp
-
-        @foreach($stats as $stat)
-        <div class="col-md-3 col-sm-6 stat-card-wrapper">
-            <div class="card shadow-lg text-center rounded-circle p-4 stat-card hover-scale border-0">
-                <div class="card-body">
-                    <i class="{{ $stat['icon'] }} fa-3x mb-3 text-{{ $stat['color'] }}"></i>
-                    <h5 class="card-title text-muted">{{ $stat['title'] }}</h5>
-                    <p class="h4 fw-bold text-{{ $stat['color'] }}">{{ $stat['value'] }}</p>
+    <div class="container mt-5">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div
+                    class="page-title-box d-flex justify-content-between align-items-center p-4 rounded shadow-lg bg-gradient-primary text-white">
+                    <h4 class="page-title mb-0 fw-bold">
+                        <i class="la la-dashboard me-2"></i>Trang Quản Lý
+                    </h4>
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="#">StepViet</a></li>
+                        <li class="breadcrumb-item"><a href="#">Admin</a></li>
+                        <li class="breadcrumb-item active ">Trang Quản Lý</li>
+                    </ol>
                 </div>
             </div>
         </div>
-        @endforeach
-    </div>
 
-    <!-- Bố cục chính: Biểu đồ bên trái, Đơn hàng mới nhất bên phải -->
-    <div class="row g-4">
-        <!-- Cột trái: Biểu đồ Doanh Thu và Trạng Thái Đơn Hàng -->
-        <div class="col-lg-7">
-            <!-- Biểu đồ Doanh Thu và Số Đơn Hàng -->
-            <div class="card shadow-lg border-0 rounded-lg mb-4">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="card-title fw-bold text-primary">
-                            <i class="bi bi-bar-chart me-2"></i>Doanh Thu và Số Đơn Hàng
-                        </h5>
-                        <!-- Bộ lọc thời gian -->
-                        <div class="dropdown">
-                            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button"
-                                id="timeFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Theo Tháng
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="timeFilterDropdown">
-                                <li><a class="dropdown-item" href="#" data-filter="week">Theo Tuần</a></li>
-                                <li><a class="dropdown-item active " href="#" data-filter="month">Theo Tháng</a></li>
-                                <li><a class="dropdown-item" href="#" data-filter="year">Theo Năm</a></li>
-                            </ul>
-                        </div>
+        <!-- Tổng quan thống kê - Dạng hình tròn -->
+        <div class="row mb-5 d-flex flex-row flex-nowrap justify-content-center g-4 text-white">
+            @php
+            $stats = [
+            ['title' => 'Tổng Đơn Hàng', 'value' => $totalOrders, 'icon' => 'fas fa-box', 'color' => 'primary'],
+            ['title' => 'Đơn Hàng Chờ', 'value' => $totalPendingOrders, 'icon' => 'fas fa-clock', 'color' => 'warning'],
+            ['title' => 'Doanh Thu', 'value' => number_format($revenue, 0, ',', '.') . ' VND', 'icon' => 'fas fa-money-bill-wave', 'color' => 'success'],
+            ['title' => 'Số Lượng Sản Phẩm', 'value' => $totalProducts, 'icon' => 'fas fa-cogs', 'color' => 'info'],
+            ];
+            @endphp
+
+            @foreach($stats as $stat)
+            <div class="col-md-3 col-sm-6 stat-card-wrapper">
+                <div class="card shadow-lg text-center rounded-circle p-4 stat-card hover-scale border-0">
+                    <div class="card-body">
+                        <i class="{{ $stat['icon'] }} fa-3x mb-3 text-{{ $stat['color'] }}"></i>
+                        <h5 class="card-title text-muted">{{ $stat['title'] }}</h5>
+                        <p class="h4 fw-bold text-{{ $stat['color'] }}">{{ $stat['value'] }}</p>
                     </div>
-                    <canvas id="comboChart" style="max-height: 400px;"></canvas>
                 </div>
             </div>
-
-            <!-- Biểu đồ Trạng Thái Đơn Hàng -->
-            <div class="card shadow-lg border-0 rounded-lg">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-4 fw-bold text-danger">
-                        <i class="bi bi-pie-chart me-2"></i>Trạng Thái Đơn Hàng
-                    </h5>
-                    <canvas id="orderStatusChart" style="max-height: 400px;"></canvas>
-                </div>
-            </div>
+            @endforeach
         </div>
 
-        <!-- Cột phải: Đơn Hàng Mới Nhất -->
-        <div class="col-lg-5">
-            <div class="card shadow-lg border-0 rounded-lg">
-                <div class="card-body p-3">
-                    <h5 class="card-title mb-4 fw-bold text-primary">
-                        <i class="bi bi-clock-history me-2"></i>Đơn Hàng Mới Nhất
-                    </h5>
-                    <div class="order-list">
-                        @forelse($latestOrders as $order)
-                        <div class="order-item mb-3 p-3 border border-light rounded shadow-sm hover-scale">
-                            <div class="row g-3 align-items-center">
-                                <!-- Cột trái -->
-                                <div class="col-8">
-                                    <h6 class="mb-1 fw-bold">{{ $order->user->name }}</h6>
-                                    <div class="d-flex flex-column">
-                                        <span class="text-muted fs-13 mt-1">
-                                            <strong>
-                                                <i class="{{ $order->status->iconClass() }} me-1"></i> Trạng thái:
-                                            </strong>
-                                            <span class="badge {{ $order->status->badgeClass() }} fs-12 mb-1">
-                                                {{ $order->status->label() }}
-                                            </span>
-                                        </span>
-                                        <span class="text-muted fs-12">
-                                            <strong>
-                                                <i class="bi bi-upc-scan me-1"></i> Mã đơn hàng:
-                                            </strong>
-                                            #{{ $order->code ?? 'N/A' }}
-                                        </span>
-                                        <span class="text-muted fs-12">
-                                            <strong>
-                                                <i class="bi bi-credit-card me-1"></i> Phương thức thanh toán:
-                                            </strong>
-                                            {{ optional($order->payment)->name ?? 'Chưa xác định' }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <!-- Cột phải: Tổng tiền & nút xem -->
-                                <div class="col-4 text-end">
-                                    <div class="text-primary fw-bold fs-5">
-                                        {{ number_format($order->total_price) }}₫
-                                    </div>
-                                    <a href="{{ route('don-hang.show', $order->id) }}"
-                                        class="btn btn-sm btn-outline-primary mt-2 hover-btn">
-                                        <i class="bi bi-eye"></i> Xem
-                                    </a>
-                                </div>
+        <!-- Bố cục chính: Biểu đồ bên trái, Đơn hàng mới nhất bên phải -->
+        <div class="row g-4">
+            <!-- Cột trái: Biểu đồ Doanh Thu và Trạng Thái Đơn Hàng -->
+            <div class="col-lg-7">
+                <!-- Biểu đồ Doanh Thu và Số Đơn Hàng -->
+                <div class="card shadow-lg border-0 rounded-lg mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="card-title fw-bold text-primary">
+                                <i class="bi bi-bar-chart me-2"></i>Doanh Thu và Số Đơn Hàng
+                            </h5>
+                            <!-- Bộ lọc thời gian -->
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button"
+                                    id="timeFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Theo Tháng
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="timeFilterDropdown">
+                                    <li><a class="dropdown-item" href="#" data-filter="week">Theo Tuần</a></li>
+                                    <li><a class="dropdown-item active " href="#" data-filter="month">Theo Tháng</a></li>
+                                    <li><a class="dropdown-item" href="#" data-filter="year">Theo Năm</a></li>
+                                </ul>
                             </div>
                         </div>
-                        @if(!$loop->last)
-                        <hr class="my-3">
-                        @endif
-                        @empty
-                        <p class="text-muted text-center">Không có đơn hàng nào để hiển thị.</p>
-                        @endforelse
+                        <canvas id="comboChart" style="max-height: 400px;"></canvas>
                     </div>
-                    <!-- Nút xem tất cả -->
-                    <div class="text-end mt-4">
-                        <a href="{{ route('don-hang.index') }}" class="btn btn-primary btn-sm hover-btn">
-                            Xem tất cả <i class="bi bi-arrow-right ms-2"></i>
-                        </a>
+                </div>
+
+                <!-- Biểu đồ Trạng Thái Đơn Hàng -->
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-4 fw-bold text-danger">
+                            <i class="bi bi-pie-chart me-2"></i>Trạng Thái Đơn Hàng
+                        </h5>
+                        <canvas id="orderStatusChart" style="max-height: 400px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột phải: Đơn Hàng Mới Nhất -->
+            <div class="col-lg-5">
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-body p-3">
+                        <h5 class="card-title mb-4 fw-bold text-primary">
+                            <i class="bi bi-clock-history me-2"></i>Đơn Hàng Mới Nhất
+                        </h5>
+                        <div class="order-list">
+                            @forelse($latestOrders as $order)
+                            <div class="order-item mb-3 p-3 border border-light rounded shadow-sm hover-scale">
+                                <div class="row g-3 align-items-center">
+                                    <!-- Cột trái -->
+                                    <div class="col-8">
+                                        <h6 class="mb-1 fw-bold">{{ $order->user->name }}</h6>
+                                        <div class="d-flex flex-column">
+                                            <span class="text-muted fs-13 mt-1">
+                                                <strong>
+                                                    <i class="{{ $order->status->iconClass() }} me-1"></i> Trạng thái:
+                                                </strong>
+                                                <span class="badge {{ $order->status->badgeClass() }} fs-12 mb-1">
+                                                    {{ $order->status->label() }}
+                                                </span>
+                                            </span>
+                                            <span class="text-muted fs-12">
+                                                <strong>
+                                                    <i class="bi bi-upc-scan me-1"></i> Mã đơn hàng:
+                                                </strong>
+                                                #{{ $order->code ?? 'N/A' }}
+                                            </span>
+                                            <span class="text-muted fs-12">
+                                                <strong>
+                                                    <i class="bi bi-credit-card me-1"></i> Phương thức thanh toán:
+                                                </strong>
+                                                {{ optional($order->payment)->name ?? 'Chưa xác định' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <!-- Cột phải: Tổng tiền & nút xem -->
+                                    <div class="col-4 text-end">
+                                        <div class="text-primary fw-bold fs-5">
+                                            {{ number_format($order->total_price) }}₫
+                                        </div>
+                                        <a href="{{ route('don-hang.show', $order->id) }}"
+                                            class="btn btn-sm btn-outline-primary mt-2 hover-btn">
+                                            <i class="bi bi-eye"></i> Xem
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            @if(!$loop->last)
+                            <hr class="my-3">
+                            @endif
+                            @empty
+                            <p class="text-muted text-center">Không có đơn hàng nào để hiển thị.</p>
+                            @endforelse
+                        </div>
+                        <!-- Nút xem tất cả -->
+                        <div class="text-end mt-4">
+                            <a href="{{ route('don-hang.index') }}" class="btn btn-primary btn-sm hover-btn">
+                                Xem tất cả <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

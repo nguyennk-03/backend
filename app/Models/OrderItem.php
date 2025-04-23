@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderItem extends Model
 {
-    protected $fillable = ['order_id', 'variant_id', 'quantity', 'price'];
+    protected $fillable = ['order_id', 'product_id', 'quantity', 'price'];
 
     protected $casts = [
         'quantity' => 'integer',
@@ -22,8 +22,8 @@ class OrderItem extends Model
     }
 
     // Quan hệ: Chi tiết đơn hàng chứa một biến thể sản phẩm
-    public function variant()
+    public function product()
     {
-        return $this->belongsTo(ProductVariant::class, 'variant_id');
+        return $this->belongsTo(Product::class, 'product_id');
     }
 }

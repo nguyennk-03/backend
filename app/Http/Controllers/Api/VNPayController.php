@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Discount;
 use App\Models\OrderItem;
-use App\Models\ProductVariant;
+use App\Models\Product;
 
 class VNPayController extends Controller
 {
@@ -170,7 +170,7 @@ class VNPayController extends Controller
             }
 
             foreach ($orderItems as $item) {
-                $product = ProductVariant::find($item->product_id);
+                $product = Product::find($item->product_id);
                 if ($product) {
                     $product->stock += $item->quantity;
                     $product->save();

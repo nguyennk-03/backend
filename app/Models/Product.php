@@ -13,6 +13,8 @@ class Product extends Model
         'name',
         'price',
         'image',
+        'size',
+        'color',
         'description',
         'sale',
         'hot',
@@ -47,19 +49,7 @@ class Product extends Model
     {
         return $this->belongsTo(Brand::class)->withDefault();
     }
-
-    // Quan hệ: Sản phẩm có nhiều biến thể
-    public function variants()
-    {
-        return $this->hasMany(ProductVariant::class);
-    }
-
-    // Quan hệ: Sản phẩm có nhiều hình ảnh (qua biến thể)
-    public function images()
-    {
-        return $this->hasManyThrough(Image::class, ProductVariant::class, 'product_id', 'variant_id');
-    }
-
+    
     // Quan hệ: Sản phẩm có nhiều đánh giá
     public function reviews()
     {

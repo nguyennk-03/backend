@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 use App\Models\Image;
-use App\Models\ProductVariant;
+use App\Models\Product;
 
 class ImageSeeder extends Seeder
 {
@@ -16,7 +16,7 @@ class ImageSeeder extends Seeder
         $imageFiles = File::files($imageDir);
 
         // Lấy tất cả các product variants
-        $variants = ProductVariant::all();
+        $variants = Product::all();
 
         // Kiểm tra xem có đủ ảnh để gán cho các biến thể không
         if (count($imageFiles) < count($variants)) {
@@ -31,9 +31,8 @@ class ImageSeeder extends Seeder
 
                 // Gán ảnh cho biến thể, ảnh đầu tiên là ảnh chính (is_main = true)
                 Image::create([
-                    'variant_id' => $variant->id,
-                    'path'       => $imagePath,
-                    'is_main'    => true, // ảnh duy nhất cho mỗi variant sẽ là ảnh chính
+                    'product_id' => $variant->id,
+                    'image'       => $imagePath,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

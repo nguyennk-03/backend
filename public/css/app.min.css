@@ -310,7 +310,7 @@ body.sidebar-collapsed #sidebar-menu {
   backdrop-filter: var(--glass-blur);
   border-bottom: var(--glass-border);
   z-index: 1030;
-  padding: 0 25px;
+  padding: 0 25px 0 75px;
   display: flex;
   align-items: center;
   justify-content: space-between;

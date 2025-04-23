@@ -10,9 +10,8 @@ class CreateImagesTable extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('variant_id')->constrained('product_variants')->onDelete('cascade')->comment('ID biến thể sản phẩm');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade')->comment('ID biến thể sản phẩm');
             $table->string('image')->unique()->comment('Đường dẫn ảnh (local hoặc URL)');
-            $table->boolean('is_main')->default(false)->comment('Là ảnh chính?');
             $table->timestamps();
         });
     }

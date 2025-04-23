@@ -11,7 +11,7 @@ class CreateOrderItemsTable extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade')->comment('Đơn hàng');
-            $table->foreignId('variant_id')->constrained('product_variants')->onDelete('cascade')->comment('Biến thể sản phẩm');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade')->comment('Sản phẩm');
             $table->integer('quantity')->default(1)->comment('Số lượng sản phẩm');
             $table->decimal('price', 10, 2)->comment('Giá sản phẩm tại thời điểm đặt hàng');
             $table->timestamps();

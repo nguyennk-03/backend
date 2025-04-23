@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Models\Discount;
 use App\Models\Payment;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\OrderItem;
 use Faker\Factory as Faker;
 
@@ -23,6 +22,14 @@ class OrderSeeder extends Seeder
         $userIds = User::pluck('id')->toArray();
         $discountIds = Discount::pluck('id')->toArray();
         $paymentIds = Payment::pluck('id')->toArray();
+
+        $brandPriceRanges = [
+            'Adidas' => ['min' => 1000000, 'max' => 8000000],
+            'Asics'  => ['min' => 1200000, 'max' => 5000000],
+            'Bata'   => ['min' => 500000,  'max' => 1500000],
+            'Nike'   => ['min' => 1200000, 'max' => 10000000],
+            'Puma'   => ['min' => 900000,  'max' => 4000000],
+        ];
 
         // Tính từ tháng hiện tại trở về 12 tháng trước
         $start = new \DateTime(); // thời điểm hiện tại
@@ -84,18 +91,32 @@ class OrderSeeder extends Seeder
                         'updated_at' => now(),
                     ]);
 
-                    // Tạo các sản phẩm trong đơn hàng
-                    $variants = ProductVariant::inRandomOrder()->take(rand(1, 2))->get();
+                    // Tạo các sản phẩm trong đơn hàng (sử dụng Product thay cho ProductVariant)
+                    $products = Product::inRandomOrder()->take(rand(1, 2))->get();
                     $realTotal = 0;
 
-                    foreach ($variants as $variant) {
+                    foreach ($products as $product) {
+                        // Lấy thương hiệu của sản phẩm
+                        $brand = $product->brand;
+
+                        // Kiểm tra xem thương hiệu có tồn tại trong phạm vi giá không
+                        if (isset($brandPriceRanges[$brand->name])) {  // Sửa lỗi tại đây
+                            $minPrice = $brandPriceRanges[$brand->name]['min'];
+                            $maxPrice = $brandPriceRanges[$brand->name]['max'];
+
+                            // Gán giá ngẫu nhiên trong khoảng giá của thương hiệu
+                            $price = $faker->numberBetween($minPrice, $maxPrice);
+                        } else {
+                            // Nếu không có phạm vi giá, sử dụng giá ngẫu nhiên
+                            $price = $product->price;
+                        }
+
                         $quantity = rand(1, 3);
-                        $price = round($variant->discounted_price ?? $variant->product->price ?? rand(100000, 300000), 0);
                         $realTotal += $price * $quantity;
 
                         OrderItem::create([
                             'order_id' => $order->id,
-                            'variant_id' => $variant->id,
+                            'product_id' => $product->id,
                             'quantity' => $quantity,
                             'price' => $price,
                         ]);

@@ -147,9 +147,7 @@
 
         <!-- Content Start -->
         <div class="content-page">
-            <div class="container-fluid">
-                @yield('content')
-            </div>
+            @yield('content')
         </div>
         <!-- Content End -->
 

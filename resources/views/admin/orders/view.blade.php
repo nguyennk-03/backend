@@ -80,13 +80,13 @@
                     <tbody>
                         @forelse($order->items as $item)
                         @php
-                        $variant = $item->variant;
-                        $product = $variant->product ?? null;
+                        $product = $item->product;
+                        $product = $product->product ?? null;
                         @endphp
                         <tr class="border-bottom">
                             <td>{{ $loop->iteration }}</td>
                             <td class="d-flex align-items-center">
-                                <img src="{{ asset('images/' . $variant->image) }}" class="me-3 rounded" width="45" height="45" style="object-fit:cover;">
+                                <img src="{{ asset('storage/' . $item->image) }}" class="me-3 rounded" width="45" height="45" style="object-fit:cover;">
                                 <div>
                                     <span class="fw-medium">{{ $product->name ?? 'N/A' }}</span><br>
                                     <small class="text-muted">Mã: {{ $product->code ?? '---' }}</small>
@@ -94,11 +94,11 @@
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <span class="me-2 d-inline-block border rounded-circle" style="width:16px; height:16px; background-color:{{ $variant->color }}"></span>
-                                    <span>{{ $variant->color ?? '---' }}</span>
+                                    <span class="me-2 d-inline-block border rounded-circle" style="width:16px; height:16px; background-color:{{ $product->color }}"></span>
+                                    <span>{{ $product->color ?? '---' }}</span>
                                 </div>
                             </td>
-                            <td>{{ $variant->size ?? '---' }}</td>
+                            <td>{{ $product->size ?? '---' }}</td>
                             <td class="text-center">{{ $item->quantity }}</td>
                             <td class="text-end">{{ number_format($item->price) }}₫</td>
                             <td class="text-end fw-bold">{{ number_format($item->price * $item->quantity) }}₫</td>

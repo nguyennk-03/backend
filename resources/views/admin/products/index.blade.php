@@ -1,5 +1,7 @@
 @extends('admin.layout')
+
 @section('title', 'Sản phẩm')
+
 @section('content')
 <div class="container-fluid">
     <div class="row">
@@ -39,7 +41,7 @@
     <div class="row mb-4">
         <div class="card shadow-sm rounded-lg">
             <div class="card-body p-4">
-                <form action="{{ route('san-pham.index') }}" method="GET">
+                <form action="{{ route('san-pham.index') }}" method="GET" id="filterForm">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-3">
                             <label class="form-label fw-semibold"><i class="fas fa-list-ul me-1"></i> Danh mục</label>
@@ -69,6 +71,8 @@
                                 <option value="">-- Mặc định --</option>
                                 <option value="price_asc" {{ request('sort_by') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
                                 <option value="price_desc" {{ request('sort_by') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
+                                <option value="name_asc" {{ request('sort_by') == 'name_asc' ? 'selected' : '' }}>Tên A-Z</option>
+                                <option value="name_desc" {{ request('sort_by') == 'name_desc' ? 'selected' : '' }}>Tên Z-A</option>
                                 <option value="newest" {{ request('sort_by') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
                                 <option value="oldest" {{ request('sort_by') == 'oldest' ? 'selected' : '' }}>Cũ nhất</option>
                             </select>
@@ -111,7 +115,7 @@
                         <button type="submit" class="btn btn-primary btn-sm fw-semibold shadow-sm">
                             <i class="fas fa-search me-1"></i> Tìm kiếm
                         </button>
-                        <a href="{{ route('san-pham.index') }}" class="btn btn-warning btn-sm fw-semibold shadow-sm">
+                        <a href="{{ route('san-pham.index') }}" class="btn btn-warning btn-sm fw-semibold shadow-sm" onclick="resetForm(this)">
                             <i class="fas fa-sync me-1"></i> Làm mới
                         </a>
                         <button type="button" class="btn btn-success btn-sm fw-semibold shadow-sm ms-auto" data-bs-toggle="modal" data-bs-target="#addProductModal">
@@ -178,6 +182,13 @@
                                 @enderror
                             </div>
                             <div class="col-md-6">
+                                <label for="stock_quantity" class="form-label fw-semibold">Số lượng</label>
+                                <input type="number" name="stock_quantity" id="stock_quantity" class="form-control border-0 shadow-sm" value="{{ old('stock_quantity', 0) }}" placeholder="Nhập số lượng" min="0" required>
+                                @error('stock_quantity')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
                                 <label for="image" class="form-label fw-semibold">Hình ảnh</label>
                                 <input type="file" name="image" id="image" class="form-control border-0 shadow-sm" accept="image/jpeg,image/png,image/jpg" data-preview="preview_product">
                                 <div class="image-preview mt-2 d-flex flex-wrap gap-2" id="preview_product"></div>
@@ -224,55 +235,6 @@
                                 <span class="text-danger small">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div class="col-md-12">
-                                <h5 class="fw-semibold">Biến thể</h5>
-                                <div id="variants">
-                                    <div class="variant mb-3 border p-3 rounded" data-index="0">
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Kích thước</label>
-                                                <input type="text" name="variants[0][size]" class="form-control border-0 shadow-sm" value="{{ old('variants.0.size') }}" placeholder="Nhập kích thước (ví dụ: S, M, L)">
-                                                @error('variants.0.size')
-                                                <span class="text-danger small">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Màu sắc</label>
-                                                <input type="text" name="variants[0][color]" class="form-control border-0 shadow-sm" value="{{ old('variants.0.color') }}" placeholder="Nhập màu sắc (ví dụ: Đỏ, Xanh)">
-                                                @error('variants.0.color')
-                                                <span class="text-danger small">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Phần trăm giảm giá</label>
-                                                <input type="number" name="variants[0][discount_percent]" class="form-control border-0 shadow-sm" value="{{ old('variants.0.discount_percent', 0) }}" placeholder="Nhập phần trăm giảm" min="0" max="100">
-                                                @error('variants.0.discount_percent')
-                                                <span class="text-danger small">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Số lượng</label>
-                                                <input type="number" name="variants[0][stock_quantity]" class="form-control border-0 shadow-sm" value="{{ old('variants.0.stock_quantity', 0) }}" placeholder="Nhập số lượng" min="0" required>
-                                                @error('variants.0.stock_quantity')
-                                                <span class="text-danger small">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Hình ảnh</label>
-                                                <input type="file" name="variants[0][image]" class="form-control border-0 shadow-sm variant-image-input" accept="image/jpeg,image/png,image/jpg" data-preview="preview_variants_0">
-                                                <div class="image-preview mt-2 d-flex flex-wrap gap-2" id="preview_variants_0"></div>
-                                                @error('variants.0.image')
-                                                <span class="text-danger small">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-12">
-                                                <button type="button" class="btn btn-danger btn-sm remove-variant">Xóa biến thể</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="button" id="add-variant" class="btn btn-secondary btn-sm mt-2">Thêm biến thể</button>
-                            </div>
                         </div>
                         <div class="modal-footer border-0 pt-4">
                             <button type="button" class="btn btn-secondary btn-sm fw-semibold" data-bs-dismiss="modal">Hủy</button>
@@ -311,16 +273,12 @@
                             <td class="text-center">
                                 @if ($item->image)
                                 <img src="{{ asset('storage/' . $item->image) }}" class="img-thumbnail rounded" style="width: 100px; height: 100px; object-fit: cover;" alt="{{ $item->name }}">
-                                @elseif ($item->variants->first()?->image)
-                                <img src="{{ asset('storage/' . $item->variants->first()->image) }}" class="img-thumbnail rounded" style="width: 100px; height: 100px; object-fit: cover;" alt="{{ $item->name }}">
                                 @else
-                                <span class="text-muted">Chưa có ảnh</span>
+                                <img src="{{ asset('images/placeholder.jpg') }}" class="img-thumbnail rounded" style="width: 100px; height: 100px; object-fit: cover;" alt="No Image">
                                 @endif
                             </td>
                             <td>{{ $item->name }}</td>
-                            <td class="text-end">
-                                {{ number_format($item->variants->min('discounted_price') ?? $item->price, 0, ',', '.') }} VNĐ
-                            </td>
+                            <td class="text-end">{{ $item->price }}</td>
                             <td class="text-center">{{ $item->stock_quantity }}</td>
                             <td>{{ optional($item->category)->name ?? 'Chưa có danh mục' }}</td>
                             <td>{{ optional($item->brand)->name ?? 'Chưa có thương hiệu' }}</td>
@@ -382,8 +340,6 @@
                         <div class="col-md-4 d-flex justify-content-center align-items-center">
                             @if ($item->image)
                             <img src="{{ asset('storage/' . $item->image) }}" class="img-fluid rounded shadow-sm" alt="{{ $item->name }}">
-                            @elseif ($item->variants->first()?->image)
-                            <img src="{{ asset('storage/' . $item->variants->first()->image) }}" class="img-fluid rounded shadow-sm" alt="{{ $item->name }}">
                             @else
                             <div class="bg-light rounded p-3 text-muted text-center" style="width: 200px; height: 200px; line-height: 200px;">
                                 Chưa có ảnh
@@ -393,7 +349,7 @@
                         <div class="col-md-8">
                             <div class="card border-0 p-3 rounded shadow-sm">
                                 <p class="mb-2"><strong>Tên:</strong> {{ $item->name }}</p>
-                                <p class="mb-2"><strong>Giá:</strong> {{ number_format($item->price, 0, ',', '.') }} VNĐ</p>
+                                <p class="mb-2"><strong>Giá:</strong> {{ $item->formatted_price }}</p>
                                 <p class="mb-2"><strong>Danh mục:</strong> {{ optional($item->category)->name ?? 'Chưa có danh mục' }}</p>
                                 <p class="mb-2"><strong>Thương hiệu:</strong> {{ optional($item->brand)->name ?? 'Chưa có thương hiệu' }}</p>
                                 <p class="mb-2"><strong>Trạng thái:</strong> {{ $item->status ? 'Hiển thị' : 'Ẩn' }}</p>
@@ -402,19 +358,6 @@
                                 <p class="mb-2"><strong>Tổng số lượng:</strong> {{ $item->stock_quantity }}</p>
                                 <p class="mb-2"><strong>Đã bán:</strong> {{ $item->sold }}</p>
                                 <p class="mb-2"><strong>Mô tả:</strong> {{ $item->description ?? 'Chưa có mô tả' }}</p>
-                                <p class="mb-2"><strong>Biến thể:</strong></p>
-                                <ul>
-                                    @forelse ($item->variants as $variant)
-                                    <li>
-                                        Kích thước: {{ $variant->size ?? 'N/A' }},
-                                        Màu: {{ $variant->color ?? 'N/A' }},
-                                        Giá sau giảm: {{ number_format($variant->discounted_price ?? $item->price, 0, ',', '.') }} VNĐ,
-                                        Số lượng: {{ $variant->stock_quantity }}
-                                    </li>
-                                    @empty
-                                    <li>Chưa có biến thể</li>
-                                    @endforelse
-                                </ul>
                             </div>
                         </div>
                     </div>
@@ -482,6 +425,13 @@
                                 @enderror
                             </div>
                             <div class="col-md-6">
+                                <label for="stock_quantity_{{ $item->id }}" class="form-label fw-semibold">Số lượng</label>
+                                <input type="number" name="stock_quantity" id="stock_quantity_{{ $item->id }}" class="form-control border-0 shadow-sm" value="{{ old('stock_quantity', $item->stock_quantity) }}" placeholder="Nhập số lượng" min="0" required>
+                                @error('stock_quantity')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
                                 <label for="image_{{ $item->id }}" class="form-label fw-semibold">Hình ảnh</label>
                                 <input type="file" name="image" id="image_{{ $item->id }}" class="form-control border-0 shadow-sm" accept="image/jpeg,image/png,image/jpg" data-preview="preview_product_{{ $item->id }}">
                                 @if ($item->image)
@@ -533,68 +483,6 @@
                                 <span class="text-danger small">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div class="col-md-12">
-                                <h5 class="fw-semibold">Biến thể</h5>
-                                <div id="variants_{{ $item->id }}">
-                                    @foreach ($item->variants as $index => $variant)
-                                    <div class="variant mb-3 border p-3 rounded" data-index="{{ $index }}">
-                                        <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $variant->id }}">
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Kích thước</label>
-                                                <input type="text" name="variants[{{ $index }}][size]" class="form-control border-0 shadow-sm" value="{{ old('variants.' . $index . '.size', $variant->size) }}" placeholder="Nhập kích thước (ví dụ: S, M, L)">
-                                                @error('variants.' . $index . '.size')
-                                                <span class="text-danger small">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Màu sắc</label>
-                                                <input type="text" name="variants[{{ $index }}][color]" class="form-control border-0 shadow-sm" value="{{ old('variants.' . $index . '.color', $variant->color) }}" placeholder="Nhập màu sắc (ví dụ: Đỏ, Xanh)">
-                                                @error('variants.' . $index . '.color')
-                                                <span class="text-danger small">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Phần trăm giảm giá</label>
-                                                <input type="number" name="variants[{{ $index }}][discount_percent]" class="form-control border-0 shadow-sm" value="{{ old('variants.' . $index . '.discount_percent', $variant->discount_percent) }}" placeholder="Nhập phần trăm giảm" min="0" max="100">
-                                                @error('variants.' . $index . '.discount_percent')
-                                                <span class="text-danger small">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Số lượng</label>
-                                                <input type="number" name="variants[{{ $index }}][stock_quantity]" class="form-control border-0 shadow-sm" value="{{ old('variants.' . $index . '.stock_quantity', $variant->stock_quantity) }}" placeholder="Nhập số lượng" min="0" required>
-                                                @error('variants.' . $index . '.stock_quantity')
-                                                <span class="text-danger small">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Hình ảnh hiện tại</label>
-                                                @if ($variant->image)
-                                                <div class="mt-2">
-                                                    <img src="{{ asset('storage/' . $variant->image) }}" class="rounded shadow-sm" style="width: 100px; height: 100px; object-fit: cover;" alt="Variant Image">
-                                                </div>
-                                                @else
-                                                <p class="text-muted">Chưa có ảnh</p>
-                                                @endif
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Hình ảnh mới</label>
-                                                <input type="file" name="variants[{{ $index }}][image]" class="form-control border-0 shadow-sm variant-image-input" accept="image/jpeg,image/png,image/jpg" data-preview="preview_variants_{{ $item->id }}_{{ $index }}">
-                                                <div class="image-preview mt-2 d-flex flex-wrap gap-2" id="preview_variants_{{ $item->id }}_{{ $index }}"></div>
-                                                @error('variants.' . $index . '.image')
-                                                <span class="text-danger small">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-12">
-                                                <button type="button" class="btn btn-danger btn-sm remove-variant">Xóa biến thể</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                                <button type="button" class="btn btn-secondary btn-sm mt-2 add-variant" data-product-id="{{ $item->id }}">Thêm biến thể</button>
-                            </div>
                         </div>
                         <div class="modal-footer border-0 pt-4">
                             <button type="button" class="btn btn-secondary btn-sm fw-semibold" data-bs-dismiss="modal">Đóng</button>
@@ -607,91 +495,4 @@
     </div>
     @endforeach
 </div>
-
-@section('scripts')
-<script>
-    // Auto-dismiss success message after 5 seconds
-    setTimeout(() => {
-        const successMessage = document.getElementById('success-message');
-        if (successMessage) {
-            successMessage.classList.remove('show');
-            setTimeout(() => successMessage.remove(), 200);
-        }
-    }, 5000);
-
-    // Dynamic variant addition
-    document.querySelectorAll('#add-variant, .add-variant').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id') || '';
-            const variantsContainer = document.getElementById(productId ? `variants_${productId}` : 'variants');
-            const index = variantsContainer.querySelectorAll('.variant').length;
-            const variantHtml = `
-                <div class="variant mb-3 border p-3 rounded" data-index="${index}">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Kích thước</label>
-                            <input type="text" name="variants[${index}][size]" class="form-control border-0 shadow-sm" placeholder="Nhập kích thước (ví dụ: S, M, L)">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Màu sắc</label>
-                            <input type="text" name="variants[${index}][color]" class="form-control border-0 shadow-sm" placeholder="Nhập màu sắc (ví dụ: Đỏ, Xanh)">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Phần trăm giảm giá</label>
-                            <input type="number" name="variants[${index}][discount_percent]" class="form-control border-0 shadow-sm" value="0" placeholder="Nhập phần trăm giảm" min="0" max="100">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Số lượng</label>
-                            <input type="number" name="variants[${index}][stock_quantity]" class="form-control border-0 shadow-sm" value="0" placeholder="Nhập số lượng" min="0" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Hình ảnh</label>
-                            <input type="file" name="variants[${index}][image]" class="form-control border-0 shadow-sm variant-image-input" accept="image/jpeg,image/png,image/jpg" data-preview="preview_variants_${productId ? productId + '_' : ''}${index}">
-                            <div class="image-preview mt-2 d-flex flex-wrap gap-2" id="preview_variants_${productId ? productId + '_' : ''}${index}"></div>
-                        </div>
-                        <div class="col-md-12">
-                            <button type="button" class="btn btn-danger btn-sm remove-variant">Xóa biến thể</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            variantsContainer.insertAdjacentHTML('beforeend', variantHtml);
-            attachImagePreviewListeners();
-        });
-    });
-
-    // Remove variant
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-variant')) {
-            e.target.closest('.variant').remove();
-        }
-    });
-
-    // Image preview
-    function attachImagePreviewListeners() {
-        document.querySelectorAll('.variant-image-input, [name="image"]').forEach(input => {
-            input.removeEventListener('change', handleImagePreview); // Prevent duplicate listeners
-            input.addEventListener('change', handleImagePreview);
-        });
-    }
-
-    function handleImagePreview(e) {
-        const input = e.target;
-        const previewContainer = document.getElementById(input.dataset.preview);
-        previewContainer.innerHTML = ''; // Clear previous previews
-        const file = input.files[0];
-        if (file && file.type.startsWith('image/')) {
-            const img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            img.style.width = '100px';
-            img.style.height = '100px';
-            img.style.objectFit = 'cover';
-            img.className = 'rounded shadow-sm';
-            previewContainer.appendChild(img);
-        }
-    }
-
-    // Initialize image preview listeners
-    attachImagePreviewListeners();
-</script>
 @endsection

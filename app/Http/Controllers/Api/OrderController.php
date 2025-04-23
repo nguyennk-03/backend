@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Http\Controllers\Controller;
-use App\Models\{Order, OrderItem, Payment, ProductVariant, Cart};
+use App\Models\{Order, OrderItem, Payment, Product};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth, DB, Log};
 use Symfony\Component\HttpFoundation\Response;
@@ -15,8 +15,8 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::with([
-            'items:id,order_id,variant_id,quantity,price',
-            'items.variant:id,product_id,stock_quantity,sold',
+            'items:id,order_id,product_id,quantity,price',
+            'items.product:id,name,stock_quantity,sold',
             'payment:id,name',
             'discount:id,code,value,discount_type',
         ])
@@ -46,9 +46,8 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::with([
-            'items:id,order_id,variant_id,quantity,price',
-            'items.variant:id,product_id,stock_quantity,sold',
-            'items.variant.product:id,name',
+            'items:id,order_id,product_id,quantity,price',
+            'items.product:id,name,stock_quantity,sold',
             'payment:id,name',
             'discount:id,code,value,discount_type',
         ])
@@ -86,7 +85,7 @@ class OrderController extends Controller
 
         $validated = $request->validate([
             'products' => 'required|array|min:1',
-            'products.*.variant_id' => 'required|integer|exists:product_variants,id',
+            'products.*.product_id' => 'required|integer|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1|max:1000',
             'products.*.price' => 'required|numeric|min:0',
             'phone' => 'required|regex:/^[0-9]{9,12}$/',
@@ -113,16 +112,16 @@ class OrderController extends Controller
     {
         return DB::transaction(function () use ($validated, $user) {
             try {
-                $variantIds = collect($validated['products'])->pluck('variant_id');
-                $variants = ProductVariant::whereIn('id', $variantIds)
+                $productIds = collect($validated['products'])->pluck('product_id');
+                $products = Product::whereIn('id', $productIds)
                     ->lockForUpdate()
                     ->get()
                     ->keyBy('id');
 
                 foreach ($validated['products'] as $product) {
-                    $variant = $variants->get($product['variant_id']);
-                    if (!$variant || $variant->stock_quantity < $product['quantity']) {
-                        throw new \Exception("Sản phẩm ID {$product['variant_id']} không đủ hàng (còn: " . ($variant->stock_quantity ?? 0) . ").");
+                    $item = $products->get($product['product_id']);
+                    if (!$item || $item->stock_quantity < $product['quantity']) {
+                        throw new \Exception("Sản phẩm ID {$product['product_id']} không đủ hàng (còn: " . ($item->stock_quantity ?? 0) . ").");
                     }
                 }
 
@@ -133,7 +132,8 @@ class OrderController extends Controller
                     'shipping_address' => $validated['address'],
                     'email' => $validated['email'],
                     'payment_id' => $validated['payment_id'],
-                    'total_price' => $validated['total_price'],
+                    'total_price' => $validated['total_price'] / 100, // Chia cho 100 để lưu dưới dạng decimal(10, 2)
+                    'total_after_discount' => isset($validated['total_after_discount']) ? $validated['total_after_discount'] / 100 : null,
                     'status' => OrderStatusEnum::PENDING,
                     'payment_status' => PaymentStatusEnum::PENDING,
                     'code' => 'StepViet' . time() . $user->id,
@@ -145,9 +145,9 @@ class OrderController extends Controller
                 $orderItems = collect($validated['products'])->map(function ($product) use ($order) {
                     return [
                         'order_id' => $order->id,
-                        'variant_id' => $product['variant_id'],
+                        'product_id' => $product['product_id'],
                         'quantity' => $product['quantity'],
-                        'price' => $product['price'],
+                        'price' => $product['price'] / 100, // Chia cho 100 để lưu dưới dạng decimal(10, 2)
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];
@@ -156,12 +156,10 @@ class OrderController extends Controller
                 OrderItem::insert($orderItems);
 
                 foreach ($validated['products'] as $product) {
-                    $variant = $variants->get($product['variant_id']);
-                    $variant->decrement('stock_quantity', $product['quantity']);
-                    $variant->increment('sold', $product['quantity']);
+                    $item = $products->get($product['product_id']);
+                    $item->decrement('stock_quantity', $product['quantity']);
+                    $item->increment('sold', $product['quantity']);
                 }
-
-                Cart::where('user_id', $user->id)->delete();
 
                 Log::info('Tạo đơn hàng thành công', ['order_id' => $order->id]);
 
@@ -189,16 +187,16 @@ class OrderController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        if ($order->status !== 'pending') {
+        if ($order->status !== OrderStatusEnum::PENDING) {
             return response()->json([
                 'status' => Response::HTTP_BAD_REQUEST,
-                'message' => 'Chỉ có thể hủy đơn hàng khi đang chờ thanh toán.',
+                'message' => 'Chỉ có thể hủy đơn hàng khi đang chờ xử lý.',
             ], Response::HTTP_BAD_REQUEST);
         }
 
         return DB::transaction(function () use ($order) {
             foreach ($order->items as $item) {
-                ProductVariant::where('id', $item->variant_id)->update([
+                Product::where('id', $item->product_id)->update([
                     'stock_quantity' => DB::raw("stock_quantity + {$item->quantity}"),
                     'sold' => DB::raw("sold - {$item->quantity}"),
                 ]);
