@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum ProductStatusEnum: int
+enum HotStatusEnum: int
 {
     case NORMAL = 0;
     case NEW = 1;

@@ -34,8 +34,6 @@ class Product extends Model
         'updated_at' => 'datetime',
     ];
 
-    protected $appends = ['total_stock'];
-
     protected $with = ['category', 'brand'];
 
     // Quan hệ: Sản phẩm thuộc về một danh mục

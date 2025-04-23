@@ -1,138 +1,139 @@
 @extends('admin.layout')
 @section('title', 'Chi Tiết Đơn Hàng')
-@section('content')
 
-<div class="container-fluid">
-    <!-- Tiêu đề -->
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-flex justify-content-between align-items-center p-3 rounded shadow-sm">
-                <h4 class="page-title mb-0 fw-bold">
-                    <i class="bi bi-receipt-cutoff"></i> Chi Tiết Đơn Hàng #{{ $order->id }}
-                </h4>
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin') }}">Trang Quản Lý</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('don-hang.index') }}">Đơn Hàng</a></li>
-                    <li class="breadcrumb-item active">Chi Tiết Đơn Hàng</li>
-                </ol>
+@section('content')
+<div class="container-fluid px-4 py-3">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">
+            <i class="bi bi-bag-check-fill text-success me-2"></i>Đơn Hàng #{{ $order->code }}
+        </h4>
+        <a href="{{ route('don-hang.index') }}" class="btn btn-sm btn-outline-dark">
+            <i class="bi bi-chevron-left me-1"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <!-- Info Sections -->
+    <div class="row g-4 mb-4">
+        <!-- Người nhận -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-light-subtle">
+                <div class="card-body">
+                    <h6 class="text-primary fw-semibold mb-3"><i class="bi bi-person-lines-fill me-2"></i>Thông Tin Người Nhận</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li><strong>Họ tên:</strong> {{ $order->recipient_name }}</li>
+                        <li><strong>Điện thoại:</strong> {{ $order->recipient_phone }}</li>
+                        <li><strong>Địa chỉ:</strong> {{ $order->shipping_address }}</li>
+                        <li><strong>Ghi chú:</strong> {{ $order->note ?: 'Không có' }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin đơn -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-light-subtle">
+                <div class="card-body">
+                    <h6 class="text-warning fw-semibold mb-3"><i class="bi bi-info-circle-fill me-2"></i>Thông Tin Đơn Hàng</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li><strong>Ngày đặt:</strong> {{ $order->created_at->format('d/m/Y H:i') }}</li>
+                        <li><strong>Mã vận đơn:</strong> {{ $order->tracking_code ?: 'Chưa có' }}</li>
+                        <li><strong>Trạng thái đơn:</strong>
+                            <span class="badge {{ $order->status_enum->badgeClass() }}">
+                                <i class="{{ $order->status_enum->iconClass() }}"></i> {{ $order->status_enum->label() }}
+                            </span>
+                        </li>
+                        <li><strong>Thanh toán:</strong>
+                            <span class="badge {{ $order->payment_status_enum->badgeClass() }}">
+                                <i class="{{ $order->payment_status_enum->iconClass() }}"></i> {{ $order->payment_status_enum->label() }}
+                            </span>
+                        </li>
+                        <li><strong>Phương thức:</strong> {{ $order->payment->name ?? 'Chưa chọn' }}</li>
+                        <li><strong>Tổng tiền:</strong> <span class="fw-bold text-dark">{{ number_format($order->total_price) }}₫</span></li>
+                        @if($order->total_after_discount && $order->total_after_discount < $order->total_price)
+                            <li><strong>Giảm giá:</strong> <span class="text-danger">-{{ number_format($order->total_price - $order->total_after_discount) }}₫</span></li>
+                            <li><strong>Thành tiền:</strong> <span class="text-success fw-bold">{{ number_format($order->total_after_discount) }}₫</span></li>
+                            @endif
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row g-4 mt-3">
-
-        {{-- Thông tin người nhận --}}
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 hover-scale">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-person-circle text-primary"></i> Thông Tin Người Nhận
-                    </h5>
-                    <p><strong>Tên:</strong> {{ $order->recipient_name }}</p>
-                    <p><strong>Điện thoại:</strong> {{ $order->recipient_phone }}</p>
-                    <p><strong>Địa chỉ giao hàng:</strong> {{ $order->shipping_address }}</p>
-                    <p><strong>Ghi chú:</strong> {{ $order->note ?? 'Không có' }}</p>
-                </div>
+    <!-- Sản phẩm -->
+    <div class="card border-0 shadow rounded-4">
+        <div class="card-body">
+            <h5 class="fw-semibold text-success mb-3"><i class="bi bi-boxes me-2"></i>Sản Phẩm Đặt Mua</h5>
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle">
+                    <thead class="table-light text-muted border-bottom">
+                        <tr>
+                            <th>#</th>
+                            <th>Sản phẩm</th>
+                            <th>Màu sắc</th>
+                            <th>Kích cỡ</th>
+                            <th class="text-center">SL</th>
+                            <th class="text-end">Đơn giá</th>
+                            <th class="text-end">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($order->items as $item)
+                        @php
+                        $variant = $item->variant;
+                        $product = $variant->product ?? null;
+                        @endphp
+                        <tr class="border-bottom">
+                            <td>{{ $loop->iteration }}</td>
+                            <td class="d-flex align-items-center">
+                                <img src="{{ asset('images/' . $variant->image) }}" class="me-3 rounded" width="45" height="45" style="object-fit:cover;">
+                                <div>
+                                    <span class="fw-medium">{{ $product->name ?? 'N/A' }}</span><br>
+                                    <small class="text-muted">Mã: {{ $product->code ?? '---' }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <span class="me-2 d-inline-block border rounded-circle" style="width:16px; height:16px; background-color:{{ $variant->color }}"></span>
+                                    <span>{{ $variant->color ?? '---' }}</span>
+                                </div>
+                            </td>
+                            <td>{{ $variant->size ?? '---' }}</td>
+                            <td class="text-center">{{ $item->quantity }}</td>
+                            <td class="text-end">{{ number_format($item->price) }}₫</td>
+                            <td class="text-end fw-bold">{{ number_format($item->price * $item->quantity) }}₫</td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">Chưa có sản phẩm nào.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
-
-        {{-- Thông tin đơn hàng --}}
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 hover-scale">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-info-circle text-warning"></i> Thông Tin Đơn Hàng
-                    </h5>
-                    <p><strong>Mã đơn hàng:</strong> #{{ $order->code }}</p>
-                    <p><strong>Ngày đặt:</strong> {{ $order->created_at->format('d/m/Y H:i') }}</p>
-                    <p><strong>Mã vận đơn:</strong> {{ $order->tracking_code ?? 'Chưa cập nhật' }}</p>
-
-                    <p><strong>Trạng thái đơn hàng:</strong>
-                        <span class="badge {{ $order->status_enum->badgeClass() }}">
-                            <i class="{{ $order->status_enum->iconClass() }}"></i>
-                            {{ $order->status_enum->label() }}
-                        </span>
-                    </p>
-
-                    <p><strong>Trạng thái thanh toán:</strong>
-                        <span class="badge {{ $order->payment_status_enum->badgeClass() }}">
-                            <i class="{{ $order->payment_status_enum->iconClass() }}"></i>
-                            {{ $order->payment_status_enum->label() }}
-                        </span>
-                    </p>
-
-                    <p><strong>Phương thức thanh toán:</strong>
-                        {{ $order->payment?->name ?? 'Chưa chọn' }}
-                    </p>
-
-                    <p><strong>Tổng tiền:</strong> {{ number_format($order->total_price) }}₫</p>
-
-                    @if($order->total_after_discount)
-                    <p><strong>Giảm giá:</strong> -{{ number_format($order->total_price - $order->total_after_discount) }}₫</p>
-                    <p><strong>Thành tiền:</strong> {{ number_format($order->total_after_discount) }}₫</p>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        {{-- Sản phẩm trong đơn hàng --}}
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-box-seam text-success"></i> Sản Phẩm Đặt Mua
-                    </h5>
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Sản phẩm</th>
-                                    <th>Biến thể</th>
-                                    <th>Số lượng</th>
-                                    <th>Giá</th>
-                                    <th>Thành tiền</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($order->items as $index => $item)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $item->variant->product->name ?? 'N/A' }}</td>
-                                    <td>
-                                        @php
-                                        $variant = $item->variant;
-                                        $size = $variant->size->name ?? 'Không có';
-                                        $color = $variant->color->name ?? 'Không có';
-                                        @endphp
-                                        {{ "Size: $size, Màu: $color" }}
-                                    </td>
-                                    <td>{{ $item->quantity }}</td>
-                                    <td>{{ number_format($item->price) }}₫</td>
-                                    <td>{{ number_format($item->price * $item->quantity) }}₫</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 </div>
 
-<!-- CSS -->
+<!-- Style bổ sung -->
 <style>
-    .hover-scale {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        border-radius: 12px;
+    .table td,
+    .table th {
+        vertical-align: middle;
     }
 
-    .hover-scale:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    .badge i {
+        margin-right: 3px;
+        vertical-align: middle;
+    }
+
+    .card-body h5 i,
+    .card-body h6 i {
+        vertical-align: middle;
+    }
+
+    .rounded-4 {
+        border-radius: 1rem !important;
     }
 </style>
-
 @endsection

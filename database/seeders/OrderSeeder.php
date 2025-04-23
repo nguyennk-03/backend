@@ -10,6 +10,8 @@ use App\Models\User;
 use App\Models\Discount;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\OrderItem;
 use Faker\Factory as Faker;
 
 class OrderSeeder extends Seeder
@@ -26,26 +28,23 @@ class OrderSeeder extends Seeder
         $start = new \DateTime(); // thời điểm hiện tại
         $months = [];
 
-        // Lấy 12 tháng trở về trước
         for ($i = 0; $i < 12; $i++) {
-            $months[] = $start->format('Y-m'); // lưu lại năm-tháng
+            $months[] = $start->format('Y-m');
             $start->modify('-1 month');
         }
 
         foreach ($userIds as $userId) {
             foreach ($months as $month) {
-                // Số đơn hàng ngẫu nhiên cho mỗi người dùng (từ 1 đến 10)
-                $orderCount = rand(1, 10); // Tạo số lượng đơn hàng ngẫu nhiên cho mỗi người dùng
+                $orderCount = rand(1, 10);
 
                 for ($i = 0; $i < $orderCount; $i++) {
-                    // Ngày ngẫu nhiên trong tháng
                     $endOfMonth = (new \DateTime("{$month}-01"))->modify('last day of this month');
                     $createdAt = $faker->dateTimeBetween("{$month}-01", $endOfMonth->format('Y-m-d'));
 
-                    $totalPrice = $faker->randomFloat(2, 500000, 10000000);
                     $paymentId = $faker->optional(0.8, null)->randomElement($paymentIds);
                     $statusEnum = $faker->randomElement(OrderStatusEnum::cases());
 
+                    // Xử lý trạng thái thanh toán dựa vào trạng thái đơn hàng
                     switch ($statusEnum) {
                         case OrderStatusEnum::COMPLETED:
                             $paymentStatusEnum = PaymentStatusEnum::PAID;
@@ -58,7 +57,7 @@ class OrderSeeder extends Seeder
                         case OrderStatusEnum::PROCESSING:
                             $paymentStatusEnum = $faker->randomElement([PaymentStatusEnum::PENDING, PaymentStatusEnum::PAID]);
                             break;
-                        default: // PENDING
+                        default:
                             $paymentStatusEnum = $faker->randomElement(PaymentStatusEnum::cases());
                             break;
                     }
@@ -66,35 +65,57 @@ class OrderSeeder extends Seeder
                     $status = $statusEnum->value;
                     $paymentStatus = $paymentStatusEnum->value;
 
-                    // Kiểm tra sản phẩm có giảm giá không
-                    $productsWithDiscount = Product::where('sale', 1)->get(); // Lọc sản phẩm đang giảm giá
-                    $discountId = null;
-                    if ($productsWithDiscount->isNotEmpty()) {
-                        $discountId = $faker->randomElement($discountIds); // Chọn giảm giá ngẫu nhiên
-                    }
-
-                    $discountAmount = $discountId ? $totalPrice * (rand(5, 20) / 100) : 0;
-                    $finalPrice = $totalPrice - $discountAmount;
-
-                    // Mã đơn hàng duy nhất
-                    $code = 'STEPVIET' . strtoupper(uniqid());
-
-                    Order::create([
-                        'code' => $code,
+                    // Tạo đơn hàng tạm thời với giá = 0
+                    $order = Order::create([
+                        'code' => 'STEPVIET' . strtoupper(uniqid()),
                         'user_id' => $userId,
-                        'discount_id' => $discountId,
+                        'discount_id' => null,
                         'payment_id' => $paymentId ?? 1,
                         'payment_status' => $paymentStatus,
                         'status' => $status,
-                        'total_price' => $totalPrice,
-                        'total_after_discount' => $discountId ? $finalPrice : null,
+                        'total_price' => 0,
+                        'total_after_discount' => null,
                         'recipient_name' => $faker->name(),
                         'recipient_phone' => $faker->phoneNumber(),
                         'shipping_address' => $faker->address(),
-                        'note' => $faker->optional()->sentence(),
+                        'note' => $faker->text(100),
                         'tracking_code' => $faker->optional()->regexify('[A-Z]{2}[0-9]{8}VN'),
                         'created_at' => $createdAt,
                         'updated_at' => now(),
+                    ]);
+
+                    // Tạo các sản phẩm trong đơn hàng
+                    $variants = ProductVariant::inRandomOrder()->take(rand(1, 2))->get();
+                    $realTotal = 0;
+
+                    foreach ($variants as $variant) {
+                        $quantity = rand(1, 3);
+                        $price = round($variant->discounted_price ?? $variant->product->price ?? rand(100000, 300000), 0);
+                        $realTotal += $price * $quantity;
+
+                        OrderItem::create([
+                            'order_id' => $order->id,
+                            'variant_id' => $variant->id,
+                            'quantity' => $quantity,
+                            'price' => $price,
+                        ]);
+                    }
+
+                    // Áp dụng giảm giá nếu có sản phẩm giảm giá
+                    $discountId = null;
+                    $discountAmount = 0;
+                    if (!empty($discountIds) && rand(0, 1)) {
+                        $discountId = $faker->randomElement($discountIds);
+                        $discountAmount = $realTotal * (rand(5, 20) / 100);
+                    }
+
+                    $finalPrice = $realTotal - $discountAmount;
+
+                    // Cập nhật lại tổng tiền đơn hàng
+                    $order->update([
+                        'discount_id' => $discountId,
+                        'total_price' => $realTotal,
+                        'total_after_discount' => $discountId ? $finalPrice : null,
                     ]);
                 }
             }

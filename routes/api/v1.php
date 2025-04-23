@@ -45,7 +45,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', 'user'])->group(function () {
         Route::apiResource('users', UsersController::class)->only(['index', 'show', 'update', 'destroy']);
         Route::apiResource('carts', CartController::class)->only(['index', 'store', 'update', 'destroy']);
-        Route::post('orders/payment', [OrderController::class, 'processPayment']);
+        Route::post('payments', [OrderController::class, 'processPayment']);
         Route::apiResource('orders', OrderController::class)->only(['index', 'show']);
         Route::get('momo/success', [MoMoController::class, 'MoMoSuccess']);
         Route::post('momo/notify', [MoMoController::class, 'MoMoNotify']);

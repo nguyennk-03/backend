@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
             DiscountSeeder::class,
             PaymentSeeder::class,
             OrderSeeder::class,
-            OrderItemSeeder::class,
             ReviewSeeder::class,
             NotificationSeeder::class,
             WishlistSeeder::class,
