@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -12,9 +13,9 @@ class SanPhamController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with('category', 'brand');
+        $query = Product::with('category', 'brand'); // Chỉ lấy sản phẩm chưa bị xóa mềm
 
-        // Apply filters
+        // Áp dụng bộ lọc
         if ($request->category_id) {
             $query->where('category_id', $request->category_id);
         }
@@ -37,7 +38,7 @@ class SanPhamController extends Controller
             $query->where('price', '<=', $request->max_price);
         }
 
-        // Apply sorting
+        // Áp dụng sắp xếp
         switch ($request->sort_by) {
             case 'price_asc':
                 $query->orderBy('price', 'asc');
@@ -62,11 +63,13 @@ class SanPhamController extends Controller
                 break;
         }
 
+        $sizes = Product::select('size')->distinct()->pluck('size');
+        $colors = Product::select('color')->distinct()->pluck('color');
         $products = $query->get();
         $categories = Category::all();
         $brands = Brand::all();
 
-        return view('admin.products.index', compact('products', 'categories', 'brands'));
+        return view('admin.products.index', compact('products', 'categories', 'brands', 'sizes', 'colors'));
     }
 
     public function store(Request $request)
@@ -113,10 +116,11 @@ class SanPhamController extends Controller
         $data = $validated;
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($product->image) {
+            // Xóa hình ảnh cũ nếu tồn tại
+            if (!empty($product->image) && Storage::disk('public')->exists($product->image)) {
                 Storage::disk('public')->delete($product->image);
             }
+            // Lưu hình ảnh mới
             $data['image'] = $request->file('image')->store('images/products', 'public');
         }
 
@@ -127,12 +131,22 @@ class SanPhamController extends Controller
 
     public function destroy(Product $product)
     {
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
+        try {
+            // Xóa hình ảnh nếu tồn tại
+            if (!empty($product->image) && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+
+            // Xóa sản phẩm
+            $deleted = $product->delete();
+
+            if (!$deleted) {
+                throw new \Exception('Không thể xóa sản phẩm. Có thể do ràng buộc khóa ngoại hoặc lỗi cơ sở dữ liệu.');
+            }
+
+            return redirect()->route('san-pham.index')->with('success', 'Sản phẩm đã được xóa thành công!');
+        } catch (\Exception $e) {
+            return redirect()->route('san-pham.index')->with('error', 'Có lỗi xảy ra khi xóa sản phẩm: ' . $e->getMessage());
         }
-
-        $product->delete();
-
-        return redirect()->route('san-pham.index')->with('success', 'Sản phẩm đã được xóa thành công!');
     }
 }

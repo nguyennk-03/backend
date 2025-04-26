@@ -2,8 +2,6 @@
 
 use App\Http\Controllers\Admin\BaiVietController;
 use App\Http\Controllers\Admin\BinhLuanController;
-use App\Http\Controllers\Admin\KichThuocController;
-use App\Http\Controllers\Admin\MauSacController;
 use App\Http\Controllers\AuthWebController;
 use App\Http\Controllers\Admin\NguoiDungController;
 use App\Http\Controllers\Admin\SanPhamController;
@@ -41,8 +39,6 @@ Route::prefix('admin')->middleware(['auth', 'user'])->group(function () {
     Route::get('bang-dieu-khien', [AdminController::class, 'index'])->name('admin');
     Route::resource('nguoi-dung', NguoiDungController::class);
     Route::resource('san-pham', SanPhamController::class);
-    Route::resource('mau-sac', MauSacController::class);
-    Route::resource('kich-thuoc', KichThuocController::class);
     Route::resource('danh-muc', DanhMucController::class);
     Route::resource('thuong-hieu', ThuongHieuController::class);
     Route::resource('don-hang', DonHangController::class);

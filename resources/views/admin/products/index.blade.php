@@ -235,6 +235,30 @@
                                 <span class="text-danger small">{{ $message }}</span>
                                 @enderror
                             </div>
+                            <div class="col-md-4">
+                                <label for="size" class="form-label fw-semibold">Kích thước</label>
+                                <select name="size" id="size" class="form-select border-0 shadow-sm" required>
+                                    <option value="">-- Chọn kích thước --</option>
+                                    @foreach($sizes as $size)
+                                    <option value="{{ $size }}" {{ old('size') == $size ? 'selected' : '' }}>{{ $size }}</option>
+                                    @endforeach
+                                </select>
+                                @error('size')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-md-4">
+                                <label for="color" class="form-label fw-semibold">Màu sắc</label>
+                                <select name="color" id="color" class="form-select border-0 shadow-sm" required>
+                                    <option value="">-- Chọn màu sắc --</option>
+                                    @foreach($colors as $color)
+                                    <option value="{{ $color }}" {{ old('color') == $color ? 'selected' : '' }}>{{ $color }}</option>
+                                    @endforeach
+                                </select>
+                                @error('color')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
                         <div class="modal-footer border-0 pt-4">
                             <button type="button" class="btn btn-secondary btn-sm fw-semibold" data-bs-dismiss="modal">Hủy</button>
@@ -271,10 +295,16 @@
                         <tr>
                             <td class="text-center">{{ $item->id }}</td>
                             <td class="text-center">
-                                @if ($item->image)
-                                <img src="{{ asset('storage/' . $item->image) }}" class="img-thumbnail rounded" style="width: 100px; height: 100px; object-fit: cover;" alt="{{ $item->name }}">
+                                @if (!empty($item->image) && file_exists(storage_path('app/public/' . $item->image)))
+                                <img src="{{ asset('storage/' . $item->image) }}"
+                                    class="img-fluid rounded shadow-sm"
+                                    alt="{{ $item->name }}"
+                                    style="max-width: 100px; max-height: 100px;">
                                 @else
-                                <img src="{{ asset('images/placeholder.jpg') }}" class="img-thumbnail rounded" style="width: 100px; height: 100px; object-fit: cover;" alt="No Image">
+                                <div class="bg-light rounded p-3 text-muted text-center"
+                                    style="width: 100px; height: 100px; line-height: 100px;">
+                                    Chưa có ảnh
+                                </div>
                                 @endif
                             </td>
                             <td>{{ $item->name }}</td>
@@ -338,10 +368,12 @@
                 <div class="modal-body p-4">
                     <div class="row g-4">
                         <div class="col-md-4 d-flex justify-content-center align-items-center">
-                            @if ($item->image)
-                            <img src="{{ asset('storage/' . $item->image) }}" class="img-fluid rounded shadow-sm" alt="{{ $item->name }}">
+                            @if (!empty($item->image))
+                            <img src="{{ asset($item->image) }}"
+                                class="img-fluid rounded shadow-sm" alt="{{ $item->name }}">
                             @else
-                            <div class="bg-light rounded p-3 text-muted text-center" style="width: 200px; height: 200px; line-height: 200px;">
+                            <div class="bg-light rounded p-3 text-muted text-center"
+                                style="width: 200px; height: 200px; line-height: 200px;">
                                 Chưa có ảnh
                             </div>
                             @endif
@@ -349,7 +381,9 @@
                         <div class="col-md-8">
                             <div class="card border-0 p-3 rounded shadow-sm">
                                 <p class="mb-2"><strong>Tên:</strong> {{ $item->name }}</p>
-                                <p class="mb-2"><strong>Giá:</strong> {{ $item->formatted_price }}</p>
+                                <p class="mb-2"><strong>Giá:</strong> {{ $item->price }}</p>
+                                <p class="mb-2"><strong>Màu sắc:</strong> {{ $item->color }}</p>
+                                <p class="mb-2"><strong>Kích thước:</strong> {{ $item->size }}</p>
                                 <p class="mb-2"><strong>Danh mục:</strong> {{ optional($item->category)->name ?? 'Chưa có danh mục' }}</p>
                                 <p class="mb-2"><strong>Thương hiệu:</strong> {{ optional($item->brand)->name ?? 'Chưa có thương hiệu' }}</p>
                                 <p class="mb-2"><strong>Trạng thái:</strong> {{ $item->status ? 'Hiển thị' : 'Ẩn' }}</p>

@@ -77,29 +77,15 @@
         <!-- Sidebar Start -->
         <div id="sidebar-menu" class="active">
             <ul class="metismenu list-unstyled" id="side-menu">
-                <li class="active">
+                <li>
                     <a href="{{ route('admin') }}">
                         <i class="la la-dashboard"></i> <span>Trang quản lý</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('san-pham.index') }}" class="nav-link" data-bs-toggle="collapse"
-                        data-bs-target="#product-management" aria-expanded="false" aria-controls="product-management">
+                <li>
+                    <a href="{{ route('san-pham.index') }}">
                         <i class="la la-cube"></i> <span>Quản lý sản phẩm</span>
-                        <span class="float-end"><i class="la la-angle-right"></i></span>
                     </a>
-                    <ul class="nav-second-level collapse" id="product-management">
-                        <li class="nav-item">
-                            <a href="{{ route('san-pham.index') }}" class="nav-link"><i class="la la-list"></i> Danh
-                                sách sản phẩm</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{route('mau-sac.index')  }}" class="nav-link"><i class="la la-palette"></i> Quản lý theo màu</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{route('kich-thuoc.index')  }}" class="nav-link"><i class="la la-ruler"></i> Quản lý theo size</a>
-                        </li>
-                    </ul>
                 </li>
                 <li>
                     <a href="{{ route('don-hang.index') }}">

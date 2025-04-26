@@ -27,7 +27,7 @@ class AdminController extends Controller
         // Tổng hợp thông tin nhanh
         $totalOrders = Order::count();
         $totalPendingOrders = Order::where('status', OrderStatusEnum::PENDING)->count();
-        $revenue = Order::where('status', OrderStatusEnum::COMPLETED)->sum('total_price');
+        $revenue = Order::where('status', OrderStatusEnum::DELIVERED)->sum('total_price');
 
         $counts = [
             'totalUsers' => User::count(),
@@ -47,7 +47,7 @@ class AdminController extends Controller
 
         $weeklyRevenue = Order::selectRaw('DAYNAME(created_at) as day, SUM(total_price) as revenue')
             ->whereBetween('created_at', [$start, $end])
-            ->where('status', OrderStatusEnum::COMPLETED)
+            ->where('status', OrderStatusEnum::DELIVERED)
             ->groupBy('day')
             ->get()
             ->keyBy('day');
@@ -68,7 +68,7 @@ class AdminController extends Controller
 
         // ===== Dữ liệu tháng =====
         $monthlyRevenue = Order::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, SUM(total_price) as revenue')
-            ->where('status', OrderStatusEnum::COMPLETED)
+            ->where('status', OrderStatusEnum::DELIVERED)
             ->groupBy('month')
             ->orderBy('month')
             ->get()
@@ -96,7 +96,7 @@ class AdminController extends Controller
 
         // ===== Dữ liệu năm =====
         $yearlyRevenue = Order::selectRaw('YEAR(created_at) as year, SUM(total_price) as revenue')
-            ->where('status', OrderStatusEnum::COMPLETED)
+            ->where('status', OrderStatusEnum::DELIVERED)
             ->groupBy('year')
             ->get()
             ->keyBy('year');

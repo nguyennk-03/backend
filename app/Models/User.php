@@ -26,12 +26,6 @@ class User extends Authenticatable
         'updated_at' => 'datetime',
     ];
 
-    // Quan hệ: Người dùng có nhiều giỏ hàng
-    public function carts()
-    {
-        return $this->hasMany(Cart::class);
-    }
-
     // Quan hệ: Người dùng có nhiều đơn hàng
     public function orders()
     {

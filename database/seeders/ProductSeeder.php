@@ -79,24 +79,16 @@ class ProductSeeder extends Seeder
 
         foreach ($products as $product) {
             // Gán kích thước dựa trên danh mục
-            $size = null;
-            // Gán kích thước dựa trên danh mục
-            $size = null;
-            if ($product['category_id'] == 1) {
-                // Nam
-                $size = $faker->randomElement(['40', '41', '42']);  // Size châu Á cho nam
-            } else {
-                // Nữ
-                $size = $faker->randomElement(['36', '37', '38']);  // Size châu Á cho nữ
-            }
+            $size = $product['category_id'] == 1
+                ? ['40', '41', '42']  // Nam
+                : ['36', '37', '38']; // Nữ
 
-            // Gán màu sắc dựa trên thương hiệu
-            $brandColors = $colors[$product['brand_id']];
-            $color = $faker->randomElement($brandColors);
+            // Gán toàn bộ màu sắc theo thương hiệu
+            $color = $colors[$product['brand_id']] ?? ['Đen'];
 
             Product::create(array_merge($product, [
-                'size' => $size,
-                'color' => $color,
+                'size' => implode(',', $size),
+                'color' => implode(',', $color),
                 'stock_quantity' => $faker->numberBetween(20, 100),
                 'sold' => $faker->numberBetween(0, 50),
                 'hot' => $faker->numberBetween(0, 3),

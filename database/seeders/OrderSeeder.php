@@ -20,8 +20,9 @@ class OrderSeeder extends Seeder
         $faker = Faker::create('vi_VN');
 
         $userIds = User::pluck('id')->toArray();
-        $discountIds = Discount::pluck('id')->toArray();
+        $discounts = Discount::all()->keyBy('id');
         $paymentIds = Payment::pluck('id')->toArray();
+        $products = Product::with('brand')->get(); // Tải trước sản phẩm và brand
 
         $brandPriceRanges = [
             'Adidas' => ['min' => 1000000, 'max' => 8000000],
@@ -32,9 +33,8 @@ class OrderSeeder extends Seeder
         ];
 
         // Tính từ tháng hiện tại trở về 12 tháng trước
-        $start = new \DateTime(); // thời điểm hiện tại
+        $start = new \DateTime();
         $months = [];
-
         for ($i = 0; $i < 12; $i++) {
             $months[] = $start->format('Y-m');
             $start->modify('-1 month');
@@ -48,24 +48,37 @@ class OrderSeeder extends Seeder
                     $endOfMonth = (new \DateTime("{$month}-01"))->modify('last day of this month');
                     $createdAt = $faker->dateTimeBetween("{$month}-01", $endOfMonth->format('Y-m-d'));
 
-                    $paymentId = $faker->optional(0.8, null)->randomElement($paymentIds);
+                    $paymentId = $paymentIds ? $faker->optional(0.8, null)->randomElement($paymentIds) : null;
                     $statusEnum = $faker->randomElement(OrderStatusEnum::cases());
 
-                    // Xử lý trạng thái thanh toán dựa vào trạng thái đơn hàng
+                    // Xử lý trạng thái thanh toán dựa trên trạng thái đơn hàng
                     switch ($statusEnum) {
-                        case OrderStatusEnum::COMPLETED:
-                            $paymentStatusEnum = PaymentStatusEnum::PAID;
+                        case OrderStatusEnum::PENDING:
+                        case OrderStatusEnum::AWAITING_CONFIRMATION:
+                            $paymentStatusEnum = PaymentStatusEnum::PENDING; // Chưa xác nhận, chờ thanh toán
                             break;
-                        case OrderStatusEnum::CANCELED:
-                        case OrderStatusEnum::RETURNED:
-                            $paymentStatusEnum = $faker->randomElement([PaymentStatusEnum::FAILED, PaymentStatusEnum::REFUNDED]);
+                        case OrderStatusEnum::PROCESSING:
+                        case OrderStatusEnum::PACKING:
+                            $paymentStatusEnum = PaymentStatusEnum::PAID; // Đã xử lý hoặc đóng gói, giả định đã thanh toán
                             break;
                         case OrderStatusEnum::SHIPPED:
-                        case OrderStatusEnum::PROCESSING:
-                            $paymentStatusEnum = $faker->randomElement([PaymentStatusEnum::PENDING, PaymentStatusEnum::PAID]);
+                            $paymentStatusEnum = PaymentStatusEnum::PAID; // Đã gửi, giả định đã thanh toán
+                            break;
+                        case OrderStatusEnum::DELIVERED:
+                            $paymentStatusEnum = PaymentStatusEnum::PAID; // Giao thành công, đã thanh toán
+                            break;
+                        case OrderStatusEnum::CANCELED:
+                            $paymentStatusEnum = PaymentStatusEnum::CANCELED; // Đơn hủy, thanh toán hủy
+                            break;
+                        case OrderStatusEnum::RETURN_REQUESTED:
+                        case OrderStatusEnum::RETURN_PROCESSING:
+                            $paymentStatusEnum = PaymentStatusEnum::PAID; // Yêu cầu trả, đang xử lý, chưa hoàn tiền
+                            break;
+                        case OrderStatusEnum::RETURNED:
+                            $paymentStatusEnum = PaymentStatusEnum::REFUNDED; // Đã trả hàng, đã hoàn tiền
                             break;
                         default:
-                            $paymentStatusEnum = $faker->randomElement(PaymentStatusEnum::cases());
+                            $paymentStatusEnum = PaymentStatusEnum::PENDING; // Mặc định, chờ thanh toán
                             break;
                     }
 
@@ -77,7 +90,7 @@ class OrderSeeder extends Seeder
                         'code' => 'STEPVIET' . strtoupper(uniqid()),
                         'user_id' => $userId,
                         'discount_id' => null,
-                        'payment_id' => $paymentId ?? 1,
+                        'payment_id' => $paymentId,
                         'payment_status' => $paymentStatus,
                         'status' => $status,
                         'total_price' => 0,
@@ -85,30 +98,27 @@ class OrderSeeder extends Seeder
                         'recipient_name' => $faker->name(),
                         'recipient_phone' => $faker->phoneNumber(),
                         'shipping_address' => $faker->address(),
-                        'note' => $faker->text(100),
-                        'tracking_code' => $faker->optional()->regexify('[A-Z]{2}[0-9]{8}VN'),
+                        'note' => $faker->optional(0.5)->text(100),
+                        'tracking_code' => $faker->optional(0.3)->regexify('[A-Z]{2}[0-9]{8}VN'),
                         'created_at' => $createdAt,
-                        'updated_at' => now(),
+                        'updated_at' => $createdAt, // Đồng bộ với created_at
                     ]);
 
-                    // Tạo các sản phẩm trong đơn hàng (sử dụng Product thay cho ProductVariant)
-                    $products = Product::inRandomOrder()->take(rand(1, 2))->get();
+                    // Chọn ngẫu nhiên 1-2 sản phẩm
+                    $selectedProducts = $products->random(min(1, $products->count(), rand(1, 2)));
                     $realTotal = 0;
 
-                    foreach ($products as $product) {
+                    foreach ($selectedProducts as $product) {
                         // Lấy thương hiệu của sản phẩm
-                        $brand = $product->brand;
+                        $brandName = $product->brand ? $product->brand->name : null;
 
-                        // Kiểm tra xem thương hiệu có tồn tại trong phạm vi giá không
-                        if (isset($brandPriceRanges[$brand->name])) {  // Sửa lỗi tại đây
-                            $minPrice = $brandPriceRanges[$brand->name]['min'];
-                            $maxPrice = $brandPriceRanges[$brand->name]['max'];
-
-                            // Gán giá ngẫu nhiên trong khoảng giá của thương hiệu
+                        // Gán giá dựa trên thương hiệu
+                        if ($brandName && isset($brandPriceRanges[$brandName])) {
+                            $minPrice = $brandPriceRanges[$brandName]['min'];
+                            $maxPrice = $brandPriceRanges[$brandName]['max'];
                             $price = $faker->numberBetween($minPrice, $maxPrice);
                         } else {
-                            // Nếu không có phạm vi giá, sử dụng giá ngẫu nhiên
-                            $price = $product->price;
+                            $price = $product->price ?? $faker->numberBetween(500000, 5000000);
                         }
 
                         $quantity = rand(1, 3);
@@ -122,17 +132,24 @@ class OrderSeeder extends Seeder
                         ]);
                     }
 
-                    // Áp dụng giảm giá nếu có sản phẩm giảm giá
+                    // Áp dụng giảm giá nếu có
                     $discountId = null;
                     $discountAmount = 0;
-                    if (!empty($discountIds) && rand(0, 1)) {
-                        $discountId = $faker->randomElement($discountIds);
-                        $discountAmount = $realTotal * (rand(5, 20) / 100);
+                    if (!empty($discounts) && rand(0, 1)) {
+                        $discount = $faker->randomElement($discounts->values()->all());
+                        $discountId = $discount->id;
+
+                        if ($discount->discount_type === 'percentage') {
+                            $discountValue = min(max($discount->value, 0), 100);
+                            $discountAmount = $realTotal * ($discountValue / 100);
+                        } else {
+                            $discountAmount = max($discount->value, 0);
+                        }
                     }
 
-                    $finalPrice = $realTotal - $discountAmount;
+                    $finalPrice = max(0, $realTotal - $discountAmount);
 
-                    // Cập nhật lại tổng tiền đơn hàng
+                    // Cập nhật tổng tiền đơn hàng
                     $order->update([
                         'discount_id' => $discountId,
                         'total_price' => $realTotal,

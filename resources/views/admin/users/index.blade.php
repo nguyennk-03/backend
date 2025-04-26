@@ -206,189 +206,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Modal xem chi tiết -->
-                                <div class="modal fade" id="showModal{{ $user->id }}" tabindex="-1"
-                                    aria-labelledby="showModalLabel{{ $user->id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content rounded-lg shadow-lg">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title fw-bold" id="showModalLabel{{ $user->id }}">
-                                                    <i class="fas fa-info-circle me-2"></i> Chi tiết người dùng
-                                                    #{{ $user->id }}
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body p-4">
-                                                <div class="row g-4">
-                                                    <div
-                                                        class="col-md-4 d-flex justify-content-center align-items-center">
-                                                        @if (!empty($user->avatar))
-                                                        <img src="{{ asset($user->avatar) }}"
-                                                            class="img-fluid rounded shadow-sm" alt="{{ $user->name }}">
-                                                        @else
-                                                        <div class="bg-light rounded p-3 text-muted text-center"
-                                                            style="width: 200px; height: 200px; line-height: 200px;">
-                                                            Chưa có ảnh
-                                                        </div>
-                                                        @endif
-                                                    </div>
-                                                    <div class="col-md-8">
-                                                        <div class="card border-0 p-3 rounded shadow-sm">
-                                                            <p class="mb-2"><strong>Tên:</strong> {{ $user->name }}</p>
-                                                            <p class="mb-2"><strong>Email:</strong> {{ $user->email }}
-                                                            </p>
-                                                            <p class="mb-2"><strong>Vai trò:</strong> {{ $user->role }}
-                                                            </p>
-                                                            <p class="mb-2"><strong>Địa chỉ:</strong>
-                                                                {{ $user->address ?? 'Chưa có địa chỉ' }}
-                                                            </p>
-                                                            <p class="mb-0"><strong>Ngày tạo:</strong>
-                                                                {{ $user->created_at->format('d/m/Y H:i') }}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer border-0">
-                                                <button type="button" class="btn btn-secondary btn-sm fw-semibold"
-                                                    data-bs-dismiss="modal">Đóng</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Modal chỉnh sửa -->
-                                <div class="modal fade" id="editModal{{ $user->id }}" tabindex="-1"
-                                    aria-labelledby="editModalLabel{{ $user->id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content rounded-lg shadow-lg">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title fw-bold" id="editModalLabel{{ $user->id }}">
-                                                    <i class="fas fa-edit me-2"></i> Chỉnh sửa người dùng
-                                                    #{{ $user->id }}
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body p-4">
-                                                @if ($errors->any())
-                                                <div class="alert alert-danger alert-dismissible fade show"
-                                                    role="alert">
-                                                    <ul class="mb-0">
-                                                        @foreach ($errors->all() as $error)
-                                                        <li>{{ $error }}</li>
-                                                        @endforeach
-                                                    </ul>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                                @endif
-                                                <form action="{{ route('nguoi-dung.update', $user->id) }}" method="POST"
-                                                    enctype="multipart/form-data">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <div class="row g-4">
-                                                        <div class="col-md-6">
-                                                            <label for="name_{{ $user->id }}"
-                                                                class="form-label fw-semibold">Tên</label>
-                                                            <input type="text" name="name" id="name_{{ $user->id }}"
-                                                                class="form-control border-0 shadow-sm"
-                                                                value="{{ old('name', $user->name) }}"
-                                                                placeholder="Nhập tên" required>
-                                                            @error('name')
-                                                            <span class="text-danger small">{{ $message }}</span>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label for="email_{{ $user->id }}"
-                                                                class="form-label fw-semibold">Email</label>
-                                                            <input type="email" name="email" id="email_{{ $user->id }}"
-                                                                class="form-control border-0 shadow-sm"
-                                                                value="{{ old('email', $user->email) }}"
-                                                                placeholder="Nhập email" required>
-                                                            @error('email')
-                                                            <span class="text-danger small">{{ $message }}</span>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label for="role_{{ $user->id }}"
-                                                                class="form-label fw-semibold">Vai trò</label>
-                                                            <select name="role" id="role_{{ $user->id }}"
-                                                                class="form-select border-0 shadow-sm">
-                                                                <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>
-                                                                    Người dùng
-                                                                </option>
-                                                                <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>
-                                                                    Admin
-                                                                </option>
-                                                            </select>
-                                                            @error('role')
-                                                            <span class="text-danger small">{{ $message }}</span>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label for="address_{{ $user->id }}"
-                                                                class="form-label fw-semibold">Địa chỉ</label>
-                                                            <input type="text" name="address"
-                                                                id="address_{{ $user->id }}"
-                                                                class="form-control border-0 shadow-sm"
-                                                                value="{{ old('address', $user->address) }}"
-                                                                placeholder="Nhập địa chỉ">
-                                                            @error('address')
-                                                            <span class="text-danger small">{{ $message }}</span>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <label for="avatar_{{ $user->id }}"
-                                                                class="form-label fw-semibold">Ảnh đại diện</label>
-                                                            <div class="input-group">
-                                                                <input type="file" name="avatar"
-                                                                    id="avatar_{{ $user->id }}"
-                                                                    class="form-control border-0 shadow-sm"
-                                                                    accept="image/*"
-                                                                    data-preview="preview_{{ $user->id }}">
-                                                                <button type="button" class="btn btn-outline-primary"
-                                                                    onclick="document.getElementById('avatar_{{ $user->id }}').click()">
-                                                                    Chọn file
-                                                                </button>
-                                                            </div>
-                                                            <div class="mt-3 d-flex align-items-center gap-3">
-                                                                @if (!empty($user->avatar))
-                                                                <div class="current-image">
-                                                                    <label class="form-label small text-muted">Ảnh hiện
-                                                                        tại:</label>
-                                                                    <img src="{{ asset($user->avatar) }}"
-                                                                        alt="Ảnh hiện tại" class="rounded shadow-sm"
-                                                                        style="width: 60px; height: 60px; object-fit: cover;">
-                                                                </div>
-                                                                @endif
-                                                                <div class="preview-image">
-                                                                    <label class="form-label small text-muted">Ảnh xem
-                                                                        trước:</label>
-                                                                    <img id="preview_{{ $user->id }}" src=""
-                                                                        alt="Ảnh xem trước"
-                                                                        class="rounded shadow-sm d-none"
-                                                                        style="width: 60px; height: 60px; object-fit: cover;">
-                                                                </div>
-                                                            </div>
-                                                            @error('avatar')
-                                                            <span class="text-danger small">{{ $message }}</span>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer border-0 pt-4">
-                                                        <button type="button"
-                                                            class="btn btn-secondary btn-sm fw-semibold"
-                                                            data-bs-dismiss="modal">Đóng</button>
-                                                        <button type="submit"
-                                                            class="btn btn-primary btn-sm fw-semibold">Cập nhật</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </td>
                         </tr>
                         @empty
@@ -399,6 +216,188 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+    <!-- Modal xem chi tiết -->
+    <div class="modal fade" id="showModal{{ $user->id }}" tabindex="-1"
+        aria-labelledby="showModalLabel{{ $user->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rounded-lg shadow-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="showModalLabel{{ $user->id }}">
+                        <i class="fas fa-info-circle me-2"></i> Chi tiết người dùng
+                        #{{ $user->id }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-4 d-flex justify-content-center align-items-center">
+                            @if (!empty($user->avatar))
+                            <img src="{{ asset($user->avatar) }}"
+                                class="img-fluid rounded shadow-sm" alt="{{ $user->name }}">
+                            @else
+                            <div class="bg-light rounded p-3 text-muted text-center"
+                                style="width: 200px; height: 200px; line-height: 200px;">
+                                Chưa có ảnh
+                            </div>
+                            @endif
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card border-0 p-3 rounded shadow-sm">
+                                <p class="mb-2"><strong>Tên:</strong> {{ $user->name }}</p>
+                                <p class="mb-2"><strong>Email:</strong> {{ $user->email }}
+                                </p>
+                                <p class="mb-2"><strong>Vai trò:</strong> {{ $user->role }}
+                                </p>
+                                <p class="mb-2"><strong>Địa chỉ:</strong>
+                                    {{ $user->address ?? 'Chưa có địa chỉ' }}
+                                </p>
+                                <p class="mb-0"><strong>Ngày tạo:</strong>
+                                    {{ $user->created_at->format('d/m/Y H:i') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary btn-sm fw-semibold"
+                        data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal chỉnh sửa -->
+    <div class="modal fade" id="editModal{{ $user->id }}" tabindex="-1"
+        aria-labelledby="editModalLabel{{ $user->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rounded-lg shadow-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="editModalLabel{{ $user->id }}">
+                        <i class="fas fa-edit me-2"></i> Chỉnh sửa người dùng
+                        #{{ $user->id }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show"
+                        role="alert">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                    </div>
+                    @endif
+                    <form action="{{ route('nguoi-dung.update', $user->id) }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label for="name_{{ $user->id }}"
+                                    class="form-label fw-semibold">Tên</label>
+                                <input type="text" name="name" id="name_{{ $user->id }}"
+                                    class="form-control border-0 shadow-sm"
+                                    value="{{ old('name', $user->name) }}"
+                                    placeholder="Nhập tên" required>
+                                @error('name')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email_{{ $user->id }}"
+                                    class="form-label fw-semibold">Email</label>
+                                <input type="email" name="email" id="email_{{ $user->id }}"
+                                    class="form-control border-0 shadow-sm"
+                                    value="{{ old('email', $user->email) }}"
+                                    placeholder="Nhập email" required>
+                                @error('email')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="role_{{ $user->id }}"
+                                    class="form-label fw-semibold">Vai trò</label>
+                                <select name="role" id="role_{{ $user->id }}"
+                                    class="form-select border-0 shadow-sm">
+                                    <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>
+                                        Người dùng
+                                    </option>
+                                    <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>
+                                        Admin
+                                    </option>
+                                </select>
+                                @error('role')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="address_{{ $user->id }}"
+                                    class="form-label fw-semibold">Địa chỉ</label>
+                                <input type="text" name="address"
+                                    id="address_{{ $user->id }}"
+                                    class="form-control border-0 shadow-sm"
+                                    value="{{ old('address', $user->address) }}"
+                                    placeholder="Nhập địa chỉ">
+                                @error('address')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-md-12">
+                                <label for="avatar_{{ $user->id }}"
+                                    class="form-label fw-semibold">Ảnh đại diện</label>
+                                <div class="input-group">
+                                    <input type="file" name="avatar"
+                                        id="avatar_{{ $user->id }}"
+                                        class="form-control border-0 shadow-sm"
+                                        accept="image/*"
+                                        data-preview="preview_{{ $user->id }}">
+                                    <button type="button" class="btn btn-outline-primary"
+                                        onclick="document.getElementById('avatar_{{ $user->id }}').click()">
+                                        Chọn file
+                                    </button>
+                                </div>
+                                <div class="mt-3 d-flex align-items-center gap-3">
+                                    @if (!empty($user->avatar))
+                                    <div class="current-image">
+                                        <label class="form-label small text-muted">Ảnh hiện
+                                            tại:</label>
+                                        <img src="{{ asset($user->avatar) }}"
+                                            alt="Ảnh hiện tại" class="rounded shadow-sm"
+                                            style="width: 60px; height: 60px; object-fit: cover;">
+                                    </div>
+                                    @endif
+                                    <div class="preview-image">
+                                        <label class="form-label small text-muted">Ảnh xem
+                                            trước:</label>
+                                        <img id="preview_{{ $user->id }}" src=""
+                                            alt="Ảnh xem trước"
+                                            class="rounded shadow-sm d-none"
+                                            style="width: 60px; height: 60px; object-fit: cover;">
+                                    </div>
+                                </div>
+                                @error('avatar')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-4">
+                            <button type="button"
+                                class="btn btn-secondary btn-sm fw-semibold"
+                                data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit"
+                                class="btn btn-primary btn-sm fw-semibold">Cập nhật</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -81,12 +81,12 @@
                         @forelse($order->items as $item)
                         @php
                         $product = $item->product;
-                        $product = $product->product ?? null;
+                        $product = $product ?? null;
                         @endphp
                         <tr class="border-bottom">
                             <td>{{ $loop->iteration }}</td>
                             <td class="d-flex align-items-center">
-                                <img src="{{ asset('storage/' . $item->image) }}" class="me-3 rounded" width="45" height="45" style="object-fit:cover;">
+                                <img src="{{ asset('images/' . $product->image) }}" class="me-3 rounded" width="45" height="45" style="object-fit:cover;">
                                 <div>
                                     <span class="fw-medium">{{ $product->name ?? 'N/A' }}</span><br>
                                     <small class="text-muted">Mã: {{ $product->code ?? '---' }}</small>
