@@ -204,6 +204,13 @@
                                         data-bs-target="#editModal{{ $user->id }}">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <form action="{{ route('nguoi-dung.destroy', $user->id) }}" method="POST" class="d-inline-block">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm shadow-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
                                 </div>
 
                             </td>

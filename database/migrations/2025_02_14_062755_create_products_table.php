@@ -13,8 +13,8 @@ class CreateProductsTable extends Migration
             $table->string('name')->comment('Tên sản phẩm');
             $table->decimal('price', 10, 2)->comment('Giá gốc');
             $table->string('image')->nullable()->comment('Hình ảnh sản phẩm');
-            $table->string('size')->nullable()->comment('Kích thước');
-            $table->string('color')->nullable()->comment('Màu sắc');
+            $table->foreignId('size_id')->nullable()->constrained('sizes')->onDelete('set null')->comment('Kích thước sản phẩm');
+            $table->foreignId('color_id')->nullable()->constrained('colors')->onDelete('set null')->comment('Màu sản phẩm');
             $table->text('description')->nullable()->comment('Mô tả sản phẩm');
             $table->tinyInteger('sale')->default(0)->comment('0: Không giảm giá, 1: Đang giảm giá');
             $table->tinyInteger('hot')->default(0)->comment('0: Thường, 1: Mới, 2: Nổi bật, 3: Bán chạy');

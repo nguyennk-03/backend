@@ -13,8 +13,8 @@ class Product extends Model
         'name',
         'price',
         'image',
-        'size',
-        'color',
+        'size_id',
+        'color_id',
         'description',
         'sale',
         'hot',
@@ -49,7 +49,16 @@ class Product extends Model
     {
         return $this->belongsTo(Brand::class)->withDefault();
     }
-    
+    public function size()
+    {
+        return $this->belongsTo(Size::class);
+    }
+
+    public function color()
+    {
+        return $this->belongsTo(Color::class);
+    }
+
     // Quan hệ: Sản phẩm có nhiều đánh giá
     public function reviews()
     {

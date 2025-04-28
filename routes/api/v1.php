@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\DiscountController;
 use App\Http\Controllers\Api\ImageController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Api\ZaloPayController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\SizeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +27,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
     Route::apiResource('brands', BrandController::class)->only(['index', 'show']);
     Route::apiResource('images', ImageController::class)->only(['index', 'show']);
+    Route::apiResource('colors', ColorController::class)->only(['index', 'show']);
+    Route::apiResource('sizes', SizeController::class)->only(['index', 'show']);
     Route::apiResource('news', NewsController::class)->only(['index', 'show']);
 
 
