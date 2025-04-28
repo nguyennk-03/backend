@@ -311,7 +311,7 @@
                                 @endif
                             </td>
                             <td>{{ $item->name }}</td>
-                            <td class="text-end">{{ number_format($item->price, 0, ',', '.')}}₫</td>
+                            <td class="text-end">{{ number_format($item->price * 100, 0, ',', '.') }}₫</td>
                             <td class="text-center">{{ $item->stock_quantity }}</td>
                             <td class="text-center">{{ $item->sold ?? 0 }}</td>
                             <td class="text-center">{{ optional($item->color)->name ?? 'Chưa có màu' }}</td>

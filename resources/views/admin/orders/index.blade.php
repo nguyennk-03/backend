@@ -174,7 +174,7 @@
                         <tr>
                             <td class="text-center">{{ $order->id }}</td>
                             <td>{{ $order->user ? $order->user->name : 'Khách vãng lai' }}</td>
-                            <td class="text-end">{{ number_format($order->total_price, 0, ',', '.') }} VNĐ</td>
+                            <td class="text-end">{{ number_format($order->total_price, 0, ',', '.') }} đ</td>
                             <td class="text-center">
                                 <form action="{{ route('don-hang.update', $order->id) }}" method="POST" class="d-inline-block">
                                     @csrf

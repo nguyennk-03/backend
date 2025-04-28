@@ -11,8 +11,6 @@ class BrandSeeder extends Seeder
     {
         $brands = [
             ['name' => 'Adidas', 'logo' => 'images/brands/adidas.png', 'status' => 1],
-            ['name' => 'Asics', 'logo' => 'images/brands/asics.png', 'status' => 1],
-            ['name' => 'Bata', 'logo' => 'images/brands/bata.png', 'status' => 1],
             ['name' => 'Nike', 'logo' => 'images/brands/nike.png', 'status' => 1],
             ['name' => 'Puma', 'logo' => 'images/brands/puma.png', 'status' => 1],
         ];
