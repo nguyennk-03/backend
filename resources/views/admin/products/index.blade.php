@@ -271,10 +271,10 @@
 
 
     <!-- Products Table -->
-    <div class="card shadow-sm rounded-lg">
+    <div class="card shadow-sm rounded-lg" style="width: 100%; overflow-x: auto;">
         <div class="card-body p-4">
             <div class="table-responsive">
-                <table id="ProductTable" class="table table-striped table-hover align-middle">
+                <table id="ProductTable" class="table table-striped table-hover align-middle" style="width: 100%; font-size: 14px;">
                     <thead>
                         <tr>
                             <th class="text-center py-2">ID</th>
@@ -282,9 +282,6 @@
                             <th class="text-center py-2">Tên</th>
                             <th class="text-center py-2">Giá</th>
                             <th class="text-center py-2">Số lượng</th>
-                            <th class="text-center py-2">Đã bán</th>
-                            <th class="text-center py-2">Màu sắc</th>
-                            <th class="text-center py-2">Kích thước</th>
                             <th class="text-center py-2">Danh mục</th>
                             <th class="text-center py-2">Thương hiệu</th>
                             <th class="text-center py-2">Trạng thái</th>
@@ -302,20 +299,17 @@
                                 <img src="{{ asset('storage/' . $item->image) }}"
                                     class="img-fluid rounded shadow-sm"
                                     alt="{{ $item->name }}"
-                                    style="max-width: 100px; max-height: 100px;">
+                                    style="max-width: 80px; max-height: 80px;">
                                 @else
-                                <div class="bg-light rounded p-3 text-muted text-center"
-                                    style="width: 100px; height: 100px; line-height: 80px;">
+                                <div class="bg-light rounded p-2 text-muted text-center"
+                                    style="width: 80px; height: 80px; line-height: 60px; font-size: 12px;">
                                     Chưa có ảnh
                                 </div>
                                 @endif
                             </td>
-                            <td>{{ $item->name }}</td>
+                            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">{{ $item->name }}</td>
                             <td class="text-end">{{ number_format($item->price * 100, 0, ',', '.') }}₫</td>
                             <td class="text-center">{{ $item->stock_quantity }}</td>
-                            <td class="text-center">{{ $item->sold ?? 0 }}</td>
-                            <td class="text-center">{{ optional($item->color)->name ?? 'Chưa có màu' }}</td>
-                            <td class="text-center">{{ optional($item->size)->name ?? 'Chưa có size' }}</td>
                             <td class="text-center">{{ optional($item->category)->name ?? 'Chưa có danh mục' }}</td>
                             <td class="text-center">{{ optional($item->brand)->name ?? 'Chưa có thương hiệu' }}</td>
                             <td class="text-center">
@@ -330,16 +324,16 @@
                             </td>
                             <td class="text-center">
                                 <span class="badge 
-                                    {{ $item->hot == 0 ? 'bg-secondary' : 
-                                       ($item->hot == 1 ? 'bg-primary' : 
-                                       ($item->hot == 2 ? 'bg-warning' : 'bg-success')) }}">
+                                {{ $item->hot == 0 ? 'bg-secondary' : 
+                                   ($item->hot == 1 ? 'bg-primary' : 
+                                   ($item->hot == 2 ? 'bg-warning' : 'bg-success')) }}">
                                     {{ $item->hot == 0 ? 'Thường' : 
-                                       ($item->hot == 1 ? 'Mới' : 
-                                       ($item->hot == 2 ? 'Nổi bật' : 'Bán chạy') ) }}
+                                   ($item->hot == 1 ? 'Mới' : 
+                                   ($item->hot == 2 ? 'Nổi bật' : 'Bán chạy') ) }}
                                 </span>
                             </td>
                             <td class="text-center">
-                                <div class="d-flex justify-content-center gap-2">
+                                <div class="d-flex justify-content-center gap-1">
                                     <button type="button" class="btn btn-warning btn-sm shadow-sm"
                                         data-bs-toggle="modal" data-bs-target="#showModal{{ $item->id }}">
                                         <i class="fas fa-eye"></i>
@@ -362,7 +356,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="14" class="text-center text-muted py-4">
+                            <td colspan="12" class="text-center text-muted py-4">
                                 Không có sản phẩm nào để hiển thị.
                             </td>
                         </tr>
@@ -400,8 +394,8 @@
                             <div class="card border-0 p-3 rounded shadow-sm">
                                 <p class="mb-2"><strong>Tên:</strong> {{ $item->name }}</p>
                                 <p class="mb-2"><strong>Giá:</strong> {{ $item->price }}</p>
-                                <p class="mb-2"><strong>Màu sắc:</strong> {{ $item->color }}</p>
-                                <p class="mb-2"><strong>Kích thước:</strong> {{ $item->size }}</p>
+                                <p class="mb-2"><strong>Màu sắc:</strong> {{ optional($item->color)->name ?? 'Chưa có màu sắc' }}</p>
+                                <p class="mb-2"><strong>Kích thước:</strong> {{ optional($item->size)->name ?? 'Chưa có kích thước' }}</p>
                                 <p class="mb-2"><strong>Danh mục:</strong> {{ optional($item->category)->name ?? 'Chưa có danh mục' }}</p>
                                 <p class="mb-2"><strong>Thương hiệu:</strong> {{ optional($item->brand)->name ?? 'Chưa có thương hiệu' }}</p>
                                 <p class="mb-2"><strong>Trạng thái:</strong> {{ $item->status ? 'Hiển thị' : 'Ẩn' }}</p>

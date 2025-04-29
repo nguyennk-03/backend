@@ -40,7 +40,7 @@ class NewsSeeder extends Seeder
                 chân, ZoomX Vaporfly giúp tăng độ bật nảy, giảm mệt mỏi và hỗ trợ tối đa cho vận động viên marathon. Nếu bạn đang tìm
                 kiếm một đôi giày hiệu suất cao, đây chính là lựa chọn hàng đầu.',
                 'category_id' => 2,
-                'brand_id' => 4,
+                'brand_id' => 2,
                 'status' => 1,
                 'image' => 'images/news/nike_vaporfly.jpg'
             ],
@@ -50,28 +50,9 @@ class NewsSeeder extends Seeder
                 Foam nhẹ nhàng và lớp lót thoáng khí, đôi giày không chỉ tạo sự thoải mái mà còn giúp tăng cường hiệu suất vận động. Một
                 lựa chọn tuyệt vời cho các tín đồ sneaker.',
                 'category_id' => 1,
-                'brand_id' => 5,
-                'status' => 1,
-                'image' => 'images/news/puma_futurerider.jpg'
-            ],
-            [
-                'title' => 'Asics Novablast – Sải bước mạnh mẽ, chinh phục mọi thử thách',
-                'content' => 'Dành cho những ai yêu thích tốc độ, Asics Novablast được trang bị đệm FF Blast giúp tăng độ nảy và giảm áp
-                lực lên bàn chân. Kiểu dáng thể thao cùng trọng lượng nhẹ làm cho Novablast trở thành đôi giày lý tưởng cho cả việc chạy
-                bộ và tập luyện hàng ngày.',
-                'category_id' => 2,
-                'brand_id' => 2,
-                'status' => 1,
-                'image' => 'images/news/asics_novablast.jpg'
-            ],
-            [
-                'title' => 'Bata Power – Biểu tượng bền bỉ vượt thời gian',
-                'content' => 'Bata Power là một trong những dòng giày có độ bền cao nhất trên thị trường. Với phần đế cao su chắc chắn
-                và lớp da tổng hợp chống nước, đôi giày này thích hợp cho các hoạt động thể thao và sử dụng hàng ngày.',
-                'category_id' => 1,
                 'brand_id' => 3,
                 'status' => 1,
-                'image' => 'images/news/bata_power.jpg'
+                'image' => 'images/news/puma_futurerider.jpg'
             ],
             [
                 'title' => 'Nike Air Jordan – Huyền thoại không bao giờ lỗi mốt',
@@ -79,7 +60,7 @@ class NewsSeeder extends Seeder
                 thao, kết hợp cùng công nghệ đệm Air độc quyền, Nike Air Jordan không chỉ là một đôi giày, mà còn là một tuyên ngôn thời
                 trang.',
                 'category_id' => 2,
-                'brand_id' => 4,
+                'brand_id' => 2,
                 'status' => 1,
                 'image' => 'images/news/nike_airjordan.jpg'
             ],
@@ -89,7 +70,7 @@ class NewsSeeder extends Seeder
                 tín đồ street style. Với thiết kế đơn giản nhưng đầy tinh tế, phần đế dày giúp tạo chiều cao và điểm nhấn nổi bật.',
                 'category_id' => 1,
                 'status' => 1,
-                'brand_id' => 5,
+                'brand_id' => 3,
                 'image' => 'images/news/puma_cali.jpg'
             ],
             [
@@ -103,20 +84,11 @@ class NewsSeeder extends Seeder
                 'image' => 'images/news/adidas_superstar.jpg'
             ],
             [
-                'title' => 'Asics Gel-Kayano – Bước tiến vượt bậc trong công nghệ giày chạy',
-                'content' => 'Asics Gel-Kayano nổi tiếng với sự ổn định và khả năng giảm chấn tuyệt vời. Công nghệ GEL đặc trưng giúp
-                bảo vệ chân khỏi tác động mạnh, mang lại cảm giác thoải mái ngay cả khi chạy đường dài.',
-                'category_id' => 1,
-                'brand_id' => 2,
-                'status' => 1,
-                'image' => 'images/news/asics_gelkayano.jpg'
-            ],
-            [
                 'title' => 'Nike Air Max Kids – Giải pháp hoàn hảo cho trẻ em năng động',
                 'content' => 'Nike Air Max Kids mang đến sự thoải mái tối đa với lớp đệm khí Air. Đôi giày này không chỉ giúp bé vận
                 động linh hoạt mà còn đảm bảo độ bám tốt nhờ thiết kế đế chống trượt.',
                 'category_id' => 2,
-                'brand_id' => 4,
+                'brand_id' => 2,
                 'image' => 'images/news/nike_airmax_kids.jpg',
                 'status' => 1,
             ],

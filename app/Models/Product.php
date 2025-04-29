@@ -36,7 +36,7 @@ class Product extends Model
         'updated_at' => 'datetime',
     ];
 
-    protected $with = ['category', 'brand'];
+    // protected $with = ['category', 'brand', 'size', 'color'];
 
     // Quan hệ: Sản phẩm thuộc về một danh mục
     public function category()

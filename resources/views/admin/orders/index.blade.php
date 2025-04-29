@@ -161,19 +161,21 @@
                 <table id="OrderTable" class="table table-striped table-hover align-middle">
                     <thead>
                         <tr>
-                            <th class="text-center py-3">ID</th>
-                            <th class="text-center py-3">Khách hàng</th>
-                            <th class="text-center py-3">Tổng tiền</th>
-                            <th class="text-center py-3">Trạng thái</th>
-                            <th class="text-center py-3">Ngày đặt</th>
-                            <th class="text-center py-3">Thao tác</th>
+                            <th class="text-center">ID</th>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th class="text-end">Tổng tiền</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-center">Ngày đặt</th>
+                            <th class="text-center">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($orders as $order)
                         <tr>
                             <td class="text-center">{{ $order->id }}</td>
-                            <td>{{ $order->user ? $order->user->name : 'Khách vãng lai' }}</td>
+                            <td>{{ $order->code }}</td>
+                            <td>{{ $order->user->name ?? 'Khách vãng lai' }}</td>
                             <td class="text-end">{{ number_format($order->total_price, 0, ',', '.') }} đ</td>
                             <td class="text-center">
                                 <form action="{{ route('don-hang.update', $order->id) }}" method="POST" class="d-inline-block">
@@ -182,10 +184,8 @@
                                     <select name="status" onchange="this.form.submit()" class="form-select form-select-sm">
                                         @foreach(\App\Enums\OrderStatusEnum::cases() as $status)
                                         <option
-                                            value="{{ $order->status->value }}"
-                                            class="bg-light text-dark"
-                                            data-class="{{ $status->badgeClass() }}"
-                                            {{ $order->status->value === $status ? 'selected' : '' }}>
+                                            value="{{ $status->value }}"
+                                            {{ $order->status->value === $status->value ? 'selected' : '' }}>
                                             {{ $status->label() }}
                                         </option>
                                         @endforeach
@@ -194,19 +194,44 @@
                             </td>
                             <td class="text-center">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                             <td class="text-center">
-                                <div class="d-flex justify-content-center gap-2">
-                                    <button type="button" class="btn btn-warning btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#showModal{{ $order->id }}">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
+                                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#showModal{{ $order->id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </td>
                         </tr>
 
-                        <!-- Show Order Modal -->
-
+                        <!-- Modal xem chi tiết đơn hàng -->
+                        <div class="modal fade" id="showModal{{ $order->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $order->id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-primary text-white">
+                                        <h5 class="modal-title" id="modalLabel{{ $order->id }}">Chi tiết đơn hàng #{{ $order->code }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul class="list-group">
+                                            @foreach ($order->items as $item)
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                {{ $item->product_name }} x {{ $item->quantity }}
+                                                <span>{{ number_format($item->price, 0, ',', '.') }} đ</span>
+                                            </li>
+                                            @endforeach
+                                        </ul>
+                                        <hr>
+                                        <p class="text-end fw-bold">Tổng tiền: {{ number_format($order->total_price, 0, ',', '.') }} đ</p>
+                                        @if ($order->total_after_discount)
+                                        <p class="text-end text-success fw-bold">Sau giảm: {{ number_format($order->total_after_discount, 0, ',', '.') }} đ</p>
+                                        @endif
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">Không có đơn hàng nào để hiển thị.</td>
+                            <td colspan="7" class="text-center text-muted py-4">Không có đơn hàng nào để hiển thị.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -215,49 +240,90 @@
         </div>
     </div>
     <div class="modal fade" id="showModal{{ $order->id }}" tabindex="-1" aria-labelledby="showModalLabel{{ $order->id }}" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="showModalLabel{{ $order->id }}">Chi tiết đơn hàng #{{ $order->id }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="showModalLabel{{ $order->id }}">Chi tiết đơn hàng #{{ $order->code }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
                 <div class="modal-body">
+                    {{-- Thông tin khách hàng & đơn hàng --}}
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <h6><strong>Thông tin khách hàng</strong></h6>
-                            <p>Tên: {{ $order->user ? $order->user->name : 'Khách vãng lai' }}</p>
-                            <p>Email: {{ $order->user ? $order->user->email : 'N/A' }}</p>
-                            <p>Điện thoại: {{ $order->phone ?? 'N/A' }}</p>
+                            <p>Tên: {{ $order->user->name ?? 'Khách vãng lai' }}</p>
+                            <p>Email: {{ $order->user->email ?? 'N/A' }}</p>
+                            <p>Điện thoại: {{ $order->recipient_phone ?? $order->user->phone ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-6">
                             <h6><strong>Thông tin đơn hàng</strong></h6>
-                            <p>Mã đơn: #{{ $order->id }}</p>
+                            <p>Mã đơn: {{ $order->code }}</p>
                             <p>Trạng thái:
                                 <span class="badge {{ $order->status->badgeClass() }}">
                                     {{ $order->status->label() }}
                                 </span>
                             </p>
+                            <p>Trạng thái thanh toán:
+                                <span class="badge {{ $order->payment_status->badgeClass() }}">
+                                    {{ $order->payment_status->label() }}
+                                </span>
+                            </p>
+                            <p>Phương thức thanh toán: {{ $order->payment->name ?? 'Không xác định' }}</p>
+                            <p>Mã vận đơn: {{ $order->tracking_code ?? 'N/A' }}</p>
                             <p>Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</p>
                         </div>
-                        <div class="col-md-12 mt-3">
-                            <h6><strong>Địa chỉ giao hàng</strong></h6>
-                            <p>{{ $order->user->address }}</p>
-                        </div>
                     </div>
 
+                    {{-- Địa chỉ giao hàng --}}
+                    <div class="mb-3">
+                        <h6><strong>Địa chỉ giao hàng</strong></h6>
+                        <p>{{ $order->shipping_address ?? 'Không có địa chỉ' }}</p>
+                        <p>Người nhận: {{ $order->recipient_name ?? 'N/A' }}</p>
+                    </div>
+
+                    {{-- Danh sách sản phẩm --}}
                     <h6 class="mb-3"><strong>Danh sách sản phẩm</strong></h6>
-                    {{ $order->products }}
-                    <div class="table-responsive">
-
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>SL</th>
+                                    <th>Giá</th>
+                                    <th>Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($order->items as $item)
+                                <tr>
+                                    <td>{{ $item->product_name }}</td>
+                                    <td>{{ $item->quantity }}</td>
+                                    <td>{{ number_format($item->price, 0, ',', '.') }} đ</td>
+                                    <td>{{ number_format($item->quantity * $item->price, 0, ',', '.') }} đ</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
 
-                    @if($order->note)
+                    {{-- Tổng tiền, giảm giá, thanh toán --}}
+                    <div class="text-end">
+                        <p><strong>Tổng tiền:</strong> {{ number_format($order->total_price, 0, ',', '.') }} đ</p>
+                        @if ($order->discount)
+                        <p><strong>Giảm giá:</strong> {{ $order->discount->code }} - {{ $order->discount->value }}{{ $order->discount->type === 'percent' ? '%' : 'đ' }}</p>
+                        <p><strong>Sau giảm:</strong> {{ number_format($order->total_after_discount, 0, ',', '.') }} đ</p>
+                        @endif
+                    </div>
+
+                    {{-- Ghi chú --}}
+                    @if ($order->note)
                     <div class="mt-3">
                         <h6><strong>Ghi chú</strong></h6>
                         <p>{{ $order->note }}</p>
                     </div>
                     @endif
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 </div>
