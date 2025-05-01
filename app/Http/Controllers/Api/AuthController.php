@@ -67,7 +67,18 @@ class AuthController extends Controller
             if (!$user || !Hash::check($data['password'], $user->password)) {
                 throw ValidationException::withMessages([
                     'email' => ['Thông tin đăng nhập không chính xác.'],
-                ]);
+                    'password' => ['Thông tin đăng nhập không chính xác.'],
+                ])->status(Response::HTTP_UNAUTHORIZED);
+            }
+            if ($user->is_locked) {
+                throw ValidationException::withMessages([
+                    'email' => ['Tài khoản của bạn đã bị khóa.'],
+                ])->status(Response::HTTP_FORBIDDEN);
+            }
+            if ($user->status === 0) {
+                throw ValidationException::withMessages([
+                    'email' => ['Tài khoản của bạn chưa được kích hoạt.'],
+                ])->status(Response::HTTP_FORBIDDEN);
             }
 
             $token = $user->createToken('authToken', [$user->role])->plainTextToken;
@@ -179,5 +190,4 @@ class AuthController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
 }

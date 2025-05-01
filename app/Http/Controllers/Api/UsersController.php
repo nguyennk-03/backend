@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
 
 class UsersController extends Controller
@@ -14,7 +15,7 @@ class UsersController extends Controller
     // Lấy danh sách người dùng có filter
     public function index(Request $request)
     {
-        $authUser = Auth::user(); 
+        $authUser = Auth::user();
         if (!$authUser) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
@@ -109,34 +110,45 @@ class UsersController extends Controller
             'role' => ['sometimes', Rule::in(['admin', 'user'])],
             'status' => 'sometimes|boolean',
             'is_locked' => 'sometimes|boolean',
-            'current_password' => 'required_with:new_password|string|min:6', // Kiểm tra mật khẩu cũ
-            'new_password' => 'sometimes|string|min:6|confirmed', // Kiểm tra mật khẩu mới và xác nhận
+            'password' => 'sometimes|string|min:6|confirmed',
         ]);
 
-        // Kiểm tra mật khẩu cũ
-        if ($request->filled('current_password')) {
-            if (!Hash::check($request->current_password, $user->password)) {
-                return response()->json([
-                    'message' => 'Mật khẩu cũ không đúng.',
-                ], 400);
-            }
-
-            // Kiểm tra mật khẩu mới không trùng với mật khẩu cũ
-            if ($request->current_password === $request->new_password) {
-                return response()->json([
-                    'message' => 'Mật khẩu mới không được trùng với mật khẩu cũ.',
-                ], 400);
-            }
-
-            // Cập nhật mật khẩu mới
-            $validated['password'] = Hash::make($request->new_password);
+        if ($request->filled('password')) {
+            $validated['password'] = Hash::make($request->password);
         }
 
-        // Cập nhật thông tin người dùng
         $user->update($validated);
 
-        // Trả về dữ liệu người dùng đã cập nhật, ẩn mật khẩu
         return response()->json($user->makeHidden(['password']));
+    }
+    public function updateSelf(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'current_password' => 'required|string|min:6',
+            'new_password' => 'required|string|min:6|confirmed',
+        ]);
+
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['Mật khẩu hiện tại không chính xác.'],
+            ]);
+        }
+
+        if ($validated['current_password'] === $validated['new_password']) {
+            return response()->json([
+                'message' => 'Mật khẩu mới không được trùng với mật khẩu hiện tại.',
+            ], 400);
+        }
+
+        $user->update([
+            'password' => Hash::make($validated['new_password']),
+        ]);
+
+        return response()->json([
+            'message' => 'Mật khẩu đã được cập nhật thành công.',
+        ]);
     }
 
     // Xóa user
