@@ -109,20 +109,27 @@ class UsersController extends Controller
             'role' => ['sometimes', Rule::in(['admin', 'user'])],
             'status' => 'sometimes|boolean',
             'is_locked' => 'sometimes|boolean',
-            'password' => 'sometimes|string|min:6|confirmed',
+            'current_password' => 'required_with:new_password|string|min:6', // Kiểm tra mật khẩu cũ
+            'new_password' => 'sometimes|string|min:6|confirmed', // Kiểm tra mật khẩu mới và xác nhận
         ]);
 
-        // Kiểm tra và thay đổi mật khẩu nếu có
-        if ($request->filled('password')) {
-            // Đảm bảo mật khẩu phải khác với mật khẩu hiện tại
-            if (Hash::check($request->password, $user->password)) {
+        // Kiểm tra mật khẩu cũ
+        if ($request->filled('current_password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
                 return response()->json([
-                    'message' => 'Mật khẩu mới không được trùng với mật khẩu hiện tại.',
+                    'message' => 'Mật khẩu cũ không đúng.',
                 ], 400);
             }
 
-            // Mã hóa mật khẩu mới
-            $validated['password'] = Hash::make($request->password);
+            // Kiểm tra mật khẩu mới không trùng với mật khẩu cũ
+            if ($request->current_password === $request->new_password) {
+                return response()->json([
+                    'message' => 'Mật khẩu mới không được trùng với mật khẩu cũ.',
+                ], 400);
+            }
+
+            // Cập nhật mật khẩu mới
+            $validated['password'] = Hash::make($request->new_password);
         }
 
         // Cập nhật thông tin người dùng
@@ -131,6 +138,7 @@ class UsersController extends Controller
         // Trả về dữ liệu người dùng đã cập nhật, ẩn mật khẩu
         return response()->json($user->makeHidden(['password']));
     }
+
     // Xóa user
     public function destroy($id)
     {
