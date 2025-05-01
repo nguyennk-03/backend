@@ -39,7 +39,7 @@ Route::prefix('v1')->group(function () {
     Route::post('password/reset', [AuthController::class, 'resetPassword']);
 
     Route::middleware(['auth:sanctum', 'user'])->group(function () {
-        Route::apiResource('users', UsersController::class)->only(['index', 'show', 'update', 'destroy']);
+        Route::apiResource('users', UsersController::class)->only(['index', 'show', 'update']);
         Route::post('payments', [OrderController::class, 'processPayment']);
         Route::apiResource('orders', OrderController::class)->only(['index', 'show']);
         // Route::get('momo/success', [MoMoController::class, 'MoMoSuccess']);

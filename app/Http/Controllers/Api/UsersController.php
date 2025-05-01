@@ -112,15 +112,25 @@ class UsersController extends Controller
             'password' => 'sometimes|string|min:6|confirmed',
         ]);
 
+        // Kiểm tra và thay đổi mật khẩu nếu có
         if ($request->filled('password')) {
+            // Đảm bảo mật khẩu phải khác với mật khẩu hiện tại
+            if (Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'message' => 'Mật khẩu mới không được trùng với mật khẩu hiện tại.',
+                ], 400);
+            }
+
+            // Mã hóa mật khẩu mới
             $validated['password'] = Hash::make($request->password);
         }
 
+        // Cập nhật thông tin người dùng
         $user->update($validated);
 
+        // Trả về dữ liệu người dùng đã cập nhật, ẩn mật khẩu
         return response()->json($user->makeHidden(['password']));
     }
-
     // Xóa user
     public function destroy($id)
     {

@@ -107,14 +107,19 @@ class AuthController extends Controller
                 'email' => 'required|email|exists:users,email',
             ]);
 
-            $token = Password::createToken($user);
+            $email = $request->email;
+
+            // Tìm user trước
             $user = User::where('email', $email)->first();
 
+            // Tạo token
             $token = Password::broker()->createToken($user);
 
+            // Tạo URL frontend reset
             $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
             $url = "{$frontendUrl}/password/reset/{$token}?email=" . urlencode($email);
 
+            // Gửi email
             Mail::to($email)->send(new ResetPasswordLink($url));
 
             return response()->json([
@@ -142,29 +147,26 @@ class AuthController extends Controller
                 'password' => 'required|string|min:8|confirmed',
             ]);
 
-            $tokenData = DB::table('password_reset_tokens')
-                ->where('email', $request->email)
-                ->first();
+            $status = Password::broker()->reset(
+                $request->only('email', 'password', 'password_confirmation', 'token'),
+                function ($user, $password) {
+                    $user->password = Hash::make($password);
+                    $user->setRememberToken(Str::random(60));
+                    $user->save();
 
-            if (!$tokenData || !Hash::check($request->token, $tokenData->token)) {
+                    event(new PasswordReset($user));
+                }
+            );
+
+            if ($status == Password::PASSWORD_RESET) {
                 return response()->json([
-                    'message' => 'Token đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.',
+                    'message' => 'Đặt lại mật khẩu thành công!',
+                ], Response::HTTP_OK);
+            } else {
+                return response()->json([
+                    'message' => 'Token không hợp lệ hoặc đã hết hạn.',
                 ], Response::HTTP_BAD_REQUEST);
             }
-
-            $user = User::where('email', $request->email)->first();
-
-            $user->password = Hash::make($request->password);
-            $user->setRememberToken(Str::random(60));
-            $user->save();
-
-            event(new PasswordReset($user));
-
-            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
-
-            return response()->json([
-                'message' => 'Đặt lại mật khẩu thành công!',
-            ], Response::HTTP_OK);
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Xác thực thất bại.',
@@ -177,4 +179,5 @@ class AuthController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    
 }
