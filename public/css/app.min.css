@@ -385,7 +385,7 @@ body.sidebar-collapsed #sidebar-menu {
 /* ========== CONTENT AREA ENHANCEMENT ========== */
 .content-page {
   margin-left: var(--sidebar-width);
-  padding: 35px;
+  padding: 10px;
   min-height: calc(100vh - var(--topbar-height));
   transition: var(--transition-smooth);
   margin-top: var(--topbar-height);

@@ -27,7 +27,7 @@ class AdminController extends Controller
         // Tổng hợp thông tin nhanh
         $totalOrders = Order::count();
         $totalPendingOrders = Order::where('status', OrderStatusEnum::PENDING)->count();
-        $revenue = Order::where('status', OrderStatusEnum::DELIVERED)->sum('total_price');
+        $revenue = Order::where('status', OrderStatusEnum::DELIVERED)->sum('total_price') * 100;
 
         $counts = [
             'totalUsers' => User::count(),
@@ -62,7 +62,7 @@ class AdminController extends Controller
         $weeklyOrderData = [];
 
         foreach ($days as $day) {
-            $weeklyValues[] = $weeklyRevenue[$day]->revenue ?? 0;
+            $weeklyValues[] = ($weeklyRevenue[$day]->revenue ?? 0) * 100;
             $weeklyOrderData[] = $weeklyOrders[$day]->count ?? 0;
         }
 
@@ -90,7 +90,7 @@ class AdminController extends Controller
         $comboOrderData = [];
 
         foreach ($months as $month) {
-            $comboRevenueData[] = $monthlyRevenue[$month]->revenue ?? 0;
+            $comboRevenueData[] = ($monthlyRevenue[$month]->revenue ?? 0) * 100;
             $comboOrderData[] = $monthlyOrders[$month]->count ?? 0;
         }
 
@@ -112,7 +112,7 @@ class AdminController extends Controller
         $yearlyOrderData = [];
 
         foreach ($years as $year) {
-            $yearlyValues[] = $yearlyRevenue[$year]->revenue ?? 0;
+            $yearlyValues[] = ($yearlyRevenue[$year]->revenue ?? 0) * 100;
             $yearlyOrderData[] = $yearlyOrders[$year]->count ?? 0;
         }
 

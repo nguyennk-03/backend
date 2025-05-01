@@ -1,3 +1,8 @@
+<?php
+
+use Illuminate\Support\Str;
+?>
+
 @extends('admin.layout')
 @section('title', 'Bài viết')
 @section('content')
@@ -27,7 +32,7 @@
         <div class="card-body">
             <form action="{{ route('bai-viet.index') }}" method="GET">
                 <div class="row g-3 align-items-end">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label fw-semibold"><i class="fas fa-list-ul me-1"></i> Danh mục</label>
                         <select name="category_id" class="form-select form-select-sm border-0 shadow-sm">
                             <option value="">-- Tất cả --</option>
@@ -38,7 +43,18 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-6 d-flex gap-2 align-items-end justify-content-end">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold"><i class="fas fa-tag me-1"></i> Thương hiệu</label>
+                        <select name="brand_id" class="form-select form-select-sm border-0 shadow-sm">
+                            <option value="">-- Tất cả --</option>
+                            @foreach($brands as $brand)
+                            <option value="{{ $brand->id }}" {{ request('brand_id') == $brand->id ? 'selected' : '' }}>
+                                {{ $brand->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex gap-2 align-items-end justify-content-end">
                         <button type="submit" class="btn btn-primary btn-sm fw-semibold shadow-sm">
                             <i class="fas fa-search me-1"></i> Tìm kiếm
                         </button>
@@ -58,7 +74,7 @@
     <div class="card shadow-sm rounded-lg">
         <div class="card-body p-4">
             <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle">
+                <table id="NewsTable" class="table table-striped table-hover align-middle">
                     <thead>
                         <tr>
                             <th class="text-center py-3">ID</th>
@@ -103,9 +119,6 @@
                         @endforelse
                     </tbody>
                 </table>
-            </div>
-            <div class="mt-3">
-                {{ $news->links() }}
             </div>
         </div>
     </div>
@@ -156,7 +169,7 @@
                             <label for="brand_id" class="form-label fw-semibold">Thương hiệu</label>
                             <select name="brand_id" id="brand_id" class="form-select border-0 shadow-sm">
                                 <option value="">-- Không chọn --</option>
-                                @foreach(\App\Models\Brand::all() as $brand)
+                                @foreach($brands as $brand)
                                 <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
                                     {{ $brand->name }}
                                 </option>
@@ -235,7 +248,7 @@
                             <label for="brand_id_{{ $newsItem->id }}" class="form-label fw-semibold">Thương hiệu</label>
                             <select name="brand_id" id="brand_id_{{ $newsItem->id }}" class="form-select border-0 shadow-sm">
                                 <option value="">-- Không chọn --</option>
-                                @foreach(\App\Models\Brand::all() as $brand)
+                                @foreach($brands as $brand)
                                 <option value="{{ $brand->id }}" {{ old('brand_id', $newsItem->brand_id) == $brand->id ? 'selected' : '' }}>
                                     {{ $brand->name }}
                                 </option>

@@ -108,6 +108,7 @@ class SanPhamController extends Controller
         return redirect()->route('san-pham.index')->with('success', 'Sản phẩm đã được thêm thành công!');
     }
 
+
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([

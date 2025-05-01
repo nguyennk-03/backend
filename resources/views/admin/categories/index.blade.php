@@ -28,8 +28,10 @@
         <div class="col-12">
             <div class="card shadow-sm rounded-lg">
                 <div class="card-body p-4">
+                    <!-- Form để lọc danh mục theo sắp xếp -->
                     <form action="{{ route('danh-muc.index') }}" method="GET">
                         <div class="row g-3 align-items-end">
+                            <!-- Sắp xếp danh mục -->
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold"><i class="fas fa-sort me-1"></i> Sắp xếp</label>
                                 <select name="sort_by" class="form-select form-select-sm border-0 shadow-sm">
@@ -40,15 +42,19 @@
                                     <option value="oldest" {{ request('sort_by') == 'oldest' ? 'selected' : '' }}>Cũ nhất</option>
                                 </select>
                             </div>
+                            <!-- Các nút hành động -->
                             <div class="col-md-6 d-flex gap-2 align-items-end">
+                                <!-- Nút gửi form lọc -->
                                 <button type="submit" class="btn btn-primary btn-sm fw-semibold shadow-sm">
                                     <i class="fas fa-search me-1"></i> Tìm kiếm
                                 </button>
+                                <!-- Nút làm mới bộ lọc -->
                                 <a href="{{ route('danh-muc.index') }}" class="btn btn-warning btn-sm fw-semibold shadow-sm">
                                     <i class="fas fa-sync me-1"></i> Làm mới
                                 </a>
+                                <!-- Nút mở modal thêm danh mục -->
                                 <button type="button" class="btn btn-success btn-sm fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                                    <i class="fas fa-plus me-1"></i> Thêm
+                                    <i class="fas fa-plus me-1"></i> Thêm danh mục
                                 </button>
                             </div>
                         </div>
@@ -59,16 +65,15 @@
     </div>
 
     <!-- Modal thêm danh mục -->
-    <div class="modal fade" id="addCategoryModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addCategoryModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content rounded-lg shadow-lg">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="categoryModalLabel"><i class="fas fa-plus-circle me-2"></i> Thêm
-                        danh mục mới</h5>
+                    <h5 class="modal-title fw-bold" id="categoryModalLabel"><i class="fas fa-plus-circle me-2"></i> Thêm danh mục mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
+                    <!-- Hiển thị lỗi xác thực nếu có -->
                     @if ($errors->any())
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <ul class="mb-0">
@@ -79,31 +84,30 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                     @endif
+                    <!-- Form thêm danh mục mới -->
                     <form action="{{ route('danh-muc.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row g-4">
-                            <div class="col-md-6">
-                                <label for="parent_id" class="form-label fw-semibold">Danh mục cha</label>
-                                <select name="parent_id" id="parent_id" class="form-select border-0 shadow-sm">
-                                    <option value="">Không có danh mục cha</option>
-                                    @foreach ($categories as $item)
-                                    <option value="{{ $item->id }}" {{ old('parent_id') == $item->id ? 'selected' : '' }}>
-                                        {{ $item->name }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                                @error('parent_id')
-                                <span class="text-danger small">{{ $message }}</span>
-                                @enderror
-                            </div>
+                            <!-- Tên danh mục -->
                             <div class="col-md-6">
                                 <label for="name" class="form-label fw-semibold">Tên danh mục</label>
-                                <input type="text" name="name" id="name" class="form-control border-0 shadow-sm"
-                                    value="{{ old('name') }}" placeholder="Nhập tên danh mục" required>
+                                <input type="text" name="name" id="name" class="form-control border-0 shadow-sm" value="{{ old('name') }}" placeholder="Nhập tên danh mục" required>
                                 @error('name')
                                 <span class="text-danger small">{{ $message }}</span>
                                 @enderror
                             </div>
+                            <!-- Trạng thái hiển thị -->
+                            <div class="col-md-6">
+                                <label for="status" class="form-label fw-semibold">Trạng thái</label>
+                                <select name="status" id="status" class="form-select border-0 shadow-sm" required>
+                                    <option value="1" {{ old('status', 1) == 1 ? 'selected' : '' }}>Hiển thị</option>
+                                    <option value="0" {{ old('status') == 0 ? 'selected' : '' }}>Ẩn</option>
+                                </select>
+                                @error('status')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <!-- Hình ảnh -->
                             <div class="col-md-12">
                                 <label for="image" class="form-label fw-semibold">Chọn hình ảnh</label>
                                 <div class="input-group">
@@ -132,39 +136,41 @@
     <div class="card shadow-sm rounded-lg">
         <div class="card-body p-4">
             <div class="table-responsive">
+                <!-- Bảng hiển thị danh sách danh mục -->
                 <table id="CategoryTable" class="table table-striped table-hover align-middle">
                     <thead>
                         <tr>
                             <th class="text-center py-3">ID</th>
                             <th class="text-center py-3">Hình ảnh</th>
                             <th class="text-center py-3">Tên</th>
-                            <th class="text-center py-3">Danh mục cha</th>
-                            <th class="text-center py-3">Mô tả</th>
+                            <th class="text-center py-3">Trạng thái</th>
                             <th class="text-center py-3">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Lặp qua danh sách danh mục -->
                         @forelse ($categories as $item)
                         <tr>
                             <td class="text-center">{{ $item->id }}</td>
+                            <!-- Hiển thị hình ảnh hoặc thông báo nếu không có -->
                             <td class="text-center">
-                                @if (!empty($item->image))
-                                <img src="{{ asset($item->image) }}" class="img-thumbnail rounded" style="object-fit: cover; max-width: 100px; max-height: 100px;" alt="{{ $item->name }}">
+                                @if ($item->image)
+                                <img src="{{ asset('storage/' . $item->image) }}" class="img-thumbnail rounded" style="object-fit: cover; max-width: 100px; max-height: 100px;" alt="{{ $item->name }}">
                                 @else
                                 <span class="text-muted">Chưa có ảnh</span>
                                 @endif
                             </td>
+                            <!-- Hiển thị tên danh mục -->
                             <td>{{ $item->name }}</td>
-                            <td>{{ optional($item->parent)->name ?? 'Không có' }}</td>
-                            <td>{{ $item->slug ?? 'Chưa có mô tả' }}</td>
+                            <!-- Hiển thị trạng thái -->
+                            <td class="text-center">{{ $item->status ? 'Hiển thị' : 'Ẩn' }}</td>
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
-                                    <button type="button" class="btn btn-warning btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#showModal{{ $item->id }}">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    <!-- Nút chỉnh sửa danh mục -->
                                     <button type="button" class="btn btn-info btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ $item->id }}">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <!-- Form xóa danh mục -->
                                     <form action="{{ route('danh-muc.destroy', $item->id) }}" method="POST" class="d-inline-block">
                                         @csrf
                                         @method('DELETE')
@@ -172,39 +178,6 @@
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </form>
-                                </div>
-
-                                <!-- Modal xem chi tiết -->
-                                <div class="modal fade" id="showModal{{ $item->id }}" tabindex="-1" aria-labelledby="showModalLabel{{ $item->id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content rounded-lg shadow-lg">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title fw-bold" id="showModalLabel{{ $item->id }}"><i class="fas fa-info-circle me-2"></i> Chi tiết danh mục #{{ $item->id }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body p-4">
-                                                <div class="row g-4">
-                                                    <div class="col-md-4 d-flex justify-content-center align-items-center">
-                                                        @if (!empty($item->image))
-                                                        <img src="{{ asset($item->image) }}" class="img-fluid rounded shadow-sm" alt="{{ $item->name }}">
-                                                        @else
-                                                        <div class="bg-light rounded p-3 text-muted text-center" style="width: 200px; height: 200px; line-height: 200px;">Chưa có ảnh</div>
-                                                        @endif
-                                                    </div>
-                                                    <div class="col-md-8">
-                                                        <div class="card border-0 p-3 rounded shadow-sm">
-                                                            <p class="mb-2"><strong>Tên:</strong> {{ $item->name }}</p>
-                                                            <p class="mb-2"><strong>Danh mục cha:</strong> {{ optional($item->parent)->name ?? 'Không có' }}</p>
-                                                            <p class="mb-0"><strong>Mô tả:</strong> {{ $item->slug ?? 'Chưa có mô tả' }}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer border-0">
-                                                <button type="button" class="btn btn-secondary btn-sm fw-semibold" data-bs-dismiss="modal">Đóng</button>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <!-- Modal chỉnh sửa -->
@@ -216,6 +189,7 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body p-4">
+                                                <!-- Hiển thị lỗi xác thực nếu có -->
                                                 @if ($errors->any())
                                                 <div class="alert alert-danger alert-dismissible fade show">
                                                     <ul class="mb-0">
@@ -226,26 +200,12 @@
                                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                                 </div>
                                                 @endif
+                                                <!-- Form chỉnh sửa danh mục -->
                                                 <form action="{{ route('danh-muc.update', $item->id) }}" method="POST" enctype="multipart/form-data">
                                                     @csrf
                                                     @method('PUT')
                                                     <div class="row g-4">
-                                                        <div class="col-md-6">
-                                                            <label for="parent_id_{{ $item->id }}" class="form-label fw-semibold">Danh mục cha</label>
-                                                            <select name="parent_id" id="parent_id_{{ $item->id }}" class="form-select border-0 shadow-sm">
-                                                                <option value="">Không có danh mục cha</option>
-                                                                @foreach ($categories as $category)
-                                                                @if ($category->id != $item->id)
-                                                                <option value="{{ $category->id }}" {{ old('parent_id', $item->parent_id) == $category->id ? 'selected' : '' }}>
-                                                                    {{ $category->name }}
-                                                                </option>
-                                                                @endif
-                                                                @endforeach
-                                                            </select>
-                                                            @error('parent_id')
-                                                            <span class="text-danger small">{{ $message }}</span>
-                                                            @enderror
-                                                        </div>
+                                                        <!-- Tên danh mục -->
                                                         <div class="col-md-6">
                                                             <label for="name_{{ $item->id }}" class="form-label fw-semibold">Tên danh mục</label>
                                                             <input type="text" name="name" id="name_{{ $item->id }}" class="form-control border-0 shadow-sm" value="{{ old('name', $item->name) }}" placeholder="Nhập tên danh mục" required>
@@ -253,6 +213,18 @@
                                                             <span class="text-danger small">{{ $message }}</span>
                                                             @enderror
                                                         </div>
+                                                        <!-- Trạng thái hiển thị -->
+                                                        <div class="col-md-6">
+                                                            <label for="status_{{ $item->id }}" class="form-label fw-semibold">Trạng thái</label>
+                                                            <select name="status" id="status_{{ $item->id }}" class="form-select border-0 shadow-sm" required>
+                                                                <option value="1" {{ old('status', $item->status) == 1 ? 'selected' : '' }}>Hiển thị</option>
+                                                                <option value="0" {{ old('status', $item->status) == 0 ? 'selected' : '' }}>Ẩn</option>
+                                                            </select>
+                                                            @error('status')
+                                                            <span class="text-danger small">{{ $message }}</span>
+                                                            @enderror
+                                                        </div>
+                                                        <!-- Hình ảnh -->
                                                         <div class="col-md-12">
                                                             <label for="image_{{ $item->id }}" class="form-label fw-semibold">Chọn hình ảnh</label>
                                                             <div class="input-group">
@@ -260,10 +232,10 @@
                                                                 <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('image_{{ $item->id }}').click()">Chọn file</button>
                                                             </div>
                                                             <div class="mt-3 d-flex align-items-center gap-3">
-                                                                @if (!empty($item->image))
+                                                                @if ($item->image)
                                                                 <div class="current-image">
                                                                     <label class="form-label small text-muted">Hình ảnh hiện tại:</label>
-                                                                    <img src="{{ asset($item->image) }}" alt="Hình ảnh hiện tại" class="rounded shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+                                                                    <img src="{{ asset('storage/' . $item->image) }}" alt="Hình ảnh hiện tại" class="rounded shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
                                                                 </div>
                                                                 @endif
                                                                 <div class="preview-image">
@@ -288,8 +260,9 @@
                             </td>
                         </tr>
                         @empty
+                        <!-- Hiển thị thông báo nếu không có danh mục -->
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">Không có danh mục nào để hiển thị.</td>
+                            <td colspan="5" class="text-center text-muted py-4">Không có danh mục nào để hiển thị.</td>
                         </tr>
                         @endforelse
                     </tbody>

@@ -22,15 +22,7 @@ class OrderSeeder extends Seeder
         $userIds = User::pluck('id')->toArray();
         $discounts = Discount::all()->keyBy('id');
         $paymentIds = Payment::pluck('id')->toArray();
-        $products = Product::with('brand')->get(); // Tải trước sản phẩm và brand
-
-        $brandPriceRanges = [
-            'Adidas' => ['min' => 1000000, 'max' => 8000000],
-            'Asics'  => ['min' => 1200000, 'max' => 5000000],
-            'Bata'   => ['min' => 500000,  'max' => 1500000],
-            'Nike'   => ['min' => 1200000, 'max' => 10000000],
-            'Puma'   => ['min' => 900000,  'max' => 4000000],
-        ];
+        $products = Product::all();
 
         // Tính từ tháng hiện tại trở về 12 tháng trước
         $start = new \DateTime();
@@ -42,50 +34,31 @@ class OrderSeeder extends Seeder
 
         foreach ($userIds as $userId) {
             foreach ($months as $month) {
-                $orderCount = rand(1, 10);
-
+                $orderCount = rand(2, 4); // mỗi user mỗi tháng có 2 hoặc 3 đơn
                 for ($i = 0; $i < $orderCount; $i++) {
                     $endOfMonth = (new \DateTime("{$month}-01"))->modify('last day of this month');
                     $createdAt = $faker->dateTimeBetween("{$month}-01", $endOfMonth->format('Y-m-d'));
 
-                    $paymentId = $paymentIds ? $faker->optional(0.8, null)->randomElement($paymentIds) : null;
+                    $paymentId = $paymentIds ? $faker->randomElement($paymentIds) : null;
                     $statusEnum = $faker->randomElement(OrderStatusEnum::cases());
 
-                    // Xử lý trạng thái thanh toán dựa trên trạng thái đơn hàng
-                    switch ($statusEnum) {
-                        case OrderStatusEnum::PENDING:
-                        case OrderStatusEnum::AWAITING_CONFIRMATION:
-                            $paymentStatusEnum = PaymentStatusEnum::PENDING; // Chưa xác nhận, chờ thanh toán
-                            break;
-                        case OrderStatusEnum::PROCESSING:
-                        case OrderStatusEnum::PACKING:
-                            $paymentStatusEnum = PaymentStatusEnum::PAID; // Đã xử lý hoặc đóng gói, giả định đã thanh toán
-                            break;
-                        case OrderStatusEnum::SHIPPED:
-                            $paymentStatusEnum = PaymentStatusEnum::PAID; // Đã gửi, giả định đã thanh toán
-                            break;
-                        case OrderStatusEnum::DELIVERED:
-                            $paymentStatusEnum = PaymentStatusEnum::PAID; // Giao thành công, đã thanh toán
-                            break;
-                        case OrderStatusEnum::CANCELED:
-                            $paymentStatusEnum = PaymentStatusEnum::CANCELED; // Đơn hủy, thanh toán hủy
-                            break;
-                        case OrderStatusEnum::RETURN_REQUESTED:
-                        case OrderStatusEnum::RETURN_PROCESSING:
-                            $paymentStatusEnum = PaymentStatusEnum::PAID; // Yêu cầu trả, đang xử lý, chưa hoàn tiền
-                            break;
-                        case OrderStatusEnum::RETURNED:
-                            $paymentStatusEnum = PaymentStatusEnum::REFUNDED; // Đã trả hàng, đã hoàn tiền
-                            break;
-                        default:
-                            $paymentStatusEnum = PaymentStatusEnum::PENDING; // Mặc định, chờ thanh toán
-                            break;
-                    }
+                    $paymentStatusEnum = match ($statusEnum) {
+                        OrderStatusEnum::PENDING,
+                        OrderStatusEnum::AWAITING_CONFIRMATION => PaymentStatusEnum::PENDING,
+                        OrderStatusEnum::PROCESSING,
+                        OrderStatusEnum::PACKING,
+                        OrderStatusEnum::SHIPPED,
+                        OrderStatusEnum::DELIVERED,
+                        OrderStatusEnum::RETURN_REQUESTED,
+                        OrderStatusEnum::RETURN_PROCESSING => PaymentStatusEnum::PAID,
+                        OrderStatusEnum::RETURNED => PaymentStatusEnum::REFUNDED,
+                        OrderStatusEnum::CANCELED => PaymentStatusEnum::CANCELED,
+                        default => PaymentStatusEnum::PENDING,
+                    };
 
                     $status = $statusEnum->value;
                     $paymentStatus = $paymentStatusEnum->value;
 
-                    // Tạo đơn hàng tạm thời với giá = 0
                     $order = Order::create([
                         'code' => 'STEPVIET' . strtoupper(uniqid()),
                         'user_id' => $userId,
@@ -101,26 +74,14 @@ class OrderSeeder extends Seeder
                         'note' => $faker->optional(0.5)->text(100),
                         'tracking_code' => $faker->optional(0.3)->regexify('[A-Z]{2}[0-9]{8}VN'),
                         'created_at' => $createdAt,
-                        'updated_at' => $createdAt, // Đồng bộ với created_at
+                        'updated_at' => $createdAt,
                     ]);
 
-                    // Chọn ngẫu nhiên 1-2 sản phẩm
-                    $selectedProducts = $products->random(min(1, $products->count(), rand(1, 2)));
+                    $selectedProducts = $products->random(rand(1, min(2, $products->count())));
                     $realTotal = 0;
 
                     foreach ($selectedProducts as $product) {
-                        // Lấy thương hiệu của sản phẩm
-                        $brandName = $product->brand ? $product->brand->name : null;
-
-                        // Gán giá dựa trên thương hiệu
-                        if ($brandName && isset($brandPriceRanges[$brandName])) {
-                            $minPrice = $brandPriceRanges[$brandName]['min'];
-                            $maxPrice = $brandPriceRanges[$brandName]['max'];
-                            $price = $faker->numberBetween($minPrice, $maxPrice);
-                        } else {
-                            $price = $product->price ?? $faker->numberBetween(500000, 5000000);
-                        }
-
+                        $price = $product->price ?? 0;
                         $quantity = rand(1, 3);
                         $realTotal += $price * $quantity;
 
@@ -132,7 +93,6 @@ class OrderSeeder extends Seeder
                         ]);
                     }
 
-                    // Áp dụng giảm giá nếu có
                     $discountId = null;
                     $discountAmount = 0;
                     if (!empty($discounts) && rand(0, 1)) {
@@ -149,7 +109,6 @@ class OrderSeeder extends Seeder
 
                     $finalPrice = max(0, $realTotal - $discountAmount);
 
-                    // Cập nhật tổng tiền đơn hàng
                     $order->update([
                         'discount_id' => $discountId,
                         'total_price' => $realTotal,

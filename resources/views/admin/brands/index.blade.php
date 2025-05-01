@@ -47,7 +47,7 @@
                                     <i class="fas fa-sync me-1"></i> Làm mới
                                 </a>
                                 <button type="button" class="btn btn-success btn-sm fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                                    <i class="fas fa-plus me-1"></i> Thêm
+                                    <i class="fas fa-plus me-1"></i> Thêm thương hiệu
                                 </button>
                             </div>
                         </div>

@@ -16,47 +16,40 @@ class DonHangController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::query();
+        // Build query for orders with eager-loaded relations
+        $query = Order::with(['user', 'items'])->latest();
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        // Apply search filter
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+            });
         }
 
-        $orders = $query->with('user')->get();
+        // Apply status filter
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
 
-        $users = User::all();
-        $products = Product::all();
+        // Get all results without pagination
+        $orders = $query->get();
+
+        // Fetch users and products for the "Add Order" modal
+        $users = User::select('id', 'name', 'email')->get();
+        $products = Product::select('id', 'name', 'price')->get();
 
         return view('admin.orders.index', compact('orders', 'users', 'products'));
     }
 
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_email' => 'required|email|max:255',
-            'customer_phone' => 'required|string|max:20',
-            'total_price' => 'required|numeric|min:0',
-            'status' => 'required|string|in:pending,processing,completed,canceled',
-        ]);
-
-        $order = Order::create($request->all());
-
-        return redirect()->route('orders.index')->with('success', 'Đơn hàng đã được tạo thành công.');
-    }
 
     public function show($id)
     {
         $order = Order::with('user', 'items.product')->findOrFail($id);
 
         return view('admin.orders.view', compact('order'));
-    }
-
-    public function edit($id)
-    {
-        $order = Order::findOrFail($id);
-        return view('admin.orders.edit', compact('order'));
     }
 
     public function update(Request $request, $id)
@@ -70,11 +63,5 @@ class DonHangController extends Controller
         $order->save();
 
         return back()->with('success', 'Cập nhật trạng thái thành công!');
-    }
-
-    public function destroy($id)
-    {
-        Order::destroy($id);
-        return redirect()->route('orders')->with('success', 'Xóa đơn hàng thành công');
     }
 }

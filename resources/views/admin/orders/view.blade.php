@@ -8,7 +8,7 @@
         <h4 class="fw-bold mb-0">
             <i class="bi bi-bag-check-fill text-success me-2"></i>Đơn Hàng #{{ $order->code }}
         </h4>
-        <a href="{{ route('don-hang.index') }}" class="btn btn-sm btn-outline-dark">
+        <a href="{{ route('don-hang.index') }}" class="btn btn-sm btn-outline-dark shadow-sm hover-shadow">
             <i class="bi bi-chevron-left me-1"></i> Quay lại danh sách
         </a>
     </div>
@@ -49,10 +49,10 @@
                             </span>
                         </li>
                         <li><strong>Phương thức:</strong> {{ $order->payment->name ?? 'Chưa chọn' }}</li>
-                        <li><strong>Tổng tiền:</strong> <span class="fw-bold text-dark">{{ number_format($order->total_price) }}₫</span></li>
+                        <li><strong>Tổng tiền:</strong> <span class="fw-bold text-dark">{{ number_format($order->total_price * 100) }}₫</span></li>
                         @if($order->total_after_discount && $order->total_after_discount < $order->total_price)
-                            <li><strong>Giảm giá:</strong> <span class="text-danger">-{{ number_format($order->total_price - $order->total_after_discount) }}₫</span></li>
-                            <li><strong>Thành tiền:</strong> <span class="text-success fw-bold">{{ number_format($order->total_after_discount) }}₫</span></li>
+                            <li><strong>Giảm giá:</strong> <span class="text-danger">-{{ number_format(($order->total_price - $order->total_after_discount) * 100) }}₫</span></li>
+                            <li><strong>Thành tiền:</strong> <span class="text-success fw-bold">{{ number_format($order->total_after_discount * 100) }}₫</span></li>
                             @endif
                     </ul>
                 </div>
@@ -83,25 +83,28 @@
                         $product = $item->product;
                         $product = $product ?? null;
                         @endphp
-                        <tr class="border-bottom">
+                        <tr class="border-bottom hover-shadow">
                             <td>{{ $loop->iteration }}</td>
                             <td class="d-flex align-items-center">
-                                <img src="{{ asset('images/' . $product->image) }}" class="me-3 rounded" width="45" height="45" style="object-fit:cover;">
+                                <img src="{{ asset('storage/' . $product->image) }}" class="me-3 rounded" width="45" height="45" style="object-fit:cover;">
                                 <div>
                                     <span class="fw-medium">{{ $product->name ?? 'N/A' }}</span><br>
-                                    <small class="text-muted">Mã: {{ $product->code ?? '---' }}</small>
                                 </div>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <span class="me-2 d-inline-block border rounded-circle" style="width:16px; height:16px; background-color:{{ $product->color }}"></span>
-                                    <span>{{ $product->color ?? '---' }}</span>
+                                    @if($product->color)
+                                    <span class="me-2 d-inline-block border rounded-circle" style="width:16px; height:16px; background-color:{{ $product->color->hex_code }}"></span>
+                                    <span>{{ $product->color->name }}</span>
+                                    @else
+                                    ---
+                                    @endif
                                 </div>
                             </td>
-                            <td>{{ $product->size ?? '---' }}</td>
+                            <td>{{ $product->size->name ?? '---' }}</td>
                             <td class="text-center">{{ $item->quantity }}</td>
-                            <td class="text-end">{{ number_format($item->price) }}₫</td>
-                            <td class="text-end fw-bold">{{ number_format($item->price * $item->quantity) }}₫</td>
+                            <td class="text-end">{{ number_format($item->price * 100) }}₫</td>
+                            <td class="text-end fw-bold">{{ number_format($item->price * $item->quantity * 100) }}₫</td>
                         </tr>
                         @empty
                         <tr>
@@ -134,6 +137,15 @@
 
     .rounded-4 {
         border-radius: 1rem !important;
+    }
+
+    .hover-shadow:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .shadow-sm {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
 </style>
 @endsection
