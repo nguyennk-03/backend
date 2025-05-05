@@ -111,7 +111,7 @@ class OrderSeeder extends Seeder
 
                     $order->update([
                         'discount_id' => $discountId,
-                        'total_price' => $realTotal,
+                        'total_price' => $realTotal/100,
                         'total_after_discount' => $discountId ? $finalPrice : null,
                     ]);
                 }
