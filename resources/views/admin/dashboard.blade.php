@@ -126,7 +126,7 @@
                                     <!-- Cột phải: Tổng tiền & nút xem -->
                                     <div class="col-4 text-end">
                                         <div class="text-primary fw-bold fs-5">
-                                            {{ number_format($order->total_price * 100, 0, ',', '.') }}₫
+                                            {{ number_format($order->total_price, 0, ',', '.') }}₫
                                         </div>
                                         <a href="{{ route('don-hang.show', $order->id) }}"
                                             class="btn btn-sm btn-outline-primary mt-2 hover-btn">

@@ -78,7 +78,7 @@
                             <td class="text-center">{{ $item->id }}</td>
                             <td>{{ e($item->code) }}</td>
                             <td>{{ e($item->user->name ?? 'Khách vãng lai') }}</td>
-                            <td class="text-end">{{ number_format($item->total_price * 100, 0, ',', '.') }} đ</td>
+                            <td class="text-end">{{ number_format($item->total_price, 0, ',', '.') }} đ</td>
                             <td class="text-center">
                                 <form action="{{ route('don-hang.update', $item->id) }}" method="POST" class="d-inline-block">
                                     @csrf
@@ -195,8 +195,8 @@
                                         Size: {{ $items->product->size->name ?? 'N/A' }}
                                     </td>
                                     <td>{{ $items->quantity }}</td>
-                                    <td>{{ number_format($items->price * 100, 0, ',', '.') }} đ</td>
-                                    <td class="fw-bold text-end">{{ number_format($items->quantity * $items->price * 100, 0, ',', '.') }} đ</td>
+                                    <td>{{ number_format($items->price, 0, ',', '.') }} đ</td>
+                                    <td class="fw-bold text-end">{{ number_format($items->quantity * $items->price, 0, ',', '.') }} đ</td>
                                 </tr>
                                 @endforeach
                             </tbody>

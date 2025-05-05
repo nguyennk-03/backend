@@ -49,10 +49,10 @@
                             </span>
                         </li>
                         <li><strong>Phương thức:</strong> {{ $order->payment->name ?? 'Chưa chọn' }}</li>
-                        <li><strong>Tổng tiền:</strong> <span class="fw-bold text-dark">{{ number_format($order->total_price * 100) }}₫</span></li>
+                        <li><strong>Tổng tiền:</strong> <span class="fw-bold text-dark">{{ number_format($order->total_price) }}₫</span></li>
                         @if($order->total_after_discount && $order->total_after_discount < $order->total_price)
-                            <li><strong>Giảm giá:</strong> <span class="text-danger">-{{ number_format(($order->total_price - $order->total_after_discount) * 100) }}₫</span></li>
-                            <li><strong>Thành tiền:</strong> <span class="text-success fw-bold">{{ number_format($order->total_after_discount * 100) }}₫</span></li>
+                            <li><strong>Giảm giá:</strong> <span class="text-danger">-{{ number_format(($order->total_price - $order->total_after_discount)) }}₫</span></li>
+                            <li><strong>Thành tiền:</strong> <span class="text-success fw-bold">{{ number_format($order->total_after_discount) }}₫</span></li>
                             @endif
                     </ul>
                 </div>
@@ -103,8 +103,8 @@
                             </td>
                             <td>{{ $product->size->name ?? '---' }}</td>
                             <td class="text-center">{{ $item->quantity }}</td>
-                            <td class="text-end">{{ number_format($item->price * 100) }}₫</td>
-                            <td class="text-end fw-bold">{{ number_format($item->price * $item->quantity * 100) }}₫</td>
+                            <td class="text-end">{{ number_format($item->price) }}₫</td>
+                            <td class="text-end fw-bold">{{ number_format($item->price * $item->quantity) }}₫</td>
                         </tr>
                         @empty
                         <tr>

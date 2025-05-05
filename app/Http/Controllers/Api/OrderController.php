@@ -103,8 +103,11 @@ class OrderController extends Controller
         $shippingFee = 30000; // phí vận chuyển cố định
         $calculatedTotal += $shippingFee; // cộng phí vận chuyển vào tổng tiền
 
+        // Chuyển đổi tổng tiền từ đồng sang nghìn đồng nếu VNPay yêu cầu thanh toán theo nghìn đồng
+        $totalFor = $calculatedTotal / 1000;
+
         // Kiểm tra nếu tổng giá không khớp với tổng giá frontend gửi lên
-        if (abs($calculatedTotal - $validated['total_price']) > 0.01) {
+        if (abs($totalFor - $validated['total_price']) > 0.01) {
             return response()->json([
                 'status' => Response::HTTP_BAD_REQUEST,
                 'message' => 'Tổng giá không khớp với giá sản phẩm.',

@@ -112,29 +112,6 @@ use Illuminate\Support\Str; ?>
                                 </button>
                             </td>
                         </tr>
-
-                        <!-- Modal chi tiết bình luận -->
-                        <div class="modal fade" id="viewCommentModal{{ $comment->id }}" tabindex="-1" aria-labelledby="viewCommentModalLabel{{ $comment->id }}" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="viewCommentModalLabel{{ $comment->id }}">Chi tiết Bình luận</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p><strong>Sản phẩm:</strong> {{ $comment->product->name ?? 'N/A' }}</p>
-                                        <p><strong>Người dùng:</strong> {{ $comment->user->name ?? 'N/A' }}</p>
-                                        <p><strong>Nội dung:</strong> {{ $comment->message }}</p>
-                                        <p><strong>Bình luận cha:</strong> {{ $comment->parent ? $comment->parent->id : 'N/A' }}</p>
-                                        <p><strong>Trạng thái hiển thị:</strong> {{ $comment->is_hidden ? 'Ẩn' : 'Hiển thị' }}</p>
-                                        <p><strong>Ngày tạo:</strong> {{ $comment->created_at->format('d/m/Y H:i') }}</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         @empty
                         <tr>
                             <td colspan="8" class="text-center text-muted py-4">Không có bình luận nào để hiển thị.</td>
@@ -142,6 +119,29 @@ use Illuminate\Support\Str; ?>
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Modal chi tiết bình luận -->
+            <div class="modal fade" id="viewCommentModal{{ $comment->id }}" tabindex="-1" aria-labelledby="viewCommentModalLabel{{ $comment->id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="viewCommentModalLabel{{ $comment->id }}">Chi tiết Bình luận</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Sản phẩm:</strong> {{ $comment->product->name ?? 'N/A' }}</p>
+                            <p><strong>Người dùng:</strong> {{ $comment->user->name ?? 'N/A' }}</p>
+                            <p><strong>Nội dung:</strong> {{ $comment->message }}</p>
+                            <p><strong>Bình luận cha:</strong> {{ $comment->parent ? $comment->parent->id : 'N/A' }}</p>
+                            <p><strong>Trạng thái hiển thị:</strong> {{ $comment->is_hidden ? 'Ẩn' : 'Hiển thị' }}</p>
+                            <p><strong>Ngày tạo:</strong> {{ $comment->created_at->format('d/m/Y H:i') }}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
