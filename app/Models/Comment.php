@@ -46,6 +46,6 @@ class Comment extends Model
     // Truy vấn tất cả các bình luận hiển thị (is_hidden = 1)
     public static function visibleComments()
     {
-        return self::where('is_hidden', 1)->get();
+        return self::where('is_hidden', 0)->get();
     }
 }
