@@ -87,7 +87,6 @@ class OrderController extends Controller
             'products' => 'required|array|min:1',
             'products.*.product_id' => 'required|integer|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1|max:1000',
-            'products.*.price' => 'required|numeric|min:0',
             'phone' => 'required|regex:/^[0-9]{9,12}$/',
             'address' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -95,19 +94,24 @@ class OrderController extends Controller
             'total_price' => 'required|numeric|min:1000',
         ]);
 
-        $calculatedProductTotal = collect($validated['products'])
-            ->sum(fn($p) => $p['price'] * $p['quantity']);
-        $shippingFee = $validated['shipping_fee'] ?? 0; // frontend truyền lên
+        $productTotal = 0;
 
-        $calculatedTotal = $calculatedProductTotal + $shippingFee;
+        foreach ($validated['products'] as $item) {
+            $product = Product::findOrFail($item['product_id']);
+            $productTotal += $product->price * $item['quantity'];
+        }
+
+        $shippingFee = 30000; // phí vận chuyển cố định
+        $calculatedTotal = $productTotal + $shippingFee;
+
         if (abs($calculatedTotal - $validated['total_price']) > 0.01) {
             return response()->json([
                 'status' => Response::HTTP_BAD_REQUEST,
-                'message' => 'Tổng giá không khớp với giá sản phẩm.',
+                'message' => 'Tổng giá không hợp lệ (bao gồm phí vận chuyển).',
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->handleOrderCreation($validated, $user);
+        return $this->handleOrderCreation($validated + ['shipping_fee' => $shippingFee], $user);
     }
 
     private function handleOrderCreation(array $validated, $user)
