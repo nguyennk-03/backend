@@ -107,9 +107,6 @@ class UsersController extends Controller
             'phone' => 'sometimes|string|max:20|nullable',
             'address' => 'sometimes|string|nullable',
             'avatar' => 'sometimes|string|nullable',
-            'role' => ['sometimes', Rule::in(['admin', 'user'])],
-            'status' => 'sometimes|boolean',
-            'is_locked' => 'sometimes|boolean',
             'password' => 'sometimes|string|min:6|confirmed',
         ]);
 
@@ -127,7 +124,7 @@ class UsersController extends Controller
 
         $validated = $request->validate([
             'current_password' => 'required|string|min:6',
-            'new_password' => 'required|string|min:6|confirmed',
+            'new_password' => 'required|string|min:6|confirmed|required|string|min:6|confirmed',
         ]);
 
         if (!Hash::check($validated['current_password'], $user->password)) {

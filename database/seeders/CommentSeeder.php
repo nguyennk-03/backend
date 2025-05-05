@@ -63,8 +63,8 @@ class CommentSeeder extends Seeder
                     'user_id' => $faker->randomElement($normalUsers),
                     'message' => $question,
                     'is_staff' => false,
+                    'is_hidden' => 1,
                     'created_at' => $faker->dateTimeBetween('-6 months', 'now'),
-                    'updated_at' => now(),
                 ]);
 
                 // Admin trả lời bình luận
@@ -73,9 +73,9 @@ class CommentSeeder extends Seeder
                     'user_id' => $faker->randomElement($adminUsers),
                     'message' => $answer,
                     'is_staff' => true,
+                    'is_hidden' => 1,
                     'parent_id' => $userComment->id,
                     'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
             }
         }

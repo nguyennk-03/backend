@@ -2,17 +2,10 @@
 
 use Illuminate\Support\Str;
 ?>
-
-<!-- Kế thừa layout admin để sử dụng cấu trúc giao diện cơ bản -->
 @extends('admin.layout')
-
-<!-- Đặt tiêu đề trang -->
 @section('title', 'Bình luận')
-
-<!-- Xác định nội dung chính của trang -->
 @section('content')
 <div class="container-fluid">
-    <!-- Phần tiêu đề trang -->
     <div class="row">
         <div class="col-12">
             <!-- Hiển thị tiêu đề trang và điều hướng breadcrumb -->
@@ -26,9 +19,7 @@ use Illuminate\Support\Str;
             </div>
         </div>
     </div>
-
     <!-- Thông báo thành công -->
-    <!-- Hiển thị thông báo thành công nếu có trong session -->
     @if (session('success'))
     <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
         <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
@@ -109,15 +100,21 @@ use Illuminate\Support\Str;
                             <td>{{ Str::limit($comment->message, 50) }}</td>
                             <td class="text-center">{{ $comment->parent ? $comment->parent->id : 'N/A' }}</td>
                             <td class="text-center">
-                                {{ $comment->is_hidden ? 'Ẩn' : 'Hiển thị' }}
+                                <form action="{{ route('binh-luan.update', $comment->id) }}" method="POST" class="d-inline-block">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <select name="is_hidden" onchange="this.form.submit()" class="form-select form-select-sm">
+                                        <option value="1" {{ $comment->is_hidden == 1 ? 'selected' : '' }}>Hiển thị</option>
+                                        <option value="0" {{ $comment->is_hidden == 0 ? 'selected' : '' }}>Ẩn</option>
+                                    </select>
+                                </form>
                             </td>
                             <td class="text-center">{{ $comment->created_at->format('d/m/Y H:i') }}</td>
                             <td>
-                                <div class="d-flex justify-content-center gap-2">
-                                    <a href="{{ route('binh-luan.show', $comment->id) }}" class="btn btn-info btn-sm shadow-sm">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </div>
+                                <button type="button" class="btn btn-info btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#viewCommentModal{{ $comment->id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </td>
                         </tr>
                         @empty
@@ -129,6 +126,29 @@ use Illuminate\Support\Str;
                     </tbody>
                 </table>
             </div>
+            <!-- Modal Xem Bình luận -->
+            <div class="modal fade" id="viewCommentModal{{ $comment->id }}" tabindex="-1" aria-labelledby="viewCommentModalLabel{{ $comment->id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="viewCommentModalLabel{{ $comment->id }}">Chi tiết Bình luận</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Sản phẩm:</strong> {{ $comment->product->name ?? 'N/A' }}</p>
+                            <p><strong>Người dùng:</strong> {{ $comment->user->name ?? 'N/A' }}</p>
+                            <p><strong>Nội dung:</strong> {{ $comment->message }}</p>
+                            <p><strong>Bình luận cha:</strong> {{ $comment->parent ? $comment->parent->id : 'N/A' }}</p>
+                            <p><strong>Trạng thái hiển thị:</strong> {{ $comment->is_hidden ? 'Ẩn' : 'Hiển thị' }}</p>
+                            <p><strong>Ngày tạo:</strong> {{ $comment->created_at->format('d/m/Y H:i') }}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

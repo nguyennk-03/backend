@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->string('hex_code')->unique();
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(1)->comment('0: Ẩn, 1: Hiển thị');
             $table->timestamps();
         });
     }

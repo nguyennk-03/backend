@@ -127,7 +127,7 @@ class AuthController extends Controller
             $token = Password::broker()->createToken($user);
 
             // Tạo URL frontend reset
-            $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
+            $frontendUrl = config('app.frontend_url', 'http://localhost:4200');
             $url = "{$frontendUrl}/password/reset/{$token}?email=" . urlencode($email);
 
             // Gửi email

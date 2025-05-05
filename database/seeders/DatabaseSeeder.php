@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
             PaymentSeeder::class,
             OrderSeeder::class,
             ReviewSeeder::class,
-            NotificationSeeder::class,
             WishlistSeeder::class,
             NewsSeeder::class,
             CommentSeeder::class,

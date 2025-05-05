@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->string('title')->comment('Tiêu đề thông báo');
             $table->text('message')->comment('Nội dung thông báo');
             $table->string('link')->nullable()->comment('Liên kết liên quan');
-            $table->enum('status', ['unread', 'read'])->default('unread')->comment('Trạng thái thông báo');
+            $table->tinyInteger('status')->default(0)->comment('Trạng thái thông báo: 0: Chưa đọc, 1: Đã đọc');
             $table->timestamps();
         });
     }

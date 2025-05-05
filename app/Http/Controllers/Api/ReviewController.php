@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Review;
+use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Enums\OrderStatusEnum;
 use Carbon\Carbon;
 
 class ReviewController extends Controller
@@ -53,10 +55,27 @@ class ReviewController extends Controller
             'comment' => 'nullable|string',
         ]);
 
-        if (Review::where('product_id', $validated['product_id'])->where('user_id', Auth::id())->exists()) {
+        // Kiểm tra người dùng đã nhận hàng sản phẩm này chưa
+        $hasDeliveredOrder = Order::where('user_id', Auth::id())
+            ->where('status', OrderStatusEnum::DELIVERED)
+            ->whereHas('orderItems', function ($query) use ($validated) {
+                $query->where('product_id', $validated['product_id']);
+            })
+            ->exists();
+
+        if (!$hasDeliveredOrder) {
+            return response()->json(['error' => 'Bạn chỉ có thể đánh giá sau khi đã nhận hàng sản phẩm.'], 403);
+        }
+
+        // Kiểm tra đã đánh giá trước đó chưa
+        if (Review::where('product_id', $validated['product_id'])
+            ->where('user_id', Auth::id())
+            ->exists()
+        ) {
             return response()->json(['error' => 'Bạn đã đánh giá sản phẩm này rồi.'], 400);
         }
 
+        // Tạo đánh giá
         $review = Review::create([
             'user_id' => Auth::id(),
             'product_id' => $validated['product_id'],

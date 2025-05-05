@@ -13,14 +13,14 @@ class CreateProductsTable extends Migration
             $table->string('name')->comment('Tên sản phẩm');
             $table->decimal('price', 10, 2)->comment('Giá gốc');
             $table->string('image')->nullable()->comment('Hình ảnh sản phẩm');
-            $table->foreignId('size_id')->nullable()->constrained('sizes')->onDelete('set null')->comment('Kích thước sản phẩm');
-            $table->foreignId('color_id')->nullable()->constrained('colors')->onDelete('set null')->comment('Màu sản phẩm');
             $table->text('description')->nullable()->comment('Mô tả sản phẩm');
             $table->tinyInteger('sale')->default(0)->comment('0: Không giảm giá, 1: Đang giảm giá');
             $table->tinyInteger('hot')->default(0)->comment('0: Thường, 1: Mới, 2: Nổi bật, 3: Bán chạy');
             $table->tinyInteger('status')->default(1)->comment('0: Ẩn, 1: Hiển thị');
             $table->integer('stock_quantity')->default(0)->comment('Tổng tồn kho');
             $table->integer('sold')->default(0)->comment('Số lượng đã bán');
+            $table->foreignId('size_id')->nullable()->constrained('sizes')->onDelete('set null')->comment('Kích thước sản phẩm');
+            $table->foreignId('color_id')->nullable()->constrained('colors')->onDelete('set null')->comment('Màu sản phẩm');
             $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null')->comment('Danh mục sản phẩm');
             $table->foreignId('brand_id')->nullable()->constrained('brands')->onDelete('set null')->comment('Thương hiệu sản phẩm');
             $table->timestamps();

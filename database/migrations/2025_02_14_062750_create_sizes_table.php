@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sizes', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(1)->comment('0: Ẩn, 1: Hiển thị');
             $table->timestamps();
         });
     }

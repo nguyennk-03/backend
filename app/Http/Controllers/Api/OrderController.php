@@ -95,9 +95,11 @@ class OrderController extends Controller
             'total_price' => 'required|numeric|min:1000',
         ]);
 
-        $calculatedTotal = collect($validated['products'])
+        $calculatedProductTotal = collect($validated['products'])
             ->sum(fn($p) => $p['price'] * $p['quantity']);
+        $shippingFee = $validated['shipping_fee'] ?? 0; // frontend truyền lên
 
+        $calculatedTotal = $calculatedProductTotal + $shippingFee;
         if (abs($calculatedTotal - $validated['total_price']) > 0.01) {
             return response()->json([
                 'status' => Response::HTTP_BAD_REQUEST,

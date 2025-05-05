@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade')->comment('Sản phẩm');
             $table->tinyInteger('rating')->unsigned()->comment('Đánh giá từ 1 đến 5 sao');
             $table->text('comment')->nullable()->comment('Bình luận');
-            $table->tinyInteger('is_hidden')->default(0)->comment('0: Ẩn, 1: Hiển thị');
+            $table->tinyInteger('is_hidden')->default(1)->comment('0: Ẩn, 1: Hiển thị');
             $table->timestamps();
         });
     }

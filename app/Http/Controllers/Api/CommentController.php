@@ -9,56 +9,69 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
-    public function index()
+    // Lấy tất cả bình luận theo sản phẩm, dạng cây
+    public function index(Request $request)
     {
-        return Comment::with('user:id,name')->orderBy('created_at', 'desc')->get();
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+        ]);
+
+        $comments = Comment::with(['user', 'replies.user'])
+            ->where('product_id', $request->product_id)
+            ->whereNull('parent_id') // chỉ lấy bình luận gốc
+            ->where('is_hidden', 0)
+            ->latest()
+            ->get();
+
+        return response()->json($comments);
     }
 
-    public function show($id)
-    {
-        return Comment::with('user:id,name')->findOrFail($id);
-    }
-
+    // Tạo mới bình luận hoặc trả lời
     public function store(Request $request)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'message' => 'required|string',
+            'parent_id' => 'nullable|exists:comments,id',
         ]);
 
         $comment = Comment::create([
             'product_id' => $request->product_id,
             'user_id' => Auth::id(),
             'message' => $request->message,
-            'is_staff' => Auth::user()->role === 'admin' ? true : false,
+            'is_staff' => Auth::user()?->role === 'admin',
+            'parent_id' => $request->parent_id,
         ]);
 
-        return response()->json($comment, 201);
+        return response()->json($comment->load('user', 'parent'), 201);
     }
 
-    public function update(Request $request, $id)
-    {
-        $comment = Comment::findOrFail($id);
-
-        if ($comment->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $request->validate(['message' => 'required|string']);
-        $comment->update(['message' => $request->message]);
-
-        return response()->json($comment);
-    }
-
+    // Xóa bình luận (chỉ nếu là chủ sở hữu hoặc admin)
     public function destroy($id)
     {
         $comment = Comment::findOrFail($id);
 
-        if ($comment->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        if (Auth::id() !== $comment->user_id && Auth::user()?->role !== 'admin') {
+            return response()->json(['error' => 'Không có quyền xóa bình luận này'], 403);
         }
 
         $comment->delete();
-        return response()->json(['message' => 'Comment deleted successfully']);
+
+        return response()->json(['message' => 'Đã xóa bình luận'], 200);
+    }
+
+    // Admin: Ẩn hoặc hiện bình luận
+    public function toggleVisibility($id)
+    {
+        $comment = Comment::findOrFail($id);
+
+        if (Auth::user()?->role !== 'admin') {
+            return response()->json(['error' => 'Chỉ admin mới được phép ẩn/hiện bình luận'], 403);
+        }
+
+        $comment->is_hidden = !$comment->is_hidden;
+        $comment->save();
+
+        return response()->json(['message' => 'Đã cập nhật trạng thái hiển thị', 'is_hidden' => $comment->is_hidden]);
     }
 }
