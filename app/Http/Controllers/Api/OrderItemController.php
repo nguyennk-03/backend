@@ -21,7 +21,7 @@ class OrderItemController extends Controller
             ->whereHas('order', function ($query) {
                 $query->where('user_id', Auth::id());
             })
-            ->select('id', 'order_id', 'product_id', 'quantity', 'price','image')
+            ->select('id', 'order_id', 'product_id', 'quantity', 'price','image','size','color')
             ->latest()
             ->get();
 
