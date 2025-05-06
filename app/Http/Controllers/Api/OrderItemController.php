@@ -12,8 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class OrderItemController extends Controller
 {
-   
-
     public function index()
     {
         $user = Auth::user();
