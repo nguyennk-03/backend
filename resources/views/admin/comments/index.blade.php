@@ -91,9 +91,9 @@
                                 <form action="{{ route('binh-luan.update', $comment->id) }}" method="POST" class="d-inline-block">
                                     @csrf
                                     @method('PUT')
-                                    <select name="is_hidden" onchange="this.form.submit()" class="form-select form-select-sm">
-                                        <option value="1" {{ $comment->is_hidden == 1 ? 'selected' : '' }}>Hiển thị</option>
-                                        <option value="0" {{ $comment->is_hidden == 0 ? 'selected' : '' }}>Ẩn</option>
+                                    <select name="status" onchange="this.form.submit()" class="form-select form-select-sm">
+                                        <option value="1" {{ $comment->status == 1 ? 'selected' : '' }}>Hiển thị</option>
+                                        <option value="0" {{ $comment->status == 0 ? 'selected' : '' }}>Ẩn</option>
                                     </select>
                                 </form>
                             </td>
@@ -119,32 +119,50 @@
 
 <!-- Modal Xem Bình luận -->
 @foreach ($comments as $comment)
-<div class="modal fade" id="showCommentModal{{ $comment->id }}" tabindex="-1" aria-labelledby="showCommentModalLabel{{ $comment->id }}" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content rounded-lg shadow-lg">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="showCommentModalLabel{{ $comment->id }}">
-                    <i class="fas fa-info-circle me-2"></i> Chi tiết bình luận #{{ $comment->id }}
+<div class="modal fade" id="showCommentModal{{ $comment->id }}" tabindex="-1"
+    aria-labelledby="showCommentModalLabel{{ $comment->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-3 shadow-sm">
+            {{-- Modal Header --}}
+            <div class="modal-header d-flex justify-content-between align-items-center bg-light border-bottom-0 px-4 py-3">
+                <h5 class="modal-title fw-bold text-primary mb-0" id="showCommentModalLabel{{ $comment->id }}">
+                    <i class="fas fa-comment-dots me-2 text-info"></i>Chi tiết bình luận #{{ $comment->id }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
-                <div class="card border-0 p-3 rounded shadow-sm">
-                    <p class="mb-2"><strong>Sản phẩm:</strong> {{ $comment->product->name ?? 'Không xác định' }}</p>
-                    <p class="mb-2"><strong>Người dùng:</strong> {{ $comment->user->name ?? 'Không xác định' }}</p>
-                    <p class="mb-2"><strong>Nội dung:</strong> {{ $comment->message }}</p>
-                    <p class="mb-2"><strong>Bình luận cha:</strong> {{ $comment->parent ? ('#' . $comment->parent->id) : 'Không có' }}</p>
-                    <p class="mb-2"><strong>Trạng thái hiển thị:</strong> {{ $comment->is_hidden ? 'Ẩn' : 'Hiển thị' }}</p>
-                    <p class="mb-2"><strong>Thời gian tạo:</strong> {{ $comment->created_at->format('d/m/Y H:i') }}</p>
-                </div>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-secondary btn-sm fw-semibold" data-bs-dismiss="modal">Đóng</button>
+    
+            {{-- Modal Body --}}
+            <div class="modal-body px-4 py-3">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item py-2">
+                        <strong>Sản phẩm:</strong> {{ $comment->product->name ?? 'Không xác định' }}
+                    </li>
+                    <li class="list-group-item py-2">
+                        <strong>Người dùng:</strong> {{ $comment->user->name ?? 'Không xác định' }}
+                    </li>
+                    <li class="list-group-item py-2">
+                        <strong>Nội dung:</strong>
+                        <p class="mt-1 mb-0 text-muted fst-italic">{{ $comment->message }}</p>
+                    </li>
+                    <li class="list-group-item py-2">
+                        <strong>Bình luận cha:</strong> {{ $comment->parent ? ('#' . $comment->parent->id) : 'Không có' }}
+                    </li>
+                    <li class="list-group-item py-2">
+                        <strong>Trạng thái hiển thị:</strong>
+                        <span class="ms-2 badge {{ $comment->status ? 'bg-success' : 'bg-danger' }}">
+                            {{ $comment->status_label }}
+                        </span>
+                    </li>
+                    <li class="list-group-item py-2">
+                        <strong>Thời gian tạo:</strong> {{ $comment->created_at->format('d/m/Y H:i') }}
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
 @endforeach
+
 
 </div>
 

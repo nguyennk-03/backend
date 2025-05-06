@@ -61,30 +61,35 @@ class BaiVietController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'content' => 'required|string',
-                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
-                'category_id' => 'required|exists:categories,id',
-                'brand_id' => 'nullable|exists:brands,id',
-                'author' => 'required|string|max:255',
-                'status' => 'required|in:0,1',
+        // Nếu không nhập slug, tạo slug từ title
+        if (!$request->filled('slug') && $request->filled('title')) {
+            $request->merge([
+                'slug' => Str::slug($request->input('title'))
             ]);
-
-            $data = $request->only('title', 'content', 'category_id', 'brand_id', 'author', 'status');
-            $data['slug'] = Str::slug($request->title);
-
-            if ($request->hasFile('image')) {
-                $data['image'] = $request->file('image')->store('news', 'public');
-            }
-
-            News::create($data);
-
-            return redirect()->route('bai-viet.index')->with('success', 'Bài viết đã được thêm!');
-        } catch (\Exception $e) {
-            return back()->withInput()->with('error', 'Đã có lỗi xảy ra: ' . $e->getMessage());
         }
+
+        // Validate dữ liệu
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:news',
+            'content' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
+            'author' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $data = $validated;
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('images/news', 'public');
+        }
+
+        $data['views'] = 0;
+
+        News::create($data);
+
+        return redirect()->route('bai-viet.index')->with('success', 'Bài viết đã được tạo thành công!');
     }
 
     /**
@@ -109,53 +114,56 @@ class BaiVietController extends Controller
     /**
      * Update the specified news article.
      */
-    public function update(Request $request, News $news)
+    public function update(Request $request, $id)
     {
-        try {
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'content' => 'required|string',
-                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
-                'category_id' => 'required|exists:categories,id',
-                'brand_id' => 'nullable|exists:brands,id',
-                'author' => 'required|string|max:255',
-                'status' => 'required|in:0,1',
+        $news = News::findOrFail($id);
+
+        if (!$request->filled('slug') && $request->filled('title')) {
+            $request->merge([
+                'slug' => Str::slug($request->input('title'))
             ]);
-
-            $data = $request->only('title', 'content', 'category_id', 'brand_id', 'author', 'status');
-            $data['slug'] = Str::slug($request->title);
-
-            if ($request->hasFile('image')) {
-                // Delete old image if exists
-                if ($news->image) {
-                    Storage::disk('public')->delete($news->image);
-                }
-                $data['image'] = $request->file('image')->store('news', 'public');
-            }
-
-            $news->update($data);
-
-            return redirect()->route('bai-viet.index')->with('success', 'Bài viết đã được cập nhật!');
-        } catch (\Exception $e) {
-            return back()->withInput()->with('error', 'Đã có lỗi xảy ra: ' . $e->getMessage());
         }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:news,slug,' . $news->id,
+            'content' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
+            'author' => 'required|string|max:255',
+            'status' => 'required|in:0,1',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($news->image) {
+                Storage::disk('public')->delete($news->image);
+            }
+            $validated['image'] = $request->file('image')->store('images/news', 'public');
+        }
+
+        $news->fill($validated)->save();
+
+        return redirect()->route('bai-viet.index')->with('success', 'Bài viết đã được cập nhật!');
     }
 
     /**
      * Remove the specified news article.
      */
-    public function destroy(News $news)
+    public function destroy($id)
     {
         try {
-            // Delete associated image if exists
-            if ($news->image) {
+            $news = News::findOrFail($id);
+
+            if ($news->image && Storage::disk('public')->exists($news->image)) {
                 Storage::disk('public')->delete($news->image);
             }
 
             $news->delete();
-            return redirect()->route('bai-viet.index')->with('success', 'Bài viết đã được xóa!');
+
+            return redirect()->route('bai-viet.index')->with('success', 'Xóa bài viết thành công!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Đã có lỗi xảy ra: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi xóa sản phẩm: ' . $e->getMessage());
         }
     }
 }

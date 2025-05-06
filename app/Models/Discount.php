@@ -12,7 +12,7 @@ class Discount extends Model
     ];
 
     protected $casts = [
-        'discount_type' => 'string',
+        'discount_type' => 'integer',
         'value' => 'decimal:2',
         'min_order_amount' => 'decimal:2',
         'start_date' => 'datetime',
@@ -29,10 +29,10 @@ class Discount extends Model
     {
         return $this->hasMany(Order::class);
     }
-
-    // Quan hệ: Mã giảm giá áp dụng cho nhiều sản phẩm
-    public function products()
+    public function getValueFormattedAttribute()
     {
-        return $this->belongsToMany(Product::class, 'product_discounts');
+        return $this->discount_type == '1'
+            ? $this->value . '%'
+            : number_format($this->value, 0, ',', '.') . 'đ';
     }
 }

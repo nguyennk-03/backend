@@ -44,18 +44,18 @@ class DanhGiaController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string',
+            'status' => 'required|in:0,1',
         ]);
 
         $review = Review::findOrFail($id);
         $review->update([
-            'rating' => $request->rating,
-            'comment' => $request->comment,
+            'status' => $request->status,
         ]);
 
-        return redirect()->route('reviews')->with('success', 'Đánh giá đã được cập nhật!');
+        return redirect()->route('danh-gia.index')->with('success', 'Trạng thái đánh giá đã được cập nhật!');
     }
+
+
 
     public function destroy($id)
     {

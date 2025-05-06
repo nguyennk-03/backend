@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-    protected $fillable = ['user_id', 'product_id', 'rating', 'comment', 'is_hidden'];
+    protected $fillable = ['user_id', 'product_id', 'rating', 'comment', 'status'];
 
     protected $casts = [
         'rating' => 'integer',
-        'is_hidden' => 'boolean',
+        'status' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -25,5 +25,9 @@ class Review extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+    public function getStatusLabelAttribute()
+    {
+        return $this->status ? 'Hiển thị' : 'Ẩn';
     }
 }

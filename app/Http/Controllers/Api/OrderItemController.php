@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\OrderItem;
 use App\Models\Order;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -13,7 +14,17 @@ class OrderItemController extends Controller
 {
     public function index()
     {
-        $orderItems = OrderItem::with('product')->get();
+        $orderItems = OrderItem::with([
+            'product:id,name,stock_quantity,sold',
+            'order:id,code,status,total_price' // thêm dòng này
+        ])
+            ->whereHas('order', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
+            ->select('id', 'order_id', 'product_id', 'quantity', 'price')
+            ->latest()
+            ->get();
+
         return response()->json($orderItems, Response::HTTP_OK);
     }
 

@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Comment extends Model
 {
-    protected $fillable = ['user_id', 'product_id', 'message', 'is_staff', 'parent_id', 'is_hidden'];
+    protected $fillable = ['user_id', 'product_id', 'message', 'is_staff', 'parent_id', 'status'];
 
     protected $casts = [
         'is_staff' => 'boolean',
-        'is_hidden' => 'boolean',
+        'status' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -42,10 +42,8 @@ class Comment extends Model
     {
         return $this->is_staff;
     }
-
-    // Truy vấn tất cả các bình luận hiển thị (is_hidden = 1)
-    public static function visibleComments()
+    public function getStatusLabelAttribute()
     {
-        return self::where('is_hidden', 0)->get();
+        return $this->status ? 'Hiển thị' : 'Ẩn';
     }
 }

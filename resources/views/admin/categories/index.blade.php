@@ -180,83 +180,6 @@
                                     </form>
                                 </div>
 
-                                <!-- Modal chỉnh sửa -->
-                                <div class="modal fade" id="editModal{{ $item->id }}" tabindex="-1" aria-labelledby="editModalLabel{{ $item->id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content rounded-lg shadow-lg">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title fw-bold" id="editModalLabel{{ $item->id }}"><i class="fas fa-edit me-2"></i> Chỉnh sửa danh mục #{{ $item->id }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body p-4">
-                                                <!-- Hiển thị lỗi xác thực nếu có -->
-                                                @if ($errors->any())
-                                                <div class="alert alert-danger alert-dismissible fade show">
-                                                    <ul class="mb-0">
-                                                        @foreach ($errors->all() as $error)
-                                                        <li>{{ $error }}</li>
-                                                        @endforeach
-                                                    </ul>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                </div>
-                                                @endif
-                                                <!-- Form chỉnh sửa danh mục -->
-                                                <form action="{{ route('danh-muc.update', $item->id) }}" method="POST" enctype="multipart/form-data">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <div class="row g-4">
-                                                        <!-- Tên danh mục -->
-                                                        <div class="col-md-6">
-                                                            <label for="name_{{ $item->id }}" class="form-label fw-semibold">Tên danh mục</label>
-                                                            <input type="text" name="name" id="name_{{ $item->id }}" class="form-control border-0 shadow-sm" value="{{ old('name', $item->name) }}" placeholder="Nhập tên danh mục" required>
-                                                            @error('name')
-                                                            <span class="text-danger small">{{ $message }}</span>
-                                                            @enderror
-                                                        </div>
-                                                        <!-- Trạng thái hiển thị -->
-                                                        <div class="col-md-6">
-                                                            <label for="status_{{ $item->id }}" class="form-label fw-semibold">Trạng thái</label>
-                                                            <select name="status" id="status_{{ $item->id }}" class="form-select border-0 shadow-sm" required>
-                                                                <option value="1" {{ old('status', $item->status) == 1 ? 'selected' : '' }}>Hiển thị</option>
-                                                                <option value="0" {{ old('status', $item->status) == 0 ? 'selected' : '' }}>Ẩn</option>
-                                                            </select>
-                                                            @error('status')
-                                                            <span class="text-danger small">{{ $message }}</span>
-                                                            @enderror
-                                                        </div>
-                                                        <!-- Hình ảnh -->
-                                                        <div class="col-md-12">
-                                                            <label for="image_{{ $item->id }}" class="form-label fw-semibold">Chọn hình ảnh</label>
-                                                            <div class="input-group">
-                                                                <input type="file" name="image" id="image_{{ $item->id }}" class="form-control border-0 shadow-sm" accept="image/*" data-preview="preview_{{ $item->id }}">
-                                                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('image_{{ $item->id }}').click()">Chọn file</button>
-                                                            </div>
-                                                            <div class="mt-3 d-flex align-items-center gap-3">
-                                                                @if ($item->image)
-                                                                <div class="current-image">
-                                                                    <label class="form-label small text-muted">Hình ảnh hiện tại:</label>
-                                                                    <img src="{{ asset('storage/' . $item->image) }}" alt="Hình ảnh hiện tại" class="rounded shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
-                                                                </div>
-                                                                @endif
-                                                                <div class="preview-image">
-                                                                    <label class="form-label small text-muted">Hình ảnh xem trước:</label>
-                                                                    <img id="preview_{{ $item->id }}" src="" alt="Ảnh xem trước" class="rounded shadow-sm d-none" style="width: 60px; height: 60px; object-fit: cover;">
-                                                                </div>
-                                                            </div>
-                                                            @error('image')
-                                                            <span class="text-danger small">{{ $message }}</span>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer border-0 pt-4">
-                                                        <button type="button" class="btn btn-secondary btn-sm fw-semibold" data-bs-dismiss="modal">Đóng</button>
-                                                        <button type="submit" class="btn btn-primary btn-sm fw-semibold">Cập nhật</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </td>
                         </tr>
                         @empty
@@ -267,6 +190,84 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal chỉnh sửa -->
+    <div class="modal fade" id="editModal{{ $item->id }}" tabindex="-1" aria-labelledby="editModalLabel{{ $item->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rounded-lg shadow-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="editModalLabel{{ $item->id }}"><i class="fas fa-edit me-2"></i> Chỉnh sửa danh mục #{{ $item->id }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Hiển thị lỗi xác thực nếu có -->
+                    @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    @endif
+                    <!-- Form chỉnh sửa danh mục -->
+                    <form action="{{ route('danh-muc.update', $item->id) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <div class="row g-4">
+                            <!-- Tên danh mục -->
+                            <div class="col-md-6">
+                                <label for="name_{{ $item->id }}" class="form-label fw-semibold">Tên danh mục</label>
+                                <input type="text" name="name" id="name_{{ $item->id }}" class="form-control border-0 shadow-sm" value="{{ old('name', $item->name) }}" placeholder="Nhập tên danh mục" required>
+                                @error('name')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <!-- Trạng thái hiển thị -->
+                            <div class="col-md-6">
+                                <label for="status_{{ $item->id }}" class="form-label fw-semibold">Trạng thái</label>
+                                <select name="status" id="status_{{ $item->id }}" class="form-select border-0 shadow-sm" required>
+                                    <option value="1" {{ old('status', $item->status) == 1 ? 'selected' : '' }}>Hiển thị</option>
+                                    <option value="0" {{ old('status', $item->status) == 0 ? 'selected' : '' }}>Ẩn</option>
+                                </select>
+                                @error('status')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <!-- Hình ảnh -->
+                            <div class="col-md-12">
+                                <label for="image_{{ $item->id }}" class="form-label fw-semibold">Chọn hình ảnh</label>
+                                <div class="input-group">
+                                    <input type="file" name="image" id="image_{{ $item->id }}" class="form-control border-0 shadow-sm" accept="image/*" data-preview="preview_{{ $item->id }}">
+                                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('image_{{ $item->id }}').click()">Chọn file</button>
+                                </div>
+                                <div class="mt-3 d-flex align-items-center gap-3">
+                                    @if ($item->image)
+                                    <div class="current-image">
+                                        <label class="form-label small text-muted">Hình ảnh hiện tại:</label>
+                                        <img src="{{ asset('storage/' . $item->image) }}" alt="Hình ảnh hiện tại" class="rounded shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+                                    </div>
+                                    @endif
+                                    <div class="preview-image">
+                                        <label class="form-label small text-muted">Hình ảnh xem trước:</label>
+                                        <img id="preview_{{ $item->id }}" src="" alt="Ảnh xem trước" class="rounded shadow-sm d-none" style="width: 60px; height: 60px; object-fit: cover;">
+                                    </div>
+                                </div>
+                                @error('image')
+                                <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-4">
+                            <button type="button" class="btn btn-secondary btn-sm fw-semibold" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary btn-sm fw-semibold">Cập nhật</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

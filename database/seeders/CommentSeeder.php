@@ -63,7 +63,7 @@ class CommentSeeder extends Seeder
                     'user_id' => $faker->randomElement($normalUsers),
                     'message' => $question,
                     'is_staff' => false,
-                    'is_hidden' => 1,
+                    'status' => 1,
                     'created_at' => $faker->dateTimeBetween('-6 months', 'now'),
                 ]);
 
@@ -73,7 +73,7 @@ class CommentSeeder extends Seeder
                     'user_id' => $faker->randomElement($adminUsers),
                     'message' => $answer,
                     'is_staff' => true,
-                    'is_hidden' => 1,
+                    'status' => 1,
                     'parent_id' => $userComment->id,
                     'created_at' => now(),
                 ]);

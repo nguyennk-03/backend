@@ -41,90 +41,58 @@ class ThuongHieuController extends Controller
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'description' => 'nullable|string',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'status' => 'required|boolean',
         ]);
 
-        try {
-            $validatedData['name'] = trim($validatedData['name']);
-            $validatedData['slug'] = Str::slug($validatedData['name']);
+        $data = $validated;
 
-            $originalSlug = $validatedData['slug'];
-            $count = 1;
-            while (Brand::where('slug', $validatedData['slug'])->exists()) {
-                $validatedData['slug'] = $originalSlug . '-' . $count++;
-            }
-
-            if ($request->hasFile('logo')) {
-                $file = $request->file('logo');
-
-                if (!$file->isValid()) {
-                    throw new \Exception('File ảnh không hợp lệ: ' . $file->getErrorMessage());
-                }
-
-                $publicPath = public_path('images/brands/store');
-                if (!file_exists($publicPath)) {
-                    mkdir($publicPath, 0755, true);
-                }
-
-                $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move($publicPath, $fileName);
-                $validatedData['logo'] = 'images/brands/store/' . $fileName;
-            }
-
-            Brand::create($validatedData);
-            return redirect()->route('thuong-hieu.index')->with('success', 'Thêm thương hiệu thành công');
-        } catch (\Exception $e) {
-            Log::error('Lỗi khi thêm thương hiệu: ' . $e->getMessage());
-            return redirect()->back()->withErrors(['error' => 'Có lỗi xảy ra khi thêm thương hiệu!'])->withInput();
+        // Đảm bảo tên thương hiệu là duy nhất
+        $originalName = trim($data['name']);
+        $count = 1;
+        while (Brand::where('name', $data['name'])->exists()) {
+            $data['name'] = $originalName . '-' . $count++;
         }
+
+        if ($request->hasFile('logo')) {
+            // Lưu ảnh vào storage/app/public/images/brands
+            // và chỉ lưu đường dẫn tương đối để dùng cho truy cập qua public/storage
+            $path = $request->file('logo')->store('images/brands', 'public');
+            $data['logo'] = $path; // ví dụ: 'images/brands/abc.jpg'
+        }
+
+        Brand::create($data);
+
+        return redirect()->route('thuong-hieu.index')->with('success', 'Thương hiệu đã được thêm thành công!');
     }
+
 
     public function update(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'description' => 'nullable|string',
-        ]);
+        // Tìm thương hiệu theo ID
+        $brand = Brand::findOrFail($id);
 
-        try {
-            $brand = Brand::findOrFail($id);
-            $validatedData['name'] = trim($validatedData['name']);
-            $validatedData['slug'] = Str::slug($validatedData['name']);
+        // Cập nhật thông tin thương hiệu (ngoại trừ logo)
+        $brand->fill($request->except('logo'));
 
-            $originalSlug = $validatedData['slug'];
-            $count = 1;
-            while (Brand::where('slug', $validatedData['slug'])->where('id', '!=', $id)->exists()) {
-                $validatedData['slug'] = $originalSlug . '-' . $count++;
+        if ($request->hasFile('logo')) {
+            // Xoá logo cũ nếu có
+            if ($brand->logo && Storage::disk('public')->exists($brand->logo)) {
+                Storage::disk('public')->delete($brand->logo);
             }
 
-            if ($request->hasFile('logo')) {
-                $file = $request->file('logo');
-
-                if (!$file->isValid()) {
-                    throw new \Exception('File ảnh không hợp lệ: ' . $file->getErrorMessage());
-                }
-
-                $publicPath = public_path('images/brands/update');
-                if (!file_exists($publicPath)) {
-                    mkdir($publicPath, 0755, true);
-                }
-
-                $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move($publicPath, $fileName);
-                $validatedData['logo'] = 'images/brands/update/' . $fileName;
-            }
-
-            $brand->update($validatedData);
-            return redirect()->route('thuong-hieu.index')->with('success', 'Cập nhật thương hiệu thành công');
-        } catch (\Exception $e) {
-            Log::error('Lỗi khi cập nhật thương hiệu: ' . $e->getMessage());
-            return redirect()->back()->withErrors(['error' => 'Có lỗi xảy ra khi cập nhật thương hiệu!']);
+            // Lưu logo mới vào storage/app/public/images/brands
+            $path = $request->file('logo')->store('images/brands', 'public');
+            $brand->logo = $path;
         }
+
+        $brand->save();
+
+        return redirect()->route('thuong-hieu.index')->with('success', 'Cập nhật thương hiệu thành công!');
     }
+
 
     public function destroy($id)
     {

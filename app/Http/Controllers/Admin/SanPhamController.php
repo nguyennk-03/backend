@@ -109,38 +109,30 @@ class SanPhamController extends Controller
     }
 
 
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'category_id' => 'nullable|exists:categories,id',
-            'brand_id' => 'nullable|exists:brands,id',
-            'size_id' => 'nullable|exists:sizes,id',
-            'color_id' => 'nullable|exists:colors,id',
-            'status' => 'required|boolean',
-            'sale' => 'required|boolean',
-            'hot' => 'required|in:0,1,2,3',
-        ]);
+        $product = Product::findOrFail($id);
 
-        $data = $validated;
+        // Cập nhật thông tin
+        $product->fill($request->except('image'));
 
         if ($request->hasFile('image')) {
-            // Xóa ảnh cũ nếu có
-            if (!empty($product->image) && Storage::disk('public')->exists($product->image)) {
+            // Xoá ảnh cũ nếu có
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
                 Storage::disk('public')->delete($product->image);
             }
-            // Upload ảnh mới
-            $data['image'] = $request->file('image')->store('images/products', 'public');
+
+            // Lưu ảnh mới vào storage/app/public/images/products
+            $path = $request->file('image')->store('images/products', 'public');
+            $product->image = $path;
         }
 
-        $product->update($data);
+        $product->save();
 
-        return redirect()->route('san-pham.index')->with('success', 'Sản phẩm đã được cập nhật thành công!');
+        return redirect()->route('san-pham.index')->with('success', 'Cập nhật sản phẩm thành công!');
     }
+
+
 
     public function destroy($id)
     {
