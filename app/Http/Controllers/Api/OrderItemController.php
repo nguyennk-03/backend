@@ -7,15 +7,31 @@ use App\Models\OrderItem;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class OrderItemController extends Controller
 {
+   
+
     public function index()
     {
-        $orderItems = OrderItem::with('product')->get();
+        $user = Auth::user();
+
+        // Kiểm tra user có hợp lệ không
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        $orderItems = OrderItem::with('product')
+            ->whereHas('order', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->get();
+
         return response()->json($orderItems, Response::HTTP_OK);
     }
+
 
     public function show($id)
     {
